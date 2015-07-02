@@ -28,17 +28,24 @@
 
 (swagger/defhandler meme
   {:summary "Process a Slack event"
-;;   :parameters {:formData SlackRequest}
+   :parameters {:formData SlackRequest}
    :responses {200 {:schema s/Str}}}
   [{:keys [form-params]}]
   (response (meme/generate-meme form-params)))
 
 (swagger/defhandler echo
   {:summary "Echoes a Slack event"
-;;   :parameters {:formData SlackRequest}
+   :parameters {:formData SlackRequest}
    :responses {200 {:schema s/Any}}}
   [{:keys [form-params]}]
   (response form-params))
+
+(swagger/defhandler echo-text
+  {:summary "Echoes a Slack event"
+   :parameters {:formData SlackRequest}
+   :responses {200 {:schema s/Any}}}
+  [{:keys [form-params]}]
+  (response (:text form-params)))
 
 ;; routes
 
@@ -64,7 +71,9 @@
         ["/meme" ^:interceptors [(swagger/tag-route "meme")]
          {:post meme}]
         ["/echo" ^:interceptors [(swagger/tag-route "echo")]
-         {:post echo}]]
+         {:post echo}]
+        ["/echo-text"
+         {:post echo-text}]]
 
        ["/doc" {:get [(swagger/swagger-doc)]}]
        ["/*resource" {:get [(swagger/swagger-ui)]}]]]]))
