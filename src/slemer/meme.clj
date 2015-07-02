@@ -119,7 +119,9 @@
         (map #(.trim %) (re-matches #"<?([^>]*)>?\s?\|\s?(.*)\s?\|\s?(.*)\s?" text))]
 
     (if-let [template-id (resolve-template-id template-search)]
-      (try (create-instance template-id text-upper text-lower)
+      (try (let [meme-url (create-instance template-id text-upper text-lower)]
+             (log/info "Generate meme" meme-url)
+             meme-url)
            (catch Exception e
              (log/error "Blew up attempting to generate meme" e)
              "You broke me. Check my logs for details!"))
