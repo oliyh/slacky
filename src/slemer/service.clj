@@ -11,25 +11,27 @@
 
 ;; schemas
 
+(def req s/required-key)
+
 (s/defschema SlackRequest
-  {:token        s/Str
-   :team_id      s/Str
-   :team_domain  s/Str
-   :channel_id   s/Str
-   :channel_name s/Str
-   :user_id      s/Str
-   :user_name    s/Str
-   :command      s/Str
-   :text         s/Str})
+  {(req :token)        s/Str
+   (req :team_id)      s/Str
+   (req :team_domain)  s/Str
+   (req :channel_id)   s/Str
+   (req :channel_name) s/Str
+   (req :user_id)      s/Str
+   (req :user_name)    s/Str
+   (req :command)      s/Str
+   (req :text)         s/Str})
 
 ;; handlers
 
 (swagger/defhandler meme
   {:summary "Process a Slack event"
-   :parameters {:body SlackRequest}
-   :responses {200 {:schema (s/maybe s/Str)}}}
-  [{:keys [body-params]}]
-  (response (meme/generate-meme body-params)))
+;;   :parameters {:formData SlackRequest}
+   :responses {200 {:schema s/Str}}}
+  [{:keys [form-params]}]
+  (response (meme/generate-meme form-params)))
 
 ;; routes
 
