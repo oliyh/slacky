@@ -28,7 +28,7 @@
 
 (swagger/defhandler meme
   {:summary "Process a Slack event"
-   :parameters {:formData SlackRequest}
+;;   :parameters {:formData SlackRequest}
    :responses {200 {:schema s/Str}}}
   [{:keys [form-params]}]
   (response (meme/generate-meme form-params)))
