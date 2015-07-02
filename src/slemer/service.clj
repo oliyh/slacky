@@ -28,10 +28,17 @@
 
 (swagger/defhandler meme
   {:summary "Process a Slack event"
-;;   :parameters {:formData SlackRequest}
+   :parameters {:formData SlackRequest}
    :responses {200 {:schema s/Str}}}
   [{:keys [form-params]}]
   (response (meme/generate-meme form-params)))
+
+(swagger/defhandler echo
+  {:summary "Echoes a Slack event"
+;;   :parameters {:formData SlackRequest}
+   :responses {200 {:schema s/Any}}}
+  [{:keys [form-params]}]
+  (response form-params))
 
 ;; routes
 
@@ -39,11 +46,13 @@
   (swagger/defroutes routes
     {:info {:title "Slemer"
             :description "Memes and more for Slack"
+            :externalDocs {:description "Find out more"
+                           :url "https://github.com/oliyh/slemer"}
             :version "2.0"}
      :tags [{:name "memes"
-             :description "All the memes!"
-             :externalDocs {:description "Find out more"
-                            :url "https://github.com/oliyh/slemer"}}]}
+             :description "All the memes!"}
+            {:name "echo"
+             :description "Echoes content back"}]}
     [[["/api" ^:interceptors [(body-params/body-params)
                               bootstrap/json-body
                               (swagger/body-params)
@@ -53,7 +62,9 @@
 
        ["/slack" ;; todo interceptor to check token is one we expect?
         ["/meme" ^:interceptors [(swagger/tag-route "meme")]
-         {:post meme}]]
+         {:post meme}]
+        ["/echo" ^:interceptors [(swagger/tag-route "echo")]
+         {:post echo}]]
 
        ["/doc" {:get [(swagger/swagger-doc)]}]
        ["/*resource" {:get [(swagger/swagger-ui)]}]]]]))
