@@ -120,7 +120,7 @@
 
     (if-let [template-id (resolve-template-id template-search)]
       (try (let [meme-url (create-instance template-id text-upper text-lower)]
-             (log/info "Generate meme" meme-url)
+             (log/info "Generated meme" meme-url)
              meme-url)
            (catch Exception e
              (log/error "Blew up attempting to generate meme" e)

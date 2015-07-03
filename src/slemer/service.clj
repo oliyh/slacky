@@ -1,13 +1,23 @@
 (ns slemer.service
-  (:require [pedestal.swagger.core :as swagger]
+  (:require [clojure.java.io :as io]
             [io.pedestal.http :as bootstrap]
-            [io.pedestal.http.route :as route]
             [io.pedestal.http.body-params :as body-params]
+            [io.pedestal.http.route :as route]
             [io.pedestal.impl.interceptor :refer [terminate]]
-            [ring.util.response :refer [response not-found created]]
+            [pedestal.swagger.core :as swagger]
             [ring.util.codec :as codec]
+            [ring.util.response :refer [response not-found created]]
             [schema.core :as s]
-            [slemer.meme :as meme]))
+            [slemer
+             [meme :as meme]
+             [slack :as slack]]
+            [clojure.tools.logging :as log]))
+
+;; settings
+(def slack-webhook-url
+  (or (System/getenv "WEBHOOK-URL")
+      (when-let [f (io/resource "webhook-url.txt")]
+        (.trim (slurp f)))))
 
 ;; schemas
 
@@ -31,7 +41,13 @@
    :parameters {:formData SlackRequest}
    :responses {200 {:schema s/Str}}}
   [{:keys [form-params]}]
-  (response (meme/generate-meme form-params)))
+  (response (do (future
+                  (try
+                    (slack/send-message slack-webhook-url
+                                        (:channel_id form-params)
+                                        (meme/generate-meme form-params))
+                    (catch Exception e (log/error e))))
+                "OK")))
 
 (swagger/defhandler echo
   {:summary "Echoes a Slack event"
@@ -46,6 +62,14 @@
    :responses {200 {:schema s/Any}}}
   [{:keys [form-params]}]
   (response (:text form-params)))
+
+(swagger/defhandler echo-delay
+  {:summary "Echoes a Slack event after a delay"
+   :parameters {:formData SlackRequest}
+   :responses {200 {:schema s/Any}}}
+  [{:keys [form-params]}]
+  (response (do (Thread/sleep (Long/parseLong (:text form-params)))
+                "https://i.imgflip.com/nqg70.jpg")))
 
 ;; routes
 
@@ -72,8 +96,10 @@
          {:post meme}]
         ["/echo" ^:interceptors [(swagger/tag-route "echo")]
          {:post echo}]
-        ["/echo-text"
-         {:post echo-text}]]
+        ["/echo-text" ^:interceptors [(swagger/tag-route "echo")]
+         {:post echo-text}]
+        ["/echo-delay" ^:interceptors [(swagger/tag-route "echo")]
+         {:post echo-delay}]]
 
        ["/doc" {:get [(swagger/swagger-doc)]}]
        ["/*resource" {:get [(swagger/swagger-ui)]}]]]]))
