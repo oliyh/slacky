@@ -2,6 +2,7 @@
 /classes
 /checkouts
 /logs
+webhook-url.txt
 pom.xml
 pom.xml.asc
 *.jar
