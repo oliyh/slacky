@@ -44,10 +44,10 @@
   (response (do (future
                   (try
                     (slack/send-message slack-webhook-url
-                                        (:channel_id form-params)
+                                        form-params
                                         (meme/generate-meme form-params))
                     (catch Exception e (log/error e))))
-                "OK")))
+                "Your meme is on its way")))
 
 (swagger/defhandler echo
   {:summary "Echoes a Slack event"
