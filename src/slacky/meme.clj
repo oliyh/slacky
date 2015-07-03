@@ -1,4 +1,4 @@
-(ns slemer.meme
+(ns slacky.meme
   (:require [clj-http.client :as http]
             [cheshire.core :as json]
             [clojure.string :as string]

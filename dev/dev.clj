@@ -1,6 +1,6 @@
 (ns dev
-  (:require [slemer.service :as service]
-            [slemer.server :as server]
+  (:require [slacky.service :as service]
+            [slacky.server :as server]
             [io.pedestal.http :as bootstrap]
             [clojure.tools.namespace.repl :refer [refresh]]))
 

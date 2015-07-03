@@ -1,6 +1,6 @@
-(ns slemer.server
+(ns slacky.server
   (:gen-class) ; for -main method in uberjar
-  (:require [slemer.service :as service]
+  (:require [slacky.service :as service]
             [io.pedestal.http :as bootstrap]))
 
 (defonce service-instance nil)

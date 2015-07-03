@@ -1,4 +1,4 @@
-(ns slemer.slack
+(ns slacky.slack
   (:require [clj-http.client :as http]
             [cheshire.core :as json]
             [clojure.tools.logging :as log]))

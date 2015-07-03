@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -jar target/uberjar/slemer-standalone.jar prod
+web: java $JVM_OPTS -jar target/uberjar/slacky-standalone.jar prod

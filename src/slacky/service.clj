@@ -1,4 +1,4 @@
-(ns slemer.service
+(ns slacky.service
   (:require [clojure.java.io :as io]
             [io.pedestal.http :as bootstrap]
             [io.pedestal.http.body-params :as body-params]
@@ -8,7 +8,7 @@
             [ring.util.codec :as codec]
             [ring.util.response :refer [response not-found created]]
             [schema.core :as s]
-            [slemer
+            [slacky
              [meme :as meme]
              [slack :as slack]]
             [clojure.tools.logging :as log]))
@@ -75,10 +75,10 @@
 
 (s/with-fn-validation ;; Optional, but nice to have at compile time
   (swagger/defroutes routes
-    {:info {:title "Slemer"
+    {:info {:title "Slacky"
             :description "Memes and more for Slack"
             :externalDocs {:description "Find out more"
-                           :url "https://github.com/oliyh/slemer"}
+                           :url "https://github.com/oliyh/slacky"}
             :version "2.0"}
      :tags [{:name "memes"
              :description "All the memes!"}
