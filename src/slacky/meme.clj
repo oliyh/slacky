@@ -4,7 +4,8 @@
              [conn-mgr :refer [make-reusable-conn-manager]]]
             [cheshire.core :as json]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [slacky.slack :as slack]))
 
 (def memecaptain-url "http://memecaptain.com/")
 
@@ -46,26 +47,27 @@
 
     (when-let [body (and (= 200 (:status resp))
                          (:body resp))]
-      (-> body (json/decode keyword) :responseData :results rand-nth :unescapedUrl))))
+      (-> body (json/decode keyword) :responseData :results not-empty rand-nth :unescapedUrl))))
 
 
 (defn- create-template [image-url]
-  (log/info "Creating template for image" image-url)
-  (let [resp (http/post (str memecaptain-url "/src_images")
-                        {:connection-manager connection-pool
-                         :headers {:Content-Type "application/json"
-                                   :Accept "application/json"}
-                         :follow-redirects false
-                         :body (json/encode {:url (.trim image-url)})})]
+  (when image-url
+    (log/info "Creating template for image" image-url)
+    (let [resp (http/post (str memecaptain-url "/src_images")
+                          {:connection-manager connection-pool
+                           :headers {:Content-Type "application/json"
+                                     :Accept "application/json"}
+                           :follow-redirects false
+                           :body (json/encode {:url (.trim image-url)})})]
 
-    (if-let [polling-url (and (= 202 (:status resp))
-                              (not-empty (get-in resp [:headers "location"])))]
+      (if-let [polling-url (and (= 202 (:status resp))
+                                (not-empty (get-in resp [:headers "location"])))]
 
-      (do (poll-for-result polling-url)
-          (-> resp :body (json/decode keyword) :id))
+        (do (poll-for-result polling-url)
+            (-> resp :body (json/decode keyword) :id))
 
-      (throw (ex-info (str "Unexpected response from /src_images")
-                      resp)))))
+        (throw (ex-info (str "Unexpected response from /src_images")
+                        resp))))))
 
 
 (defn- resolve-template-id [term]
@@ -111,17 +113,24 @@
       (throw (ex-info (str "Unexpected response")
                       resp)))))
 
-(defn generate-meme [{:keys [text]}]
-  (log/debug text)
+(def command-pattern #"<?([^>]*)>?\s?\|\s?(.*)\s?\|\s?(.*)\s?")
+
+(defn valid-command? [{:keys [text]}]
+  (re-matches command-pattern text))
+
+(defn generate-meme [{:keys [user_name text command]} respond-to]
   (let [[_ template-search text-upper text-lower]
-        (map #(.trim %) (re-matches #"<?([^>]*)>?\s?\|\s?(.*)\s?\|\s?(.*)\s?" text))]
+        (map #(.trim %) (re-matches command-pattern text))]
 
     (if-let [template-id (resolve-template-id template-search)]
       (try (let [meme-url (create-instance template-id text-upper text-lower)]
              (log/info "Generated meme" meme-url)
-             meme-url)
+             (respond-to :channel (slack/meme-message user_name text meme-url)))
            (catch Exception e
              (log/error "Blew up attempting to generate meme" e)
-             "You broke me. Check my logs for details!"))
+             (respond-to :user (str "You broke me. Check my logs for details!"
+                                    "\n" "`" command " " text "`"))))
 
-      "Couldn't find a good template for the meme, try specifying a url instead")))
+      (respond-to :user
+                  (str "Couldn't find a good template for the meme, try specifying a url instead"
+                       "\n" "`" command " " text "`")))))

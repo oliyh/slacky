@@ -41,13 +41,16 @@
    :parameters {:formData SlackRequest}
    :responses {200 {:schema s/Str}}}
   [{:keys [form-params]}]
-  (response (do (future
-                  (try
-                    (slack/send-message slack-webhook-url
-                                        form-params
-                                        (meme/generate-meme form-params))
-                    (catch Exception e (log/error e))))
-                "Your meme is on its way")))
+  (response
+   (if (meme/valid-command? form-params)
+     (do
+       (log/info form-params)
+       (future
+         (try
+           (meme/generate-meme form-params (slack/build-responder slack-webhook-url form-params))
+           (catch Exception e (log/error e))))
+       "Your meme is on its way")
+     "Sorry, this is not a valid command syntax")))
 
 (swagger/defhandler echo
   {:summary "Echoes a Slack event"
