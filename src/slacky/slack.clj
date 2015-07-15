@@ -1,10 +1,15 @@
 (ns slacky.slack
-  (:require [clj-http.client :as http]
+  (:require [clj-http
+             [client :as http]
+             [conn-mgr :refer [make-reusable-conn-manager]]]
             [cheshire.core :as json]
             [clojure.tools.logging :as log]))
 
+(def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
+
 (defn send-message [webhook-url {:keys [channel_id text user_name]} message]
-  (let [response (http/post webhook-url {:body (json/encode {:text message
+  (let [response (http/post webhook-url {:connection-manager connection-pool
+                                         :body (json/encode {:text message
                                                              :attachments
                                                              [{:fallback (str user_name ": " text)
                                                                :pretext nil

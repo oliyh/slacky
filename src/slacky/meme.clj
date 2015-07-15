@@ -1,21 +1,19 @@
 (ns slacky.meme
-  (:require [clj-http.client :as http]
+  (:require [clj-http
+             [client :as http]
+             [conn-mgr :refer [make-reusable-conn-manager]]]
             [cheshire.core :as json]
             [clojure.string :as string]
             [clojure.tools.logging :as log]))
 
 (def memecaptain-url "http://memecaptain.com/")
 
-(def connection-pool nil)
-
-;; todo use a connection manager with clj-http or the pool with aleph
-(comment (http/connection-pool {:connection-options {:keep-alive? false}
-                                :connections-per-host 4}))
+(def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
 
 (defn- poll-for-result [polling-url]
   (log/debug "Polling" polling-url)
   (loop [attempts 0]
-    (let [resp (http/get polling-url {:pool connection-pool :follow-redirects false})
+    (let [resp (http/get polling-url {:connection-manager connection-pool :follow-redirects false})
           status (:status resp)]
 
       (cond
@@ -38,7 +36,7 @@
 (defn- google-image-search [term]
   (log/info "Googling for images matching" term)
   (let [resp (http/get "http://ajax.googleapis.com/ajax/services/search/images"
-                       {:pool connection-pool
+                       {:connection-manager connection-pool
                         :headers {:Content-Type "application/json"
                                   :Accept "application/json"}
                         :query-params {:q term
@@ -54,7 +52,7 @@
 (defn- create-template [image-url]
   (log/info "Creating template for image" image-url)
   (let [resp (http/post (str memecaptain-url "/src_images")
-                        {:pool connection-pool
+                        {:connection-manager connection-pool
                          :headers {:Content-Type "application/json"
                                    :Accept "application/json"}
                          :follow-redirects false
@@ -88,7 +86,7 @@
 (defn- create-instance [template-id text-upper text-lower]
   (log/info "Generating meme based on template" template-id)
   (let [resp (http/post (str memecaptain-url "/gend_images")
-                        {:pool connection-pool
+                        {:connection-manager connection-pool
                          :headers {:Content-Type "application/json"
                                    :Accept "application/json"}
                          :follow-redirects false
