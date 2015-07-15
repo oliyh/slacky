@@ -3,6 +3,8 @@
 /checkouts
 /logs
 webhook-url.txt
+memory:slacky
+memory:test
 pom.xml
 pom.xml.asc
 *.jar

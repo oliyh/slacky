@@ -1,0 +1,37 @@
+body {
+    background-position: top right;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    background-image: url('/images/businesscat.png');
+}
+
+.jumbotron {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.jumbotron .leader {
+    text-align: center;
+}
+
+.header {
+    text-align: center;
+    padding-bottom: 6em;
+    font-family: 'Quicksand', sans-serif;
+    color: white;
+    text-transform: uppercase;
+}
+
+.header h1 {
+    font-size: 8em;
+}
+
+.header h4 {
+    font-size: 2.9em;
+}
+
+#success-message, #failure-message {
+    display: none;
+}

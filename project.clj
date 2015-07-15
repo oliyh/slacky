@@ -14,12 +14,21 @@
 
                  [org.clojure/tools.logging "0.3.1"]
                  [clj-http "1.1.2"]
-                 [cheshire "5.4.0"]]
+                 [cheshire "5.4.0"]
+
+                 [org.clojure/java.jdbc "0.3.5"]
+                 [org.xerial/sqlite-jdbc "3.8.7"]
+                 [org.postgresql/postgresql "9.4-1201-jdbc41"]
+                 [com.mchange/c3p0 "0.9.5.1"]
+                 [joplin.core "0.2.12"]
+                 [joplin.jdbc "0.2.12"]
+                 [honeysql "0.6.1"]]
   :main ^:skip-aot slacky.server
   :min-lein-version "2.0.0"
   :target-path "target/%s"
-  :resource-paths ["config", "resources"]
+  :resource-paths ["config", "resources", "migrators"]
   :profiles {:uberjar {:aot :all}
              :dev {:source-paths ["dev"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]]}}
-  :uberjar-name "slacky-standalone.jar")
+  :uberjar-name "slacky-standalone.jar"
+  :repl-options {:init-ns user})

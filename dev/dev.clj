@@ -1,8 +1,11 @@
 (ns dev
-  (:require [slacky.service :as service]
-            [slacky.server :as server]
+  (:require [slacky
+             [service :as service]
+             [server :as server]
+             [settings :as settings]]
             [io.pedestal.http :as bootstrap]
-            [clojure.tools.namespace.repl :refer [refresh]]))
+            [clojure.tools.namespace.repl :refer [refresh]]
+            [slacky.db :as db]))
 
 (def service (-> service/service ;; start with production configuration
                  (merge  {:env :dev

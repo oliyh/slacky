@@ -3,21 +3,20 @@
             [io.pedestal.http :as bootstrap]
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.http.route :as route]
+            [io.pedestal.http.route.definition :refer [defroutes]]
             [io.pedestal.impl.interceptor :refer [terminate]]
+            [io.pedestal.interceptor.helpers :refer [before handler]]
+            [io.pedestal.interceptor :as interceptor]
             [pedestal.swagger.core :as swagger]
             [ring.util.codec :as codec]
-            [ring.util.response :refer [response not-found created]]
+            [ring.util.response :refer [response not-found created resource-response content-type status]]
             [schema.core :as s]
             [slacky
+             [accounts :as accounts]
              [meme :as meme]
-             [slack :as slack]]
+             [slack :as slack]
+             [settings :as settings]]
             [clojure.tools.logging :as log]))
-
-;; settings
-(def slack-webhook-url
-  (or (System/getenv "WEBHOOK-URL")
-      (when-let [f (io/resource "webhook-url.txt")]
-        (.trim (slurp f)))))
 
 ;; schemas
 
@@ -34,20 +33,24 @@
    (req :command)      s/Str
    (req :text)         s/Str})
 
-;; handlers
+(s/defschema AddAccount
+  {(req :token) s/Str
+   (req :key)   s/Str})
+
+;; api handlers
 
 (swagger/defhandler meme
   {:summary "Process a Slack event"
    :parameters {:formData SlackRequest}
    :responses {200 {:schema s/Str}}}
-  [{:keys [form-params]}]
+  [{:keys [form-params] :as context}]
   (response
    (if (meme/valid-command? form-params)
      (do
        (log/info form-params)
        (future
          (try
-           (meme/generate-meme form-params (slack/build-responder slack-webhook-url form-params))
+           (meme/generate-meme form-params (slack/build-responder (::slack-webhook-url context) form-params))
            (catch Exception e (log/error e))))
        "Your meme is on its way")
      "Sorry, this is not a valid command syntax")))
@@ -56,28 +59,57 @@
   {:summary "Echoes a Slack event"
    :parameters {:formData SlackRequest}
    :responses {200 {:schema s/Any}}}
-  [{:keys [form-params]}]
+  [{:keys [form-params] :as req}]
   (response form-params))
 
-(swagger/defhandler echo-text
-  {:summary "Echoes a Slack event"
-   :parameters {:formData SlackRequest}
+(swagger/defhandler add-account
+  {:summary "Adds an account"
+   :parameters {:formData AddAccount}
    :responses {200 {:schema s/Any}}}
-  [{:keys [form-params]}]
-  (response (:text form-params)))
+  [{:keys [form-params] :as req}]
+  (try
+    (accounts/add-account! (:db-connection req) (:token form-params) (:key form-params))
+    (response "Account added")
+    (catch Exception e
+      (log/error "Failed to add account" e)
+      (-> (response "Failed to add account")
+          (status 500)))))
 
-(swagger/defhandler echo-delay
-  {:summary "Echoes a Slack event after a delay"
-   :parameters {:formData SlackRequest}
-   :responses {200 {:schema s/Any}}}
-  [{:keys [form-params]}]
-  (response (do (Thread/sleep (Long/parseLong (:text form-params)))
-                "https://i.imgflip.com/nqg70.jpg")))
+
+;; authentication
+
+;; todo: lookup token / webhook pair in a data store
+(swagger/defbefore authenticate-slack-call
+  {:description "Ensures the caller has registered their token and an incoming webhook"
+   :parameters {:formData {:token s/Str}}
+   :responses {403 {}}}
+  [{:keys [request response] :as context}]
+  (let [db (:db-connection request)
+        token (get-in request [:form-params :token])
+        account (accounts/lookup-account db token)]
+    (if-let [webhook-url (:key account)]
+      (assoc-in context [:request ::slack-webhook-url] webhook-url)
+      (-> context
+          terminate
+          (assoc-in [:response] {:status 403
+                                 :headers {}
+                                 :body (str "You are not permitted to use this service.\n"
+                                            "Please register your token '"
+                                            token
+                                            "' at https://slacky-server.herokuapp.com")})))))
+
+;; app-routes
+
+(def home
+  (handler ::home-handler
+           (fn [req]
+             (-> (resource-response "public/index.html")
+                 (content-type "text/html")))))
 
 ;; routes
 
 (s/with-fn-validation ;; Optional, but nice to have at compile time
-  (swagger/defroutes routes
+  (swagger/defroutes api-routes
     {:info {:title "Slacky"
             :description "Memes and more for Slack"
             :externalDocs {:description "Find out more"
@@ -94,26 +126,37 @@
                               (swagger/coerce-params)
                               (swagger/validate-response)]
 
-       ["/slack" ;; todo interceptor to check token is one we expect?
+       ["/slack" ^:interceptors [authenticate-slack-call]
         ["/meme" ^:interceptors [(swagger/tag-route "meme")]
          {:post meme}]
         ["/echo" ^:interceptors [(swagger/tag-route "echo")]
-         {:post echo}]
-        ["/echo-text" ^:interceptors [(swagger/tag-route "echo")]
-         {:post echo-text}]
-        ["/echo-delay" ^:interceptors [(swagger/tag-route "echo")]
-         {:post echo-delay}]]
+         {:post echo}]]
+
+       ["/account" ^:interceptors [(swagger/tag-route "account")]
+        {:post add-account}]
 
        ["/doc" {:get [(swagger/swagger-doc)]}]
        ["/*resource" {:get [(swagger/swagger-ui)]}]]]]))
 
+(defroutes app-routes
+  [[["/" {:get home}]]])
+
+(def routes
+  (concat api-routes app-routes))
+
 ;; service
 
-(def port (Integer. (or (System/getenv "PORT") 8080)))
+(def service
+  {:env :prod
+   ::bootstrap/routes routes
+   ::bootstrap/router :linear-search
+   ::bootstrap/resource-path "/public"
+   ::bootstrap/type :jetty
+   ::bootstrap/port (settings/web-port)})
 
-(def service {:env :prod
-              ::bootstrap/routes routes
-              ::bootstrap/router :linear-search
-              ::bootstrap/resource-path "/public"
-              ::bootstrap/type :jetty
-              ::bootstrap/port port})
+(defn with-database [service db]
+  (update-in service
+             [::bootstrap/interceptors] conj
+             (before ::inject-database
+                     (fn [context]
+                       (assoc-in context [:request :db-connection] db)))))
