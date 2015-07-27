@@ -35,3 +35,10 @@ body {
 #success-message, #failure-message {
     display: none;
 }
+
+.example {
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 2em;
+    border-radius: 4px;
+    text-align: center;
+}
