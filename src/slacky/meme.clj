@@ -22,7 +22,7 @@
         (= 303 status)
         (get-in resp [:headers "location"])
 
-        (< 10 attempts)
+        (< 30 attempts)
         (throw (Exception. (str "Timed out waiting")))
 
         (= 200 status)
@@ -69,22 +69,6 @@
         (throw (ex-info (str "Unexpected response from /src_images")
                         resp))))))
 
-
-(defn- resolve-template-id [term]
-  (log/debug "Resolving template for term" term)
-  (cond
-    (string/blank? term)
-    nil
-
-    (re-matches #"^https?://.*$" term)
-    (create-template term)
-
-    :else
-    (create-template (google-image-search term)))
-
-  ;; allow pre-baked ones?
-  )
-
 (defn- create-instance [template-id text-upper text-lower]
   (log/info "Generating meme based on template" template-id)
   (let [resp (http/post (str memecaptain-url "/gend_images")
@@ -113,14 +97,76 @@
       (throw (ex-info (str "Unexpected response")
                       resp)))))
 
+;; from https://bitbucket.org/atlassianlabs/ac-koa-hipchat-sassy/src/1d0a72839002d9dc9f911825de73d819d7f94f5c/lib/commands/meme.js?at=master
+(def ^:private known-meme-templates
+  {:y-u-no               "NryNmg"
+   :one-does-not-simply  "da2i4A"
+   :all-the-things       "Dv99KQ"
+   :not-sure-if          "CsNF8w"
+   :brace-yourself       "_I74XA"
+   :success              "AbNPRQ"
+   :first-world-problems "QZZvlg"
+   :what-if-i-told-you   "fWle1w"
+   :how-do-they-work     "3V6rYA"})
+
+(defn- resolve-template-id [term]
+  (log/debug "Resolving template for term" term)
+  (cond
+
+    (contains? known-meme-templates term)
+    (get known-meme-templates term)
+
+    (string/blank? term)
+    nil
+
+    (re-matches #"^https?://.*$" term)
+    (create-template term)
+
+    :else
+    (create-template (google-image-search term))))
+
 (def command-pattern #"<?([^>]*)>?\s?\|\s?(.*)\s?\|\s?(.*)\s?")
 
+(defn- resolve-meme-pattern [text]
+  (condp re-matches text
+
+    #"^(?i)y u no (.*)" :>> (fn [[_ text-lower]]
+                              [:y-u-no "y u no" text-lower])
+
+    #"^(?i)one does not simply (.*)" :>> (fn [[_ text-lower]]
+                                           [:one-does-not-simply "one does not simply" text-lower])
+
+    #"(?i)not sure if (.*) or (.*)" :>> (fn [[_ text-upper text-lower]]
+                                          [:not-sure-if (str "not sure if " text-upper) (str "or " text-lower)])
+
+    #"(?i)brace yoursel(?:f|ves) (.*)" :>> (fn [[_ text-lower]]
+                                             [:brace-yourself "brace yourself" text-lower])
+
+    #"(?i)success when (.*) then (.*)" :>> (fn [[_ text-upper text-lower]]
+                                             [:success text-upper text-lower])
+
+    #"(?i)cry when (.*) then (.*)" :>> (fn [[_ text-upper text-lower]]
+                                         [:first-world-problems text-upper text-lower])
+
+    #"(?i)what if i told you (.*)" :>> (fn [[_ text-lower]]
+                                         [:what-if-i-told-you "what if i told you" text-lower])
+
+    #"(?i)(.*) how do they work\??" :>> (fn [[_ text-upper]]
+                                          [:how-do-they-work text-upper "how do they work?"])
+
+    #"(?i)(.*) all the (.*)" :>> (fn [[_ text-upper text-lower]]
+                                   [:all-the-things text-upper (str "all the " text-lower)])
+
+    (let [[_ template-search text-upper text-lower] (map #(.trim %) (re-matches command-pattern text))]
+      (when (every? #(not (string/blank? %)) [template-search text-upper text-lower])
+        [template-search text-upper text-lower]))))
+
 (defn valid-command? [{:keys [text]}]
-  (re-matches command-pattern text))
+  (not (nil? (resolve-meme-pattern text))))
 
 (defn generate-meme [{:keys [user_name text command]} respond-to]
-  (let [[_ template-search text-upper text-lower]
-        (map #(.trim %) (re-matches command-pattern text))]
+  (let [[template-search text-upper text-lower]
+        (resolve-meme-pattern text)]
 
     (if-let [template-id (resolve-template-id template-search)]
       (try (let [meme-url (create-instance template-id text-upper text-lower)]
