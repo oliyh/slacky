@@ -1,16 +1,26 @@
 # slacky
 
-Memes-as-a-service for Slack. Live instance at https://slacky-server.herokuapp.com/api.
+![](resources/public/images/slacky-logo.png?raw=true)
+
+Memes-as-a-Service for Slack. Live instance and registration at https://slacky-server.herokuapp.com.
 
 ## Installation
 
 All ready for Heroku deployment.
 
-To integrate with Slack:
-- Create a [Slash command](https://my.slack.com/services/new/slash-commands/) for `/meme` to point to https://slacky-server.herokuapp.com:443/api/slack/meme. Set the usage hint to be `image url or search term | upper text | lower text`.
-- Create an [Incoming webhook](https://my.slack.com/services/new/incoming-webhook/) and in your Heroku dashboard set config variable `WEBHOOK-URL` to be the webhook url provided by Slack
+## Examples
 
-Then simply visit a Slack channel and type /meme to get going!
+The generic template is:
+
+`/meme search term | upper text | lower text`
+
+You can provide an image to use by providing the url instead:
+
+`/meme http://path/to/image.jpg | upper text | lower text`
+
+Some pre-defined memes are also provided, documentation will follow shortly:
+
+`/meme create all the memes!`
 
 Copyright © 2015  oliyh
 
