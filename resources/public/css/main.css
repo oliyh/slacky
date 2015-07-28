@@ -10,6 +10,7 @@ body {
 
 .jumbotron {
     background-color: rgba(255, 255, 255, 0.7);
+    padding: 2em;
 }
 
 .jumbotron .leader {
@@ -18,14 +19,21 @@ body {
 
 .header {
     text-align: center;
-    padding-bottom: 6em;
+    padding-bottom: 2em;
     font-family: 'Quicksand', sans-serif;
     color: white;
     text-transform: uppercase;
+    max-width: 100w;
 }
 
 .header h1 {
     font-size: 8em;
+}
+
+@media screen and (max-width: 480px) {
+    .header h1 {
+        font-size: 64px;
+    }
 }
 
 .header h4 {
@@ -41,4 +49,5 @@ body {
     padding: 2em;
     border-radius: 4px;
     text-align: center;
+    margin-bottom: 2em;
 }

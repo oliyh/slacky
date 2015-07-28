@@ -1,5 +1,5 @@
 (defproject slacky "0.1.0-SNAPSHOT"
-  :description "Memes-as-a-service"
+  :description "Memes-as-a-Service"
   :url "https://github.com/oliyh/slacky"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
