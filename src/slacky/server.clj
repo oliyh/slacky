@@ -10,12 +10,13 @@
 
 (defn create-server
   "Standalone dev/prod mode."
-  [& [opts]]
-  (alter-var-root #'service-instance
-                  (constantly (bootstrap/create-server
-                               (-> (merge service/service opts)
-                                   (bootstrap/default-interceptors)
-                                   (service/with-database (db/create-db-connection (settings/database-url))))))))
+  ([] (create-server {}))
+  ([{:keys [db-url pedestal-opts]}]
+   (alter-var-root #'service-instance
+                   (constantly (bootstrap/create-server
+                                (-> (merge service/service pedestal-opts)
+                                    (bootstrap/default-interceptors)
+                                    (service/with-database (db/create-db-connection (or db-url (settings/database-url))))))))))
 
 (defn -main [& args]
   (create-server)

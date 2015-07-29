@@ -51,3 +51,11 @@ body {
     text-align: center;
     margin-bottom: 2em;
 }
+
+#demo-meme {
+    max-height: 320px;
+}
+
+#demo {
+    margin-bottom: 3em;
+}

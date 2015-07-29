@@ -7,7 +7,8 @@
             [clojure.tools.logging :as log]
             [slacky.slack :as slack]))
 
-(def memecaptain-url "http://memecaptain.com/")
+(def memecaptain-url "http://memecaptain.com")
+(def image-search-url "http://ajax.googleapis.com/ajax/services/search/images")
 
 (def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
 
@@ -36,7 +37,7 @@
 
 (defn- google-image-search [term]
   (log/info "Googling for images matching" term)
-  (let [resp (http/get "http://ajax.googleapis.com/ajax/services/search/images"
+  (let [resp (http/get image-search-url
                        {:connection-manager connection-pool
                         :headers {:Content-Type "application/json"
                                   :Accept "application/json"}
@@ -161,22 +162,22 @@
       (when (every? #(not (string/blank? %)) [template-search text-upper text-lower])
         [template-search text-upper text-lower]))))
 
-(defn valid-command? [{:keys [text]}]
+(defn valid-command? [text]
   (not (nil? (resolve-meme-pattern text))))
 
-(defn generate-meme [{:keys [user_name text command]} respond-to]
+(defn generate-meme [text respond-to]
   (let [[template-search text-upper text-lower]
         (resolve-meme-pattern text)]
 
     (if-let [template-id (resolve-template-id template-search)]
       (try (let [meme-url (create-instance template-id text-upper text-lower)]
              (log/info "Generated meme" meme-url)
-             (respond-to :channel (slack/meme-message user_name text meme-url)))
+             (respond-to :success meme-url))
            (catch Exception e
              (log/error "Blew up attempting to generate meme" e)
-             (respond-to :user (str "You broke me. Check my logs for details!"
-                                    "\n" "`" command " " text "`"))))
+             (respond-to :error (str "You broke me. Check my logs for details!"
+                                     "\n`" text "`" ))))
 
-      (respond-to :user
+      (respond-to :error
                   (str "Couldn't find a good template for the meme, try specifying a url instead"
-                       "\n" "`" command " " text "`")))))
+                       "\n`" text "`")))))

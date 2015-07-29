@@ -4,8 +4,11 @@
              [server :as server]
              [settings :as settings]]
             [io.pedestal.http :as bootstrap]
-            [clojure.tools.namespace.repl :refer [refresh]]
+            [clojure.tools.namespace.repl :as repl]
             [slacky.db :as db]))
+
+(def clear repl/clear)
+(def refresh repl/refresh)
 
 (def service (-> service/service ;; start with production configuration
                  (merge  {:env :dev
@@ -19,7 +22,7 @@
                  (bootstrap/dev-interceptors)))
 
 (defn start [& [opts]]
-  (server/create-server (merge service opts))
+  (server/create-server {:pedestal-opts (merge service opts)})
   (bootstrap/start server/service-instance))
 
 (defn stop []

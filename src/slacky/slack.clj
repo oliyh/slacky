@@ -3,7 +3,21 @@
              [client :as http]
              [conn-mgr :refer [make-reusable-conn-manager]]]
             [cheshire.core :as json]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [schema.core :as s]))
+
+(def req s/required-key)
+
+(s/defschema SlackRequest
+  {(req :token)        s/Str
+   (req :team_id)      s/Str
+   (req :team_domain)  s/Str
+   (req :channel_id)   s/Str
+   (req :channel_name) s/Str
+   (req :user_id)      s/Str
+   (req :user_name)    s/Str
+   (req :command)      s/Str
+   (req :text)         s/Str})
 
 (def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
 
@@ -30,16 +44,15 @@
                                          :conn-timeout 2000})]
     (log/info "Sent message to" channel "and recieved response" (:status response))))
 
-(defn build-responder [webhook-url {:keys [channel_name user_name]}]
-  (fn [destination message]
+(defn build-responder [webhook-url {:keys [channel_name user_name text]}]
+  (fn [destination meme-url]
     (try
       (send-message webhook-url
-                    (get {:user (str "@" user_name)
-                          :channel (if (= "directmessage" channel_name)
+                    (get {:error (str "@" user_name)
+                          :success (if (= "directmessage" channel_name)
                                      (str "@" user_name)
-                                     (str "#" channel_name))
-                          :default-channel nil}
+                                     (str "#" channel_name))}
                          destination)
-                    message)
+                    (meme-message user_name text meme-url))
       (catch Exception e
         (log/warn "Could not send message to Slack" e)))))

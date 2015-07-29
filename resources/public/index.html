@@ -59,7 +59,7 @@
               <div class="form-group form-group-lg">
                 <label for="key" class="col-sm-4 control-label">Incoming webhook url</label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="key" placeholder="">
+                  <input type="text" class="form-control" id="key" placeholder="https://hooks.slack.com/services/...">
                 </div>
               </div>
               <div class="form-group form-group-lg">
@@ -77,11 +77,8 @@
               </div>
             </form>
           </div>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="col-xs-10 col-xs-offset-1">
+
           <div class="row">
             <div class="col-xs-12 col-md-4">
               <div class="example">
@@ -95,7 +92,7 @@
               <div class="example">
                 <img src="/images/slacky-wins.png" class="img-thumbnail"/>
                 <code>
-                  /meme https://slacky-server.herokuapp.com/images/businesscat.png | slacky | wins
+                  /meme https://goo.gl/h9eUDM | slacky | wins
                 </code>
               </div>
             </div>
@@ -108,9 +105,34 @@
               </div>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="example">
+                <div>
+                  <img id="demo-meme" class="img-thumbnail" style="display: none;" src=""/>
+                </div>
+                <form id="demo" class="form-horizontal">
+                  <div class="col-xs-10 col-md-offset-1 col-md-9">
+                    <div class="form-group form-group-lg">
+                      <div class="input-group">
+                        <div class="input-group-addon">/meme</div>
+                        <input type="text" class="form-control" id="demo-text" placeholder="search term or url | upper text | lower text"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-xs-2 col-md-1">
+                    <div class="form-group form-group-lg">
+                      <button type="submit" class="btn btn-success btn-lg">Go!</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-
     </div>
 
     <div class="modal fade" id="guide-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

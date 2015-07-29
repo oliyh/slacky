@@ -1,12 +1,8 @@
 (ns slacky.accounts-test
-  (:require [slacky.accounts :refer :all]
-            [slacky.db :refer [create-fresh-db-connection]]
+  (:require [slacky
+             [accounts :refer :all]
+             [fixture :refer [with-database *db*]]]
             [clojure.test :refer :all]))
-
-(def ^:dynamic *db* nil)
-(defn- with-database [f]
-  (binding [*db* (create-fresh-db-connection "jdbc:sqlite:memory:test")]
-    (f)))
 
 (use-fixtures :once with-database)
 

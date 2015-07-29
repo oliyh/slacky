@@ -29,6 +29,7 @@
   :resource-paths ["config", "resources", "migrators"]
   :profiles {:uberjar {:aot :all}
              :dev {:source-paths ["dev"]
-                   :dependencies [[org.clojure/tools.namespace "0.2.11"]]}}
+                   :dependencies [[org.clojure/tools.namespace "0.2.11"]
+                                  [clj-http-fake "1.0.1"]]}}
   :uberjar-name "slacky-standalone.jar"
   :repl-options {:init-ns user})

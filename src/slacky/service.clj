@@ -22,16 +22,8 @@
 
 (def req s/required-key)
 
-(s/defschema SlackRequest
-  {(req :token)        s/Str
-   (req :team_id)      s/Str
-   (req :team_domain)  s/Str
-   (req :channel_id)   s/Str
-   (req :channel_name) s/Str
-   (req :user_id)      s/Str
-   (req :user_name)    s/Str
-   (req :command)      s/Str
-   (req :text)         s/Str})
+(s/defschema MemeRequest
+  {(req :text) s/Str})
 
 (s/defschema AddAccount
   {(req :token) s/Str
@@ -39,28 +31,49 @@
 
 ;; api handlers
 
-(swagger/defhandler meme
-  {:summary "Process a Slack event"
-   :parameters {:formData SlackRequest}
+(swagger/defhandler slack-meme
+  {:summary "Responds asynchonously with a meme to a Slash command from Slack"
+   :parameters {:formData slack/SlackRequest}
    :responses {200 {:schema s/Str}}}
   [{:keys [form-params] :as context}]
   (response
-   (if (meme/valid-command? form-params)
+   (if (meme/valid-command? (:text form-params))
      (do
        (log/info form-params)
        (future
          (try
-           (meme/generate-meme form-params (slack/build-responder (::slack-webhook-url context) form-params))
-           (catch Exception e (log/error e))))
+           (meme/generate-meme
+            (:text form-params)
+            (slack/build-responder (::slack-webhook-url context) form-params))
+           (catch Exception e
+             (log/error e)
+             {:status 500
+              :body "Something went wrong, check my logs"})))
        "Your meme is on its way")
      "Sorry, this is not a valid command syntax")))
 
-(swagger/defhandler echo
-  {:summary "Echoes a Slack event"
-   :parameters {:formData SlackRequest}
-   :responses {200 {:schema s/Any}}}
-  [{:keys [form-params] :as req}]
-  (response form-params))
+(swagger/defhandler rest-meme
+  {:summary "Responds synchronously with a meme"
+   :parameters {:formData MemeRequest}
+   :responses {200 {:schema s/Str}}}
+  [{:keys [form-params] :as context}]
+  (if (meme/valid-command? (:text form-params))
+    (let [response-atom (atom nil)]
+      (try
+        (meme/generate-meme (:text form-params)
+                            (fn [destination meme-url]
+                              (reset! response-atom
+                                       (condp = destination
+                                         :error {:status 500
+                                                 :body meme-url}
+                                         :success (response meme-url)))))
+        (deref response-atom)
+        (catch Exception e
+          (log/error e)
+          {:status 500
+           :body "Something went wrong, check my logs"})))
+    {:status 400
+     :body "Sorry, this is not a valid command syntax"}))
 
 (swagger/defhandler add-account
   {:summary "Adds an account"
@@ -116,9 +129,7 @@
                            :url "https://github.com/oliyh/slacky"}
             :version "2.0"}
      :tags [{:name "memes"
-             :description "All the memes!"}
-            {:name "echo"
-             :description "Echoes content back"}]}
+             :description "All the memes!"}]}
     [[["/api" ^:interceptors [(body-params/body-params)
                               bootstrap/json-body
                               (swagger/body-params)
@@ -128,9 +139,10 @@
 
        ["/slack" ^:interceptors [authenticate-slack-call]
         ["/meme" ^:interceptors [(swagger/tag-route "meme")]
-         {:post meme}]
-        ["/echo" ^:interceptors [(swagger/tag-route "echo")]
-         {:post echo}]]
+         {:post slack-meme}]]
+
+       ["/meme" ^:interceptors [(swagger/tag-route "meme")]
+        {:post rest-meme}]
 
        ["/account" ^:interceptors [(swagger/tag-route "account")]
         {:post add-account}]
