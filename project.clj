@@ -16,6 +16,10 @@
                  [clj-http "1.1.2"]
                  [cheshire "5.4.0"]
 
+                 ;; web
+                 [hiccup "1.0.5"]
+
+                 ;; persistence
                  [org.clojure/java.jdbc "0.3.5"]
                  [org.xerial/sqlite-jdbc "3.8.7"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]

@@ -16,7 +16,8 @@
                    (constantly (bootstrap/create-server
                                 (-> (merge service/service pedestal-opts)
                                     (bootstrap/default-interceptors)
-                                    (service/with-database (db/create-db-connection (or db-url (settings/database-url))))))))))
+                                    (service/with-database (db/create-db-connection (or db-url (settings/database-url))))
+                                    (service/with-google-analytics (settings/google-analytics-key))))))))
 
 (defn -main [& args]
   (create-server)

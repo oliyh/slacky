@@ -17,3 +17,6 @@
 
 (defn web-port []
   (Integer. (or (System/getenv "PORT") 8080)))
+
+(defn google-analytics-key []
+  (System/getenv "GOOGLE_ANALYTICS_KEY"))

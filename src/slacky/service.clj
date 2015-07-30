@@ -16,6 +16,8 @@
              [meme :as meme]
              [slack :as slack]
              [settings :as settings]]
+            [slacky.views
+             [index :as index]]
             [clojure.tools.logging :as log]))
 
 ;; schemas
@@ -63,10 +65,10 @@
         (meme/generate-meme (:text form-params)
                             (fn [destination meme-url]
                               (reset! response-atom
-                                       (condp = destination
-                                         :error {:status 500
-                                                 :body meme-url}
-                                         :success (response meme-url)))))
+                                      (condp = destination
+                                        :error {:status 500
+                                                :body meme-url}
+                                        :success (response meme-url)))))
         (deref response-atom)
         (catch Exception e
           (log/error e)
@@ -115,8 +117,8 @@
 
 (def home
   (handler ::home-handler
-           (fn [req]
-             (-> (resource-response "public/index.html")
+           (fn [{:keys [google-analytics-key]}]
+             (-> (response (index/index {:google-analytics-key google-analytics-key}))
                  (content-type "text/html")))))
 
 ;; routes
@@ -172,3 +174,10 @@
              (before ::inject-database
                      (fn [context]
                        (assoc-in context [:request :db-connection] db)))))
+
+(defn with-google-analytics [service google-analytics-key]
+  (update-in service
+             [::bootstrap/interceptors] conj
+             (before ::inject-google-analytics-key
+                     (fn [context]
+                       (assoc-in context [:request :google-analytics-key] google-analytics-key)))))
