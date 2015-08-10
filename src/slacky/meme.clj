@@ -127,6 +127,8 @@
     (create-template (google-image-search term))))
 
 (def command-pattern #"<?([^>]*)>?\s?\|\s?(.*)\s?\|\s?(.*)\s?")
+(def not-blank? (complement string/blank?))
+
 
 (defn- resolve-meme-pattern [text]
   (condp re-matches text
@@ -159,7 +161,8 @@
                                    [:all-the-things text-upper (str "all the " text-lower)])
 
     (let [[_ template-search text-upper text-lower] (map #(.trim %) (re-matches command-pattern text))]
-      (when (every? #(not (string/blank? %)) [template-search text-upper text-lower])
+      (when (and (not-blank? template-search)
+                 (some not-blank? [text-upper text-lower]))
         [template-search text-upper text-lower]))))
 
 (defn valid-command? [text]
