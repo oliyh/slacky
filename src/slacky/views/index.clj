@@ -14,7 +14,7 @@
 
 (defn- example [img-src command]
   [:div.col-xs-12.col-md-4
-   [:div.example
+   [:div.example {:data-command command}
     [:img.img-thumbnail {:src img-src}]
     [:code command]]])
 
@@ -31,19 +31,26 @@
 
           (include-css "css/bootstrap.min.css"
                        "http://fonts.googleapis.com/css?family=Quicksand:300"
-                       "css/main.css")]
-
+                       "css/main.css"
+                       "css/avgrund.css")]
          [:body
 
-          (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
-                      "js/bootstrap.min.js"
-                      "js/home.js")
-
-          [:a {:href "https://github.com/oliyh/slacky"}
+          [:a.avgrund-exclude {:href "https://github.com/oliyh/slacky"}
            [:img {:style "position: absolute; top: 0; right: 0; border: 0;"
                   :src "https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
                   :alt "Fork me on GitHub"
                   :data-canonical-src "https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"}]]
+
+          (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
+                      "js/bootstrap.min.js"
+                      "js/avgrund.js"
+                      "js/home.js")
+
+          [:div#demo-meme-popup.avgrund-popup
+           [:img#demo-meme.center-block.img-thumbnail {:src ""}]
+           [:button.btn.btn-default.center-block {:onClick "Avgrund.hide();"} "Close"]]
+
+          [:div.avgrund-cover]
 
           [:div.container
            [:div.header
@@ -52,9 +59,40 @@
 
            [:div.row
             [:div.col-xs-10.col-xs-offset-1
+
+
+             [:div.jumbotron
+
+              [:div.leader
+               [:h1 "How can haz meme?"]]
+
+              [:div.row
+               (example "/images/pai-mei-approves.png" "pai mei | pai mei | approves")
+               (example "/images/slacky-wins.png" "https://goo.gl/h9eUDM | slacky | wins")
+               (example "/images/all-the-memes.png" "create all the memes!")]
+
+              [:div.row
+               [:div.col-xs-12
+                [:form#demo.form-horizontal
+                 [:div.col-xs-12.col-md-11
+                  [:div.form-group.form-group-lg
+                   [:div.input-group
+                    [:div.input-group-addon "/meme"]
+                    [:input#demo-text.form-control {:type "text"
+                                                    :placeholder "search term or url | upper text | lower text"}]]]]
+
+                 [:div.col-xs-12.col-md-1
+                  [:div.form-group.form-group-lg
+                   [:button.btn.btn-success.btn-lg {:type "submit"}
+                    "Try!"]]]]]]]
+
+
              [:div.jumbotron
               [:div.leader
-               [:h1 "Give me memes!"]
+               [:div#memes-in-slack
+                [:span.h1 "Memes in"]
+                [:img {:src "/images/slack-logo.png"
+                       :alt "Slack"}]]
                [:p "Register your slash command token with your incoming webhook url below."
                 [:a {:href "#guide"
                      :data-toggle "modal"
@@ -88,30 +126,7 @@
                   [:span.glyphicon.glyphicon-fire {:aria-hidden "true"}]
                   "&nbsp;"
                   [:strong "Oh noes!"]
-                  " Something broke! You can try again, or give up..."]]]]]
-
-             [:div.row
-              (example "/images/pai-mei-approves.jpg" "/meme pai mei | pai mei | approves")
-              (example "/images/slacky-wins.png" "/meme https://goo.gl/h9eUDM | slacky | wins")
-              (example "/images/all-the-memes.jpg" "/meme create all the memes!")]
-
-             [:div.row
-              [:div.col-xs-12
-               [:div.example
-                [:div
-                 [:img#demo-meme.img-thumbnail {:style "display: none;"
-                                                :src ""}]]
-                [:form#demo.form-horizontal
-                 [:div.col-xs-10.col-md-offset-1.col-md-9
-                  [:div.form-group.form-group-lg
-                   [:div.input-group
-                    [:div.input-group-addon "/meme"]
-                    [:input#demo-text.form-control {:type "text"
-                                                    :placeholder "search term or url | upper text | lower text"}]]]]
-                 [:div.col-xs-2.col-md-1
-                  [:div.form-group.form-group-lg
-                   [:button.btn.btn-success.btn-lg {:type "submit"}
-                    "Go!"]]]]]]]]]]
+                  " Something broke! You can try again, or give up..."]]]]]]]]
 
           [:div#guide-modal.modal.fade {:tabindex "-1"
                                         :role "dialog"

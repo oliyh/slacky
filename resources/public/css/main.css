@@ -45,17 +45,49 @@ body {
 }
 
 .example {
-    background-color: rgba(255, 255, 255, 0.7);
-    padding: 2em;
     border-radius: 4px;
     text-align: center;
     margin-bottom: 2em;
+    cursor: pointer;
+}
+
+button {
+    width: 100%;
+}
+
+button.close {
+    width: auto;
 }
 
 #demo-meme {
-    max-height: 320px;
+    max-width: 340px;
+    max-height: 332px;
+    margin-bottom: 8px;
 }
 
-#demo {
-    margin-bottom: 3em;
+@media screen and (min-width: 992px) {
+    #demo-text {
+        border-radius: 0;
+        border-right: 0;
+    }
+
+    #demo button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+}
+
+
+#memes-in-slack span {
+    vertical-align: middle;
+}
+
+#memes-in-slack img {
+    height: 78px;
+}
+
+@media screen and (max-width: 768px) {
+    #memes-in-slack img {
+        height: 50px;
+    }
 }

@@ -23,7 +23,9 @@ $(document).ready(
     $('#demo').submit(function(e) {
       e.preventDefault();
 
+      $('#demo-text').parent('.input-group').removeClass('has-error');
       $('#demo-meme').attr('src', '/images/loading.gif').show();
+      Avgrund.show('#demo-meme-popup');
 
       $.ajax({
         url: '/api/meme',
@@ -33,9 +35,15 @@ $(document).ready(
           $('#demo-meme').attr('src', r);
         },
         error: function(r) {
-          $('#demo-failure-message').html(r);
+          console.log('oh noes');
+          $('#demo-text').parent('.input-group').addClass('has-error');
+          Avgrund.hide();
         }
       });
+    });
+
+    $('.example').click(function(e) {
+      $('#demo-text').val($(this).data('command'));
     });
 
   });
