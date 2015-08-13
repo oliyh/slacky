@@ -30,7 +30,7 @@
           [:title "Slacky"]
 
           (include-css "css/bootstrap.min.css"
-                       "http://fonts.googleapis.com/css?family=Quicksand:300"
+                       "https://fonts.googleapis.com/css?family=Quicksand:300"
                        "css/main.css"
                        "css/avgrund.css")]
          [:body
