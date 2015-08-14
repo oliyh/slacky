@@ -7,7 +7,7 @@
  */
 var Avgrund = (function(){
 
-  var container = document.documentElement,
+  var container = document.querySelector( '.avgrund-parent' ),
   popup = document.querySelector( '.avgrund-popup-animate' ),
   cover = document.querySelector( '.avgrund-cover' ),
   currentState = null;

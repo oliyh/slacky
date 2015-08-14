@@ -33,7 +33,7 @@
                        "https://fonts.googleapis.com/css?family=Quicksand:300"
                        "css/main.css"
                        "css/avgrund.css")]
-         [:body
+         [:body.avgrund-parent
 
           [:a.hidden-xs {:href "https://github.com/oliyh/slacky"}
            [:img {:style "position: absolute; top: 0; right: 0; border: 0;"
@@ -41,18 +41,13 @@
                   :alt "Fork me on GitHub"
                   :data-canonical-src "https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"}]]
 
-          (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
-                      "js/bootstrap.min.js"
-                      "js/avgrund.js"
-                      "js/home.js")
-
           [:div#demo-meme-popup.avgrund-popup
            [:img#demo-meme.center-block.img-thumbnail {:src ""}]
            [:button.btn.btn-default.center-block {:onClick "Avgrund.hide();"} "Close"]]
 
           [:div.avgrund-cover]
 
-          [:div.container
+          [:div.container.avgrund-contents
            [:div.header
             [:h1 "Slacky"]
             [:h4 "Memes as a Service"]]
@@ -178,5 +173,9 @@
                                         :data-dismiss "modal"}
                "Close"]]]]]
 
+          (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
+                      "js/bootstrap.min.js"
+                      "js/avgrund.js"
+                      "js/home.js")
           (google-analytics google-analytics-key)])
   )
