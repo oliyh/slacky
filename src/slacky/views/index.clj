@@ -41,10 +41,6 @@
                   :alt "Fork me on GitHub"
                   :data-canonical-src "https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"}]]
 
-          [:div#demo-meme-popup.avgrund-popup
-           [:img#demo-meme.center-block.img-thumbnail {:src ""}]
-           [:button.btn.btn-default.center-block {:onClick "Avgrund.hide();"} "Close"]]
-
           [:div.avgrund-cover]
 
           [:div.container.avgrund-contents
@@ -89,9 +85,9 @@
                 [:img {:src "/images/slack-logo.png"
                        :alt "Slack"}]]
                [:p "Register your slash command token with your incoming webhook url below."
+                "&nbsp;"
                 [:a {:href "#guide"
-                     :data-toggle "modal"
-                     :data-target "#guide-modal"}
+                     :onClick "Avgrund.show('#guide-modal');"}
                  "Need help?"]]]
 
               [:form#new-account.form-horizontal
@@ -123,15 +119,28 @@
                   [:strong "Oh noes!"]
                   " Something broke! You can try again, or give up..."]]]]]]]]
 
-          [:div#guide-modal.modal.fade {:tabindex "-1"
-                                        :role "dialog"
-                                        :aria-labelledby "myModalLabel"}
-           [:div.modal-dialog.modal-lg {:role "document"}
-            [:div.modal-content
+          [:div#demo-meme-popup.avgrund-popup
+           [:div
+            [:div.modal-header
+              [:button.close {:type "button"
+                              :onClick "Avgrund.hide();"}
+               [:span {:aria-hidden "true"} "&times;"]]
+             [:h4.modal-title "Brace yourself..."]]
+            [:div.modal-body
+             [:img#demo-meme.center-block {:src ""}]]
+            [:div.modal-footer
+              [:button.btn.btn-default {:type "button"
+                                        :onClick "Avgrund.hide();"}
+               "Close"]]]]
+
+          [:div#guide-modal.avgrund-popup {:tabindex "-1"
+                                           :role "dialog"
+                                           :aria-labelledby "myModalLabel"}
+           [:div {:role "document"}
+            [:div
              [:div.modal-header
               [:button.close {:type "button"
-                              :data-dismiss "modal"
-                              :aria-label "Close"}
+                              :onClick "Avgrund.hide();"}
                [:span {:aria-hidden "true"} "&times;"]]
               [:h4#myModalLabel.modal-title "Guide"]]
              [:div.modal-body
@@ -170,7 +179,7 @@
                " into your Slack and never look back! See the examples below."]]
              [:div.modal-footer
               [:button.btn.btn-default {:type "button"
-                                        :data-dismiss "modal"}
+                                        :onClick "Avgrund.hide();"}
                "Close"]]]]]
 
           (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
