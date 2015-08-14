@@ -31,8 +31,8 @@
 
           (include-css "css/bootstrap.min.css"
                        "https://fonts.googleapis.com/css?family=Quicksand:300"
-                       "css/main.css"
-                       "css/avgrund.css")]
+                       "css/avgrund.css"
+                       "css/main.css")]
          [:body.avgrund-parent
 
           [:a.hidden-xs {:href "https://github.com/oliyh/slacky"}

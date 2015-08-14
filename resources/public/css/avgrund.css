@@ -53,6 +53,9 @@
     opacity: 0;
     z-index: 100;
     padding: 20px;
+    overflow-y: auto;
+    max-width: 100%;
+    max-height: 100%;
 
     background: white;
     box-shadow: 0px 0px 20px rgba( 0, 0, 0, 0.6 );
