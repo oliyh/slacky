@@ -18,7 +18,8 @@
              [settings :as settings]]
             [slacky.views
              [index :as index]]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [clojure.string :as string]))
 
 ;; schemas
 
@@ -32,6 +33,14 @@
    (req :key)   s/Str})
 
 ;; api handlers
+
+(def ^:private invalid-meme-syntax
+  (string/join
+   "\n"
+   (concat ["Sorry, this is not a valid command syntax"
+            "Try one the following patterns:"
+            ""]
+           (meme/describe-meme-patterns))))
 
 (swagger/defhandler slack-meme
   {:summary "Responds asynchonously with a meme to a Slash command from Slack"
@@ -52,7 +61,7 @@
              {:status 500
               :body "Something went wrong, check my logs"})))
        "Your meme is on its way")
-     "Sorry, this is not a valid command syntax")))
+     invalid-meme-syntax)))
 
 (swagger/defhandler rest-meme
   {:summary "Responds synchronously with a meme"
@@ -75,7 +84,14 @@
           {:status 500
            :body "Something went wrong, check my logs"})))
     {:status 400
-     :body "Sorry, this is not a valid command syntax"}))
+     :body invalid-meme-syntax}))
+
+(swagger/defhandler get-meme-patterns
+  {:summary "Responds synchronously with a meme"
+   :responses {200 {:schema [s/Str]}}}
+  [context]
+  {:status 200
+   :body (meme/describe-meme-patterns)})
 
 (swagger/defhandler add-account
   {:summary "Adds an account"
@@ -144,7 +160,9 @@
          {:post slack-meme}]]
 
        ["/meme" ^:interceptors [(swagger/tag-route "meme")]
-        {:post rest-meme}]
+        {:post rest-meme}
+        ["/patterns"
+         {:get get-meme-patterns}]]
 
        ["/account" ^:interceptors [(swagger/tag-route "account")]
         {:post add-account}]

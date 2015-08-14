@@ -98,24 +98,11 @@
       (throw (ex-info (str "Unexpected response")
                       resp)))))
 
-;; from https://bitbucket.org/atlassianlabs/ac-koa-hipchat-sassy/src/1d0a72839002d9dc9f911825de73d819d7f94f5c/lib/commands/meme.js?at=master
-(def ^:private known-meme-templates
-  {:y-u-no               "NryNmg"
-   :one-does-not-simply  "da2i4A"
-   :all-the-things       "Dv99KQ"
-   :not-sure-if          "CsNF8w"
-   :brace-yourself       "_I74XA"
-   :success              "AbNPRQ"
-   :first-world-problems "QZZvlg"
-   :what-if-i-told-you   "fWle1w"
-   :how-do-they-work     "3V6rYA"})
-
 (defn- resolve-template-id [term]
   (log/debug "Resolving template for term" term)
   (cond
-
-    (contains? known-meme-templates term)
-    (get known-meme-templates term)
+    (keyword? term)
+    (name term)
 
     (string/blank? term)
     nil
@@ -126,44 +113,62 @@
     :else
     (create-template (google-image-search term))))
 
-(def command-pattern #"<?([^>]*)>?\s?\|\s?(.*)\s?\|\s?(.*)\s?")
-(def not-blank? (complement string/blank?))
+;; from https://bitbucket.org/atlassianlabs/ac-koa-hipchat-sassy/src/1d0a72839002d9dc9f911825de73d819d7f94f5c/lib/commands/meme.js?at=master
+(def ^:private meme-patterns
+  [{:pattern #"^(?i)y u no (?<lower>.*)"
+    :parser (fn [_ text-lower] [:NryNmg "y u no" text-lower])}
+
+   {:pattern #"^(?i)one does not simply (?<lower>.*)"
+    :parser (fn [_ text-lower] [:da2i4A "one does not simply" text-lower])}
+
+   {:pattern #"^(?i)not sure if (?<upper>.*) or (?<lower>.*)"
+    :parser (fn [_ text-upper text-lower] [:CsNF8w (str "not sure if " text-upper) (str "or " text-lower)])}
+
+   {:pattern #"^(?i)brace yoursel(?:f|ves) (?<lower>.*)"
+    :parser (fn [_ text-lower] [:_I74XA "brace yourself" text-lower])}
+
+   {:pattern #"^(?i)success when (?<upper>.*) then (?<lower>.*)"
+    :parser (fn [_ text-upper text-lower] [:AbNPRQ text-upper text-lower])}
+
+   {:pattern #"^(?i)cry when (?<upper>.*) then (?<lower>.*)"
+    :parser (fn [_ text-upper text-lower] [:QZZvlg text-upper text-lower])}
+
+   {:pattern #"^(?i)what if i told you (?<lower>.*)"
+    :parser (fn [_ text-lower] [:fWle1w "what if i told you" text-lower])}
+
+   {:pattern #"^(?i)(?<upper>.*) how do they work\??"
+    :parser (fn [_ text-upper] [:3V6rYA text-upper "how do they work?"])}
+
+   {:pattern #"^(?i)(?<upper>.*) all the (?<lower>.*)"
+    :parser (fn [_ text-upper text-lower] [:Dv99KQ text-upper (str "all the " text-lower)])}
+
+   {:pattern #"<?([^>]+)>?\s?\|\s?(?<upper>.*)\s?\|\s?(?<lower>.*)\s?"
+    :parser (fn [_ template-search text-upper text-lower]
+              (mapv string/trim [template-search text-upper text-lower]))}
+   ])
 
 
 (defn- resolve-meme-pattern [text]
-  (condp re-matches text
+  (some #(when-let [matches (re-matches (:pattern %) text)]
+           (apply (:parser %) matches)) meme-patterns))
 
-    #"^(?i)y u no (.*)" :>> (fn [[_ text-lower]]
-                              [:y-u-no "y u no" text-lower])
+(defn describe-meme-patterns []
+  (map
+     #(-> %
+       :pattern
+       (.pattern)
+       (string/replace "<?([^>]+)>?\\s?" "<search terms or image url>") ;; pipe
+       (string/replace "(?<upper>.*)" "<upper>")
+       (string/replace "(?<lower>.*)" "<lower>")
 
-    #"^(?i)one does not simply (.*)" :>> (fn [[_ text-lower]]
-                                           [:one-does-not-simply "one does not simply" text-lower])
+       (string/replace "^(?i)" "") ;; case insensitivity
+       (string/replace "(?:" "(") ;; non-capturing group
+       (string/replace "\\s?" "") ;; optional space
+       (string/replace "\\??" "?") ;; optional question mark
+       (string/replace "\\|" "|") ;; pipe
+       )
+   meme-patterns))
 
-    #"(?i)not sure if (.*) or (.*)" :>> (fn [[_ text-upper text-lower]]
-                                          [:not-sure-if (str "not sure if " text-upper) (str "or " text-lower)])
-
-    #"(?i)brace yoursel(?:f|ves) (.*)" :>> (fn [[_ text-lower]]
-                                             [:brace-yourself "brace yourself" text-lower])
-
-    #"(?i)success when (.*) then (.*)" :>> (fn [[_ text-upper text-lower]]
-                                             [:success text-upper text-lower])
-
-    #"(?i)cry when (.*) then (.*)" :>> (fn [[_ text-upper text-lower]]
-                                         [:first-world-problems text-upper text-lower])
-
-    #"(?i)what if i told you (.*)" :>> (fn [[_ text-lower]]
-                                         [:what-if-i-told-you "what if i told you" text-lower])
-
-    #"(?i)(.*) how do they work\??" :>> (fn [[_ text-upper]]
-                                          [:how-do-they-work text-upper "how do they work?"])
-
-    #"(?i)(.*) all the (.*)" :>> (fn [[_ text-upper text-lower]]
-                                   [:all-the-things text-upper (str "all the " text-lower)])
-
-    (let [[_ template-search text-upper text-lower] (map #(.trim %) (re-matches command-pattern text))]
-      (when (and (not-blank? template-search)
-                 (some not-blank? [text-upper text-lower]))
-        [template-search text-upper text-lower]))))
 
 (defn valid-command? [text]
   (not (nil? (resolve-meme-pattern text))))
