@@ -8,7 +8,7 @@
             [slacky.slack :as slack]))
 
 (def memecaptain-url "http://memecaptain.com")
-(def image-search-url "http://ajax.googleapis.com/ajax/services/search/images")
+(def image-search-url "https://ajax.googleapis.com/ajax/services/search/images")
 
 (def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
 
