@@ -40,7 +40,7 @@
    (concat ["Sorry, this is not a valid command syntax"
             "Try one the following patterns:"
             ""]
-           (meme/describe-meme-patterns))))
+           (map :pattern (meme/describe-meme-patterns)))))
 
 (swagger/defhandler slack-meme
   {:summary "Responds asynchonously with a meme to a Slash command from Slack"
@@ -134,7 +134,8 @@
 (def home
   (handler ::home-handler
            (fn [{:keys [google-analytics-key]}]
-             (-> (response (index/index {:google-analytics-key google-analytics-key}))
+             (-> (response (index/index {:google-analytics-key google-analytics-key
+                                         :meme-descriptions (meme/describe-meme-patterns)}))
                  (content-type "text/html")))))
 
 ;; routes

@@ -65,6 +65,11 @@ button.close {
     margin-bottom: 8px;
 }
 
+.tt-menu {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
 @media screen and (min-width: 992px) {
     #demo-text {
         border-radius: 0;

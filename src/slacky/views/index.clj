@@ -1,5 +1,6 @@
 (ns slacky.views.index
-  (:require [hiccup.page :refer [html5 include-css include-js]]))
+  (:require [hiccup.page :refer [html5 include-css include-js]]
+            [cheshire.core :as json]))
 
 (defn- google-analytics [google-analytics-key]
   (when google-analytics-key
@@ -18,7 +19,7 @@
     [:img.img-thumbnail {:src img-src}]
     [:code command]]])
 
-(defn index [{:keys [google-analytics-key]}]
+(defn index [{:keys [google-analytics-key meme-descriptions]}]
   (html5 {:lang "en"}
          [:head
           [:meta {:charset "utf-8"}]
@@ -32,6 +33,7 @@
           (include-css "css/bootstrap.min.css"
                        "https://fonts.googleapis.com/css?family=Quicksand:300"
                        "css/avgrund.css"
+                       "css/typeahead.css"
                        "css/main.css")]
          [:body.avgrund-parent
 
@@ -70,7 +72,9 @@
                    [:div.input-group
                     [:div.input-group-addon "/meme"]
                     [:input#demo-text.form-control {:type "text"
-                                                    :placeholder "search term or url | upper text | lower text"}]]]]
+                                                    :placeholder "search term or url | upper text | lower text"}]
+                    [:script {:type "text/javascript"}
+                     "patterns = " (json/encode meme-descriptions)]]]]
 
                  [:div.col-xs-12.col-md-1
                   [:div.form-group.form-group-lg
@@ -184,6 +188,7 @@
 
           (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
                       "js/bootstrap.min.js"
+                      "js/typeahead.jquery.js"
                       "js/avgrund.js"
                       "js/home.js")
           (google-analytics google-analytics-key)])
