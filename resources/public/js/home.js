@@ -47,27 +47,43 @@ $(document).ready(
     });
 
 
+    function tokenisedMatches(q, pattern) {
+      var queryTokens, patternTokens, match;
+      queryTokens = q.trim().split(' ');
+
+      patternTokens = pattern
+        .replace(/\[upper\]/g, '(.*)')
+        .replace(/\[lower\]/g, '(.*)')
+        .replace(/\[search terms or image url\]/g, '(.*)')
+        .split(' ')
+        .slice(0, queryTokens.length);
+
+      match = true;
+      for (i = 0; i < patternTokens.length; i++) {
+        if (new RegExp(patternTokens[i]).test(queryTokens[i])
+            || new RegExp(queryTokens[i]).test(patternTokens[i])) {
+          // continue
+        } else {
+          match = false;
+          break;
+        }
+      }
+
+      return match;
+    }
+
     var substringMatcher = function(strs) {
       return function findMatches(q, cb) {
-        var matches, substringRegex;
+        var matches;
 
         // an array that will be populated with substring matches
         matches = [];
 
-        // regex used to determine if a string contains the substring `q`
-        substrRegex = new RegExp(q, 'i');
-
-        // iterate through the pool of strings and for any string that
-        // contains the substring `q`, add it to the `matches` array
-
-        // not sure if a
-        // not sure if (.*) or (.*)
-
-
         $.each(strs, function(i, str) {
-          if (substrRegex.test(str.pattern)) {
-            matches.push(str.pattern);
+          if (tokenisedMatches(q, str.pattern)) {
+            matches.push(str);
           }
+
         });
 
         cb(matches);
@@ -82,6 +98,15 @@ $(document).ready(
     {
       name: 'patterns',
       source: substringMatcher(patterns),
-      limit: 20
+      limit: 20,
+      display: 'pattern',
+      templates: {
+        suggestion: function(m) { return '<div class="typeahead-result">'
+                                  + '<span>' + m.pattern + '</span>'
+                                  + '<div>'
+                                  + (m.template == undefined ? '' : '<img src="' + m.template + '"/>')
+                                  + '</div>'
+                                  + '</div>'; }
+      }
     });
   });

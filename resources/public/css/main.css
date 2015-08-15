@@ -70,6 +70,25 @@ button.close {
     overflow-y: auto;
 }
 
+.typeahead-result {
+    height: 46px;
+}
+
+.typeahead-result span {
+    vertical-align: middle;
+}
+
+.typeahead-result img {
+    height: 40px;
+}
+
+.typeahead-result div {
+    float: right;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+}
+
 @media screen and (min-width: 992px) {
     #demo-text {
         border-radius: 0;
