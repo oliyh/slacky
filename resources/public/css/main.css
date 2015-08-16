@@ -71,7 +71,7 @@ button.close {
 }
 
 .typeahead-result {
-    height: 46px;
+    min-height: 46px;
 }
 
 .typeahead-result span {
