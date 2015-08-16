@@ -103,7 +103,7 @@ $(document).ready(
       templates: {
         suggestion: function(m) { return '<div class="typeahead-result">'
                                   + '<span>' + m.pattern + '</span>'
-                                  + '<div>'
+                                  + '<div class="hidden-xs">'
                                   + (m.template == undefined ? '' : '<img src="' + m.template + '"/>')
                                   + '</div>'
                                   + '</div>'; }
