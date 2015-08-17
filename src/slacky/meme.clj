@@ -151,6 +151,10 @@
     :template :Dv99KQ
     :parser (fn [_ text-upper text-lower] [text-upper (str "all the " text-lower)])}
 
+   {:pattern #"^(?i)(?<upper>.*),? (?:\1) everywhere"
+    :template :yDcY5w
+    :parser (fn [_ text-upper] [text-upper (str text-upper " everywhere")])}
+
    {:pattern #"<?([^>]+)>?\s?\|\s?(?<upper>.*)\s?\|\s?(?<lower>.*)\s?"
     :parser (fn [_ template-search text-upper text-lower]
               (mapv string/trim [template-search text-upper text-lower]))}
@@ -171,11 +175,13 @@
       (string/replace "<?([^>]+)>?\\s?" "[search terms or image url]") ;; pipe
       (string/replace "(?<upper>.*)" "[upper]")
       (string/replace "(?<lower>.*)" "[lower]")
+      (string/replace "(?:\\1)" "[upper]")
 
       (string/replace "^(?i)" "") ;; case insensitivity
       (string/replace "(?:" "(") ;; non-capturing group
       (string/replace "\\s?" "") ;; optional space
       (string/replace "\\??" "?") ;; optional question mark
+      (string/replace ",?" ",") ;; optional comma
       (string/replace "\\|" "|") ;; pipe
       ))
 
