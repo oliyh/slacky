@@ -20,3 +20,9 @@
     "angry arnold |" nil
     "angry arnold" nil
     ))
+
+(deftest describe-meme-patterns-test
+  (let [descriptions (describe-meme-patterns)]
+    (is (= {:pattern "y u no [lower]"
+            :template "http://i.memecaptain.com/src_images/NryNmg.jpg"}
+           (first descriptions)))))

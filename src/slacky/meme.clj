@@ -115,43 +115,43 @@
 
 ;; from https://bitbucket.org/atlassianlabs/ac-koa-hipchat-sassy/src/1d0a72839002d9dc9f911825de73d819d7f94f5c/lib/commands/meme.js?at=master
 (def ^:private meme-patterns
-  [{:pattern #"^(?i)y u no (?<lower>.*)"
+  [{:pattern #"^(?i)y u no (?<lower>.+)"
     :template :NryNmg
     :parser (fn [_ text-lower] ["y u no" text-lower])}
 
-   {:pattern #"^(?i)one does not simply (?<lower>.*)"
+   {:pattern #"^(?i)one does not simply (?<lower>.+)"
     :template :da2i4A
     :parser (fn [_ text-lower] ["one does not simply" text-lower])}
 
-   {:pattern #"^(?i)not sure if (?<upper>.*) or (?<lower>.*)"
+   {:pattern #"^(?i)not sure if (?<upper>.+) or (?<lower>.+)"
     :template :CsNF8w
     :parser (fn [_ text-upper text-lower] [(str "not sure if " text-upper) (str "or " text-lower)])}
 
-   {:pattern #"^(?i)brace yoursel(?:f|ves) (?<lower>.*)"
+   {:pattern #"^(?i)brace yoursel(?:f|ves) (?<lower>.+)"
     :template :_I74XA
     :parser (fn [_ text-lower] ["brace yourself" text-lower])}
 
-   {:pattern #"^(?i)success when (?<upper>.*) then (?<lower>.*)"
+   {:pattern #"^(?i)success when (?<upper>.+) then (?<lower>.*)"
     :template :AbNPRQ
     :parser (fn [_ text-upper text-lower] [text-upper text-lower])}
 
-   {:pattern #"^(?i)cry when (?<upper>.*) then (?<lower>.*)"
+   {:pattern #"^(?i)cry when (?<upper>.+) then (?<lower>.+)"
     :template :QZZvlg
     :parser (fn [_ text-upper text-lower] [text-upper text-lower])}
 
-   {:pattern #"^(?i)what if i told you (?<lower>.*)"
+   {:pattern #"^(?i)what if i told you (?<lower>.+)"
     :template :fWle1w
     :parser (fn [_ text-lower] ["what if i told you" text-lower])}
 
-   {:pattern #"^(?i)(?<upper>.*) how do they work\??"
+   {:pattern #"^(?i)(?<upper>.+),? how do they work\??"
     :template :3V6rYA
     :parser (fn [_ text-upper] [text-upper "how do they work?"])}
 
-   {:pattern #"^(?i)(?<upper>.*) all the (?<lower>.*)"
+   {:pattern #"^(?i)(?<upper>.+) all the (?<lower>.+)"
     :template :Dv99KQ
     :parser (fn [_ text-upper text-lower] [text-upper (str "all the " text-lower)])}
 
-   {:pattern #"^(?i)(?<upper>.*),? (?:\1) everywhere"
+   {:pattern #"^(?i)(?<upper>.+),? (?:\1) everywhere"
     :template :yDcY5w
     :parser (fn [_ text-upper] [text-upper (str text-upper " everywhere")])}
 
@@ -172,16 +172,18 @@
 (defn- clean-pattern [p]
   (-> p
       (.pattern)
-      (string/replace "<?([^>]+)>?\\s?" "[search terms or image url]") ;; pipe
+      (string/replace "<?([^>]+)>?" "[search terms or image url]") ;; pipe
       (string/replace "(?<upper>.*)" "[upper]")
+      (string/replace "(?<upper>.+)" "[upper]")
       (string/replace "(?<lower>.*)" "[lower]")
+      (string/replace "(?<lower>.+)" "[lower]")
       (string/replace "(?:\\1)" "[upper]")
 
       (string/replace "^(?i)" "") ;; case insensitivity
       (string/replace "(?:" "(") ;; non-capturing group
-      (string/replace "\\s?" "") ;; optional space
+      (string/replace "\\s?" " ") ;; optional space
       (string/replace "\\??" "?") ;; optional question mark
-      (string/replace ",?" ",") ;; optional comma
+      (string/replace ",?" "") ;; optional comma
       (string/replace "\\|" "|") ;; pipe
       ))
 

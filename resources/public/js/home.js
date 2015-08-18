@@ -35,8 +35,7 @@ $(document).ready(
           $('#demo-meme').attr('src', r);
         },
         error: function(r) {
-          console.log('oh noes');
-          $('#demo-text').parent('.input-group').addClass('has-error');
+          $('#demo-text').closest('.input-group').addClass('has-error');
           Avgrund.hide();
         }
       });
@@ -52,16 +51,16 @@ $(document).ready(
       queryTokens = q.trim().split(' ');
 
       patternTokens = pattern
-        .replace(/\[upper\]/g, '(.*)')
-        .replace(/\[lower\]/g, '(.*)')
-        .replace(/\[search terms or image url\]/g, '(.*)')
+        .replace(/\[upper\]/g, '(.+)')
+        .replace(/\[lower\]/g, '(.+)')
+        .replace(/\[search terms or image url\]/g, '(.+)')
         .split(' ')
         .slice(0, queryTokens.length);
 
       match = true;
       for (i = 0; i < patternTokens.length; i++) {
-        if (new RegExp(patternTokens[i]).test(queryTokens[i])
-            || new RegExp(queryTokens[i]).test(patternTokens[i])) {
+        if (new RegExp(patternTokens[i], 'i').test(queryTokens[i])
+            || new RegExp(queryTokens[i], 'i').test(patternTokens[i])) {
           // continue
         } else {
           match = false;

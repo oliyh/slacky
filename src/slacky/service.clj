@@ -88,7 +88,8 @@
 
 (swagger/defhandler get-meme-patterns
   {:summary "Responds synchronously with a meme"
-   :responses {200 {:schema [s/Str]}}}
+   :responses {200 {:schema [{:pattern s/Str
+                              (s/optional-key :template) s/Str}]}}}
   [context]
   {:status 200
    :body (meme/describe-meme-patterns)})
