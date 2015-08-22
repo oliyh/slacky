@@ -5,6 +5,10 @@ $(document).ready(
       e.preventDefault();
       $('#success-message, #failure-message').hide();
 
+      if (window.ga != undefined) {
+        ga('send', 'event', 'account', 'register');
+      }
+
       $.ajax({
         url: '/api/account',
         type: 'POST',
@@ -22,6 +26,10 @@ $(document).ready(
 
     $('#demo').submit(function(e) {
       e.preventDefault();
+
+      if (window.ga != undefined) {
+        ga('send', 'event', 'demo');
+      }
 
       $('#demo-text').parent('.input-group').removeClass('has-error');
       $('#demo-meme').attr('src', '/images/loading.gif').show();
