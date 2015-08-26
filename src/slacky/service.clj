@@ -29,8 +29,12 @@
   {(req :text) s/Str})
 
 (s/defschema AddAccount
-  {(req :token) s/Str
-   (req :key)   s/Str})
+  {(req :token) (s/both s/Str
+                        (s/named (s/pred #(<= 20 (count %))) "must be at least 20 characters long")
+                        (s/named (s/pred #(re-matches #"\w*" %)) "must be alphanumeric"))
+   (req :key)   (s/both s/Str
+                        (s/named (s/pred #(re-matches #"^https://hooks\.slack\.com/services/.+" %))
+                                 "must be of the form https://hooks.slack.com/services/..."))})
 
 ;; api handlers
 
@@ -97,15 +101,20 @@
 (swagger/defhandler add-account
   {:summary "Adds an account"
    :parameters {:formData AddAccount}
-   :responses {200 {:schema s/Any}}}
+   :responses {200 {:schema s/Any}
+               409 {:schema s/Str}}}
   [{:keys [form-params] :as req}]
-  (try
-    (accounts/add-account! (:db-connection req) (:token form-params) (:key form-params))
-    (response "Account added")
-    (catch Exception e
-      (log/error "Failed to add account" e)
-      (-> (response "Failed to add account")
-          (status 500)))))
+  (let [db (:db-connection req)]
+    (try
+      (if (accounts/lookup-account db (:token form-params))
+        (-> (response "Account already exists")
+            (status 409))
+        (do (accounts/add-account! db (:token form-params) (:key form-params))
+            (response "Account added")))
+      (catch Exception e
+        (log/error "Failed to add account" e)
+        (-> (response "Failed to add account")
+            (status 500))))))
 
 
 ;; authentication

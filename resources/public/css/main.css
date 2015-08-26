@@ -42,6 +42,7 @@ body {
 
 #success-message, #failure-message {
     display: none;
+    width: 100%;
 }
 
 .example {
