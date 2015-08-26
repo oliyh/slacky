@@ -5,6 +5,7 @@
              [settings :as settings]]
             [io.pedestal.http :as bootstrap]
             [clojure.tools.namespace.repl :as repl]
+            [clojure.test]
             [slacky.db :as db]))
 
 (def clear repl/clear)
@@ -28,3 +29,8 @@
 (defn stop []
   (when server/service-instance
     (bootstrap/stop server/service-instance)))
+
+(defn run-all-tests []
+  (stop)
+  (refresh)
+  (clojure.test/run-all-tests #"slacky.*test$"))

@@ -110,7 +110,6 @@
 
 ;; authentication
 
-;; todo: lookup token / webhook pair in a data store
 (swagger/defbefore authenticate-slack-call
   {:description "Ensures the caller has registered their token and an incoming webhook"
    :parameters {:formData {:token s/Str}}
@@ -120,7 +119,8 @@
         token (get-in request [:form-params :token])
         account (accounts/lookup-account db token)]
     (if-let [webhook-url (:key account)]
-      (assoc-in context [:request ::slack-webhook-url] webhook-url)
+      (update context :request merge {::slack-webhook-url webhook-url
+                                      ::account-id (:id account)})
       (-> context
           terminate
           (assoc-in [:response] {:status 403
@@ -129,6 +129,16 @@
                                             "Please register your token '"
                                             token
                                             "' at https://slacky-server.herokuapp.com")})))))
+
+;; usage stats
+
+(swagger/defbefore increment-api-usage
+  {:description "Increments the api usage of this account"}
+  [{:keys [request response] :as context}]
+  (let [db (:db-connection request)
+        account-id (get request ::account-id)]
+    (accounts/api-hit! db account-id))
+  context)
 
 ;; app-routes
 
@@ -157,7 +167,8 @@
                               (swagger/coerce-params)
                               (swagger/validate-response)]
 
-       ["/slack" ^:interceptors [authenticate-slack-call]
+       ["/slack" ^:interceptors [authenticate-slack-call
+                                 increment-api-usage]
         ["/meme" ^:interceptors [(swagger/tag-route "meme")]
          {:post slack-meme}]]
 

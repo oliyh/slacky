@@ -12,4 +12,9 @@
   (is (= {:id 1
           :token "foo"
           :key "bar"}
-         (lookup-account *db* "foo"))))
+         (lookup-account *db* "foo")))
+
+  (testing "can increment and read api stats"
+    (is (= {:hits 0} (api-stats *db* 1)))
+    (api-hit! *db* 1)
+    (is (= {:hits 1} (api-stats *db* 1)))))
