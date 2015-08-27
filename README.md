@@ -4,6 +4,10 @@
 
 Memes-as-a-Service for Slack. Live instance and registration at https://slacky-server.herokuapp.com.
 
+## Demo
+
+![](resources/public/images/memes-on-slack.gif?raw=true)
+
 ## Installation
 
 All ready for Heroku deployment.
