@@ -1,6 +1,7 @@
 (ns slacky.server
   (:gen-class) ; for -main method in uberjar
-  (:require [slacky
+  (:require [angel.interceptor :as angel]
+            [slacky
              [db :as db]
              [service :as service]
              [settings :as settings]]
@@ -15,6 +16,7 @@
    (alter-var-root #'service-instance
                    (constantly (bootstrap/create-server
                                 (-> (merge service/service pedestal-opts)
+                                    angel/satisfy
                                     (bootstrap/default-interceptors)
                                     (service/with-database (db/create-db-connection (or db-url (settings/database-url))))
                                     (service/with-google-analytics (settings/google-analytics-key))))))))

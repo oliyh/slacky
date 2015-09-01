@@ -1,5 +1,6 @@
 (ns dev
-  (:require [slacky
+  (:require [angel.interceptor :as angel]
+            [slacky
              [service :as service]
              [server :as server]
              [settings :as settings]]
@@ -16,9 +17,10 @@
                           ;; do not block thread that starts web server
                           ::bootstrap/join? false
                           ;; reload routes on every request
-                          ::bootstrap/routes #(deref #'service/routes)
+                          ::bootstrap/routes (deref #'service/routes)
                           ;; all origins are allowed in dev mode
                           ::bootstrap/allowed-origins (constantly true)})
+                 angel/satisfy
                  (bootstrap/default-interceptors)
                  (bootstrap/dev-interceptors)))
 

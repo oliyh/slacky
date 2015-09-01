@@ -1,5 +1,6 @@
 (ns slacky.service
-  (:require [clojure.java.io :as io]
+  (:require [angel.interceptor :as angel]
+            [clojure.java.io :as io]
             [io.pedestal.http :as bootstrap]
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.http.route :as route]
@@ -125,6 +126,7 @@
    :parameters {:formData {:token s/Str}}
    :responses {403 {}}}
   [{:keys [request response] :as context}]
+  (log/info "Authenticating")
   (let [db (:db-connection request)
         token (get-in request [:form-params :token])
         account (accounts/lookup-account db token)]
@@ -145,6 +147,7 @@
 (swagger/defbefore increment-api-usage
   {:description "Increments the api usage of this account"}
   [{:keys [request response] :as context}]
+  (log/info "Incrementing API stats")
   (let [db (:db-connection request)
         account-id (get request ::account-id)]
     (accounts/api-hit! db account-id))
@@ -152,6 +155,8 @@
 
 (defn- annotate "Adds metatata m to a swagger route" [m]
   (sw.doc/annotate m (before ::annotate identity)))
+
+(def debugit (before ::debugit (fn [c] (def c c) c)))
 
 ;; app-routes
 
@@ -173,14 +178,14 @@
             :version "2.0"}
      :tags [{:name "memes"
              :description "All the memes!"}]}
-    [[["/api" ^:interceptors [(body-params/body-params)
-                              bootstrap/json-body
+    [[["/api" ^:interceptors [debugit
                               (swagger/body-params)
+                              bootstrap/json-body
                               (swagger/coerce-request)
-                              (swagger/validate-response)]
+                              (swagger/validate-response)
+                              (angel/prefers increment-api-usage :account)]
 
-       ["/slack" ^:interceptors [authenticate-slack-call
-                                 increment-api-usage]
+       ["/slack" ^:interceptors [(angel/provides authenticate-slack-call :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
          {:post slack-meme}]]
 
