@@ -17,12 +17,12 @@
                           ;; do not block thread that starts web server
                           ::bootstrap/join? false
                           ;; reload routes on every request
-                          ::bootstrap/routes #(deref #'service/routes)
+                          ::bootstrap/routes (deref #'service/routes)
                           ;; all origins are allowed in dev mode
                           ::bootstrap/allowed-origins (constantly true)})
+                 angel/satisfy
                  (bootstrap/default-interceptors)
-                 (bootstrap/dev-interceptors)
-                 angel/satisfy))
+                 (bootstrap/dev-interceptors)))
 
 (defn start [& [opts]]
   (server/create-server {:pedestal-opts (merge service opts)})
