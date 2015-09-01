@@ -1,5 +1,6 @@
 (ns dev
-  (:require [slacky
+  (:require [angel.interceptor :as angel]
+            [slacky
              [service :as service]
              [server :as server]
              [settings :as settings]]
@@ -20,7 +21,8 @@
                           ;; all origins are allowed in dev mode
                           ::bootstrap/allowed-origins (constantly true)})
                  (bootstrap/default-interceptors)
-                 (bootstrap/dev-interceptors)))
+                 (bootstrap/dev-interceptors)
+                 angel/satisfy))
 
 (defn start [& [opts]]
   (server/create-server {:pedestal-opts (merge service opts)})
