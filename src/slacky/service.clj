@@ -8,6 +8,7 @@
             [io.pedestal.interceptor.helpers :refer [before handler]]
             [io.pedestal.interceptor :as interceptor]
             [pedestal.swagger.core :as swagger]
+            [pedestal.swagger.doc :as sw.doc]
             [ring.util.codec :as codec]
             [ring.util.response :refer [response not-found created resource-response content-type status]]
             [schema.core :as s]
@@ -149,6 +150,9 @@
     (accounts/api-hit! db account-id))
   context)
 
+(defn- annotate "Adds metatata m to a swagger route" [m]
+  (sw.doc/annotate m (before ::annotate identity)))
+
 ;; app-routes
 
 (def home
@@ -172,24 +176,23 @@
     [[["/api" ^:interceptors [(body-params/body-params)
                               bootstrap/json-body
                               (swagger/body-params)
-                              (swagger/keywordize-params :form-params :headers)
-                              (swagger/coerce-params)
+                              (swagger/coerce-request)
                               (swagger/validate-response)]
 
        ["/slack" ^:interceptors [authenticate-slack-call
                                  increment-api-usage]
-        ["/meme" ^:interceptors [(swagger/tag-route "meme")]
+        ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
          {:post slack-meme}]]
 
-       ["/meme" ^:interceptors [(swagger/tag-route "meme")]
+       ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
         {:post rest-meme}
         ["/patterns"
          {:get get-meme-patterns}]]
 
-       ["/account" ^:interceptors [(swagger/tag-route "account")]
+       ["/account" ^:interceptors [(annotate {:tags ["account"]})]
         {:post add-account}]
 
-       ["/doc" {:get [(swagger/swagger-doc)]}]
+       ["/swagger.json" {:get [(swagger/swagger-json)]}]
        ["/*resource" {:get [(swagger/swagger-ui)]}]]]]))
 
 (defroutes app-routes
