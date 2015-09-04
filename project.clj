@@ -36,6 +36,7 @@
   :profiles {:uberjar {:aot :all}
              :dev {:source-paths ["dev"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
-                                  [clj-http-fake "1.0.1"]]}}
+                                  [clj-http-fake "1.0.1"]
+                                  [org.clojars.runa/conjure "2.1.3"]]}}
   :uberjar-name "slacky-standalone.jar"
   :repl-options {:init-ns user})

@@ -1,8 +1,14 @@
 (ns slacky.meme-test
-  (:require [slacky.meme :refer :all]
-            [clojure.test :refer :all]))
+  (:require [slacky
+             [accounts :refer [add-account! lookup-account]]
+             [fixture :refer [with-database *db*]]
+             [meme :refer :all]
+             [memecaptain :as memecaptain]]
+            [clojure.test :refer :all]
+            [conjure.core :as cj]))
 
 (def resolve-meme #'slacky.meme/resolve-meme-pattern)
+(use-fixtures :once with-database)
 
 (deftest resolve-meme-pattern-test
   (are [text meme-pattern] (= meme-pattern (resolve-meme text))
@@ -26,3 +32,25 @@
     (is (= {:pattern "y u no [lower]"
             :template "http://i.memecaptain.com/src_images/NryNmg.jpg"}
            (first descriptions)))))
+
+(def register-template #'slacky.meme/register-template)
+(def resolve-meme-pattern #'slacky.meme/resolve-meme-pattern)
+
+(deftest register-template-test
+  (add-account! *db* "foo" "bar")
+  (let [account-id (:id (lookup-account *db* "foo"))
+        result (promise)]
+
+    (cj/stubbing [memecaptain/create-template "some-template-id"]
+
+                 (register-template *db*
+                                    account-id
+                                    ":register angry martin http://foo.bar/baz.jpg"
+                                    #(deliver result [%1 %2]))
+
+                 (is (= [:success "Successfully created your template - refer to it as 'angry martin'"]
+                        @result))
+                 (cj/verify-called-once-with-args memecaptain/create-template "http://foo.bar/baz.jpg")
+
+                 (is (= [:some-template-id "" "bidi!!!111one"]
+                        (resolve-meme-pattern *db* account-id "angry martin | | bidi!!!111one"))))))

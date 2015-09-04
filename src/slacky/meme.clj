@@ -12,6 +12,9 @@
              [memecaptain :as memecaptain]
              [slack :as slack]]))
 
+(defn- url? [term]
+  (re-matches #"^https?://.*$" term))
+
 (defn- resolve-template-id [term]
   (log/debug "Resolving template for term" term)
   (cond
@@ -21,7 +24,7 @@
     (string/blank? term)
     nil
 
-    (re-matches #"^https?://.*$" term)
+    (url? term)
     (memecaptain/create-template term)
 
     :else
@@ -75,12 +78,32 @@
    ])
 
 
-(defn- resolve-meme-pattern [text]
-  (some #(when-let [matches (re-matches (:pattern %) text)]
-           (let [m (apply (:parser %) matches)]
-             (if (:template %)
-               (cons (:template %) m)
-               m))) meme-patterns))
+(defn- resolve-meme-pattern
+  ([text] (resolve-meme-pattern nil nil text))
+  ([db account-id text]
+   (when-let [pattern
+              (some #(when-let [matches (re-matches (:pattern %) text)]
+                       (let [m (apply (:parser %) matches)]
+                         (if (:template %)
+                           (cons (:template %) m)
+                           m))) meme-patterns)]
+
+     (let [template (first pattern)
+           template (or
+                     (and account-id (string? template) (not (url? template))
+                          (->
+                           (jdbc/query db (sql/format {:select [:template_id]
+                                                       :from [:meme_templates]
+                                                       :where [:and
+                                                               [:= :account_id account-id]
+                                                               [:= :name (-> template string/trim string/lower-case)]]
+                                                       :limit 1}))
+                           first
+                           :template_id
+                           keyword))
+                     template)]
+
+       (into [template] (rest pattern))))))
 
 
 (defn- clean-pattern [p]
@@ -102,7 +125,7 @@
       ))
 
 (defn- resolve-template-registration [text]
-  (re-matches #"(?i):register (.*) (https?://.*$)" text))
+  (re-matches #"(?i):register (.+) (https?://.+$)" text))
 
 (defn- resolve-command [text]
   (cond
@@ -115,9 +138,9 @@
     :else
     :unknown))
 
-(defn- generate-meme [text respond-to]
+(defn- generate-meme [db account-id text respond-to]
   (future
-    (let [[template-search text-upper text-lower] (resolve-meme-pattern text)]
+    (let [[template-search text-upper text-lower] (resolve-meme-pattern db account-id text)]
       (if-let [template-id (resolve-template-id template-search)]
         (try (let [meme-url (memecaptain/create-instance template-id text-upper text-lower)]
                (log/info "Generated meme" meme-url)
@@ -133,13 +156,13 @@
   "Your meme is on its way")
 
 (defn- register-template [db account-id text respond-to]
-  (let [[name source-url] (resolve-template-registration)]
+  (let [[_ name source-url] (resolve-template-registration text)]
 
     (try
       (let [template-id (memecaptain/create-template source-url)]
         (jdbc/with-db-transaction [db db]
           (jdbc/insert! db :meme_templates {:account_id account-id
-                                            :name name
+                                            :name (-> name string/trim string/lower-case)
                                             :source_url source-url
                                             :template_id template-id}))
         (respond-to :success (format "Successfully created your template - refer to it as '%s'" name)))
@@ -148,15 +171,15 @@
 
 (defn describe-meme-patterns []
   (mapv
-     #(cond-> %
-        :always
-        (update :pattern clean-pattern)
+   #(cond-> %
+      :always
+      (update :pattern clean-pattern)
 
-        (:template %)
-        (update :template (fn [t] (str "http://i.memecaptain.com/src_images/" (name t) ".jpg")))
+      (:template %)
+      (update :template (fn [t] (str "http://i.memecaptain.com/src_images/" (name t) ".jpg")))
 
-        :always
-        (dissoc :parser))
+      :always
+      (dissoc :parser))
    meme-patterns))
 
 (def ^:private invalid-meme-syntax
@@ -170,7 +193,7 @@
 (defn handle-request [db account-id text respond-to]
   (condp = (resolve-command text)
 
-    :generate-meme (generate-meme text respond-to)
+    :generate-meme (generate-meme db account-id text respond-to)
 
     :register-template (register-template db account-id text respond-to)
 
