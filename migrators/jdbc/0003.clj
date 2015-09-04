@@ -15,8 +15,8 @@
                            [:name "varchar(128) not null"]
                            [:source_url "varchar(256) not null"]
                            [:template_id "varchar(128) not null"])
-     "CREATE UNIQUE INDEX meme_templates_name_idx ON meme_templates(name);"
-     "CREATE UNIQUE INDEX meme_templates_account_idx ON meme_templates(account_id);")))
+     "CREATE INDEX meme_templates_name_idx ON meme_templates(name);"
+     "CREATE INDEX meme_templates_account_idx ON meme_templates(account_id);")))
 
 (defn down [db]
   (sql/with-db-connection [db db]
