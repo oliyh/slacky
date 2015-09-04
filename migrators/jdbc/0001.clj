@@ -1,13 +1,7 @@
 (ns jdbc.0001
   (:require [clojure.java.jdbc :as sql]
-            [joplin.jdbc.database]))
-
-(defn- db-provider [db]
-  (let [url (get-in db [:db :url])]
-    (condp re-find url
-        #":sqlite:" :sqlite
-        #":postgresql:" :postgres
-        :unknown)))
+            [joplin.jdbc.database]
+            [slacky.db :refer [db-provider]]))
 
 (defn up [db]
   (sql/with-db-connection [db db]

@@ -40,57 +40,58 @@
 
 ;; api handlers
 
-(def ^:private invalid-meme-syntax
-  (string/join
-   "\n"
-   (concat ["Sorry, this is not a valid command syntax"
-            "Try one the following patterns:"
-            ""]
-           (map :pattern (meme/describe-meme-patterns)))))
-
 (swagger/defhandler slack-meme
   {:summary "Responds asynchonously with a meme to a Slash command from Slack"
    :parameters {:formData slack/SlackRequest}
    :responses {200 {:schema s/Str}}}
-  [{:keys [form-params] :as context}]
-  (response
-   (if (meme/valid-command? (:text form-params))
-     (do
-       (log/info form-params)
-       (future
-         (try
-           (meme/generate-meme
-            (:text form-params)
-            (slack/build-responder (::slack-webhook-url context) form-params))
-           (catch Exception e
-             (log/error e)
-             {:status 500
-              :body "Something went wrong, check my logs"})))
-       "Your meme is on its way")
-     invalid-meme-syntax)))
+  [{:keys [form-params] :as request}]
+  (try
+    {:status 200
+     :body (meme/handle-request (:db-connection request)
+                                (::account-id request)
+                                (:text form-params)
+                                (slack/build-responder (::slack-webhook-url request) form-params))}
+
+    (catch IllegalArgumentException e
+      {:status 200
+       :body (.getMessage e)})
+
+    (catch Exception e
+      (log/error e)
+      {:status 500
+       :body "Something went wrong, check my logs"})))
 
 (swagger/defhandler rest-meme
   {:summary "Responds synchronously with a meme"
    :parameters {:formData MemeRequest}
    :responses {200 {:schema s/Str}}}
-  [{:keys [form-params] :as context}]
-  (if (meme/valid-command? (:text form-params))
-    (let [response-atom (atom nil)]
-      (try
-        (meme/generate-meme (:text form-params)
-                            (fn [destination meme-url]
-                              (reset! response-atom
+  [{:keys [form-params] :as request}]
+
+  (try
+    (let [response-promise (promise)]
+      (meme/handle-request (:db-connection request)
+                           (::account-id request)
+                           (:text form-params)
+                           (fn [destination meme-url]
+                             (deliver response-promise
                                       (condp = destination
                                         :error {:status 500
                                                 :body meme-url}
                                         :success (response meme-url)))))
-        (deref response-atom)
-        (catch Exception e
-          (log/error e)
-          {:status 500
-           :body "Something went wrong, check my logs"})))
-    {:status 400
-     :body invalid-meme-syntax}))
+
+      (if-let [response (deref response-promise 180000 false)]
+        response
+        {:status 504
+         :body "Your request timed out"}))
+
+     (catch IllegalArgumentException e
+       {:status 400
+        :body (.getMessage e)})
+
+     (catch Exception e
+       (log/error e)
+       {:status 500
+        :body "Something went wrong, check my logs"})))
 
 (swagger/defhandler get-meme-patterns
   {:summary "Responds synchronously with a meme"
@@ -156,8 +157,6 @@
 (defn- annotate "Adds metatata m to a swagger route" [m]
   (sw.doc/annotate m (before ::annotate identity)))
 
-(def debugit (before ::debugit (fn [c] (def c c) c)))
-
 ;; app-routes
 
 (def home
@@ -178,8 +177,7 @@
             :version "2.0"}
      :tags [{:name "memes"
              :description "All the memes!"}]}
-    [[["/api" ^:interceptors [debugit
-                              (swagger/body-params)
+    [[["/api" ^:interceptors [(swagger/body-params)
                               bootstrap/json-body
                               (swagger/coerce-request)
                               (swagger/validate-response)

@@ -5,10 +5,12 @@
             [clojure.test :refer :all]
             [cheshire.core :as json]
             [slacky
+             [memecaptain :refer :all]
              [fixture :refer [with-web-api]]
              [service :as service]
+             [google :refer [image-search-url]]
              [server :as server]
-             [meme :refer [memecaptain-url image-search-url] :as meme]]))
+             [meme :as meme]]))
 
 (def memecaptain-template-polling-url (str memecaptain-url "/template-polling"))
 (def memecaptain-meme-polling-url (str memecaptain-url "/meme-polling"))

@@ -4,6 +4,15 @@
   (:import [com.mchange.v2.c3p0 ComboPooledDataSource]
            org.sqlite.JDBC))
 
+(defn db-provider
+  "Utility fn used from migrators"
+  [db]
+  (let [url (get-in db [:db :url])]
+    (condp re-find url
+      #":sqlite:" :sqlite
+      #":postgresql:" :postgres
+      :unknown)))
+
 (defn- migrate-db [url]
   (joplin/migrate-db
    {:db {:type :jdbc
