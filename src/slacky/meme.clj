@@ -156,18 +156,19 @@
   "Your meme is on its way")
 
 (defn- register-template [db account-id text respond-to]
-  (let [[_ name source-url] (resolve-template-registration text)]
-
-    (try
-      (let [template-id (memecaptain/create-template source-url)]
-        (jdbc/with-db-transaction [db db]
-          (jdbc/insert! db :meme_templates {:account_id account-id
-                                            :name (-> name string/trim string/lower-case)
-                                            :source_url source-url
-                                            :template_id template-id}))
-        (respond-to :success (format "Successfully created your template - refer to it as '%s'" name)))
-      (catch Exception e
-        (respond-to :error (format "Could not create template from %s" source-url))))))
+  (future
+    (let [[_ name source-url] (resolve-template-registration text)]
+      (try
+        (let [template-id (memecaptain/create-template source-url)]
+          (jdbc/with-db-transaction [db db]
+            (jdbc/insert! db :meme_templates {:account_id account-id
+                                              :name (-> name string/trim string/lower-case)
+                                              :source_url source-url
+                                              :template_id template-id}))
+          (respond-to :success (format "Successfully created your template - refer to it as '%s'" name)))
+        (catch Exception e
+          (respond-to :error (format "Could not create template from %s" source-url))))))
+  "Your template is being registered")
 
 (defn describe-meme-patterns []
   (mapv
