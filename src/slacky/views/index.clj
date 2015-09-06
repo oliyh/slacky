@@ -55,7 +55,7 @@
 
 
              [:div.jumbotron
-
+              [:a {:name "demo"}]
               [:div.leader
                [:h1 "How can haz meme?"]]
 
@@ -83,6 +83,7 @@
 
 
              [:div.jumbotron
+              [:a {:name "slack"}]
               [:div.leader
                [:div#memes-in-slack
                 [:span.h1 "Memes in"]
@@ -121,7 +122,20 @@
                   [:span.glyphicon.glyphicon-fire {:aria-hidden "true"}]
                   "&nbsp;"
                   [:strong "Oh noes!"]
-                  " Something broke! You can try again, or give up..."]]]]]]]]
+                  " Something broke! You can try again, or give up..."]]]]]
+
+             [:div.jumbotron
+              [:a {:name "firefox"}]
+              [:div.leader
+               [:div#memes-in-slack
+                [:span.h1 "Memes in "]
+                [:img {:src "/images/firefox-logo.png"
+                       :alt "Firefox"}]]
+               [:p "Download the plugin and install by dragging the file into your Firefox window."
+                [:a.btn.btn-success.btn-lg {:href "/plugins/@slacky-0.0.1.xpi"}
+                 "Click here to download"]]
+
+               [:p "Once installed, type '/meme' into any text input to bring up the Slacky dialogue, or click the icon on the toolbar."]]]]]]
 
           [:div#demo-meme-popup.avgrund-popup
            [:div
