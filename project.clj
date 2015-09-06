@@ -23,7 +23,7 @@
 
                  ;; persistence
                  [org.clojure/java.jdbc "0.3.5"]
-                 [org.xerial/sqlite-jdbc "3.8.7"]
+                 [org.xerial/sqlite-jdbc "3.8.6"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
                  [com.mchange/c3p0 "0.9.5.1"]
                  [joplin.core "0.2.12"]
