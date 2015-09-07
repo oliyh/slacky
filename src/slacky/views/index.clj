@@ -124,7 +124,7 @@
                   [:strong "Oh noes!"]
                   " Something broke! You can try again, or give up..."]]]]]
 
-             [:div.jumbotron
+             #_[:div.jumbotron
               [:a {:name "firefox"}]
               [:div.leader
                [:div#memes-in-slack
