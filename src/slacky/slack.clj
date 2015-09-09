@@ -21,7 +21,9 @@
 
 (def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
 
-(defn meme-message [user-name meme-command meme-url]
+(defmulti ->message (fn [message-type & args] message-type))
+
+(defmethod ->message :meme [_ user-name meme-command meme-url]
   {:attachments
    [{:fallback (str user-name ": " meme-command)
      :pretext nil
@@ -30,7 +32,18 @@
      :text (str meme-command "\n" meme-url)
      :image_url meme-url}]})
 
-(defn- send-message [webhook-url channel slack-message]
+(defmethod ->message :add-template [_ user-name _ name image-url]
+  {:attachments
+   [{:fallback (format "%s added a template called '%s' for %s" user-name name image-url)
+     :pretext nil
+     :color "#D00000"
+     :title (format "%s added a template called '%s'" user-name name)
+     :image_url image-url}]})
+
+(defmethod ->message :default [_ _ _ string-message]
+  string-message)
+
+(defn send-message [webhook-url channel slack-message]
   (let [message (merge (cond (map? slack-message)
                              slack-message
 
@@ -45,14 +58,18 @@
     (log/info "Sent message to" channel "and recieved response" (:status response))))
 
 (defn build-responder [webhook-url {:keys [channel_name user_name text]}]
-  (fn [destination meme-url]
-    (try
-      (send-message webhook-url
-                    (get {:error (str "@" user_name)
-                          :success (if (= "directmessage" channel_name)
-                                     (str "@" user_name)
-                                     (str "#" channel_name))}
-                         destination)
-                    (meme-message user_name text meme-url))
-      (catch Exception e
-        (log/warn "Could not send message to Slack" e)))))
+  (let [to-user (str "@" user_name)
+        to-channel (str "#" channel_name)]
+    (fn [message-type & args]
+      (try
+        (send-message webhook-url
+                      (get {:add-template to-channel
+                            :meme (if (= "directmessage" channel_name)
+                                    to-user
+                                    to-channel)
+                            :help to-user}
+                           message-type
+                           to-user)
+                      (apply ->message message-type user_name text args))
+        (catch Exception e
+          (log/warn "Could not send message to Slack" e))))))

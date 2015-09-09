@@ -33,7 +33,7 @@
             :template "http://i.memecaptain.com/src_images/NryNmg.jpg"}
            (first descriptions)))))
 
-(def register-template #'slacky.meme/register-template)
+(def add-template #'slacky.meme/add-template)
 (def resolve-meme-pattern #'slacky.meme/resolve-meme-pattern)
 
 (deftest register-template-test
@@ -43,13 +43,13 @@
 
     (cj/stubbing [memecaptain/create-template "some-template-id"]
 
-                 (register-template *db*
-                                    account-id
-                                    ":register angry martin http://foo.bar/baz.jpg"
-                                    #(deliver result [%1 %2]))
+                 (add-template *db*
+                               account-id
+                               ":template angry martin http://foo.bar/baz.jpg"
+                               (fn [& args] (deliver result (vec args))))
 
-                 (is (= [:success "Successfully created your template - refer to it as 'angry martin'"]
-                        @result))
+                 (is (= [:add-template "angry martin" "http://foo.bar/baz.jpg"]
+                        (deref result 500 false)))
                  (cj/verify-called-once-with-args memecaptain/create-template "http://foo.bar/baz.jpg")
 
                  (is (= [:some-template-id "" "bidi!!!111one"]
