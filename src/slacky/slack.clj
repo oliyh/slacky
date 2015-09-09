@@ -30,7 +30,7 @@
      :text (str meme-command "\n" meme-url)
      :image_url meme-url}]})
 
-(defn- send-message [webhook-url channel slack-message]
+(defn send-message [webhook-url channel slack-message]
   (let [message (merge (cond (map? slack-message)
                              slack-message
 
