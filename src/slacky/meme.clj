@@ -116,30 +116,13 @@
       (string/replace "\\|" "|") ;; pipe
       ))
 
-(defn- resolve-template-registration [text]
-  (re-matches #"(?i):register (.+) (https?://.+$)" text))
-
-(defn- resolve-command [text]
-  (cond
-    (not (nil? (resolve-template-registration text)))
-    :register-template
-
-    (not (nil? (resolve-meme-pattern text)))
-    :generate-meme
-
-    (re-matches #"(?i):help$" text)
-    :help
-
-    :else
-    :unknown))
-
 (defn- generate-meme [db account-id text respond-to]
   (future
     (let [[template-search text-upper text-lower] (resolve-meme-pattern db account-id text)]
       (if-let [template-id (resolve-template-id template-search)]
         (try (let [meme-url (memecaptain/create-instance template-id text-upper text-lower)]
                (log/info "Generated meme" meme-url)
-               (respond-to :success meme-url))
+               (respond-to :meme :success meme-url))
              (catch Exception e
                (log/error "Blew up attempting to generate meme" e)
                (respond-to :error (str "You broke me. Check my logs for details!"
@@ -150,13 +133,16 @@
                          "\n`" text "`")))))
   "Your meme is on its way")
 
-(defn- register-template [db account-id text respond-to]
+(defn- resolve-template-addition [text]
+  (re-matches #"(?i):template (.+) (https?://.+$)" text))
+
+(defn- add-template [db account-id text respond-to]
   (future
-    (let [[_ name source-url] (resolve-template-registration text)]
+    (let [[_ name source-url] (resolve-template-addition text)]
       (try
         (let [template-id (memecaptain/create-template source-url)]
           (templates/persist! db account-id name source-url template-id)
-          (respond-to :success (format "Successfully created your template - refer to it as '%s'" name)))
+          (respond-to :add-template :success name source-url))
         (catch Exception e
           (respond-to :error (format "Could not create template from %s" source-url))))))
   "Your template is being registered")
@@ -182,16 +168,19 @@
             ""]
            (map :pattern (describe-meme-patterns)))))
 
-(defn- help [db account-id respond-to]
+(defn- generate-help [db account-id respond-to]
   (respond-to :error (map :pattern (describe-meme-patterns))))
 
 (defn handle-request [db account-id text respond-to]
-  (condp = (resolve-command text)
+  (cond
 
-    :generate-meme (generate-meme db account-id text respond-to)
+    (not (nil? (resolve-template-addition text)))
+    (add-template db account-id text respond-to)
 
-    :register-template (register-template db account-id text respond-to)
+    (not (nil? (resolve-meme-pattern text)))
+    (generate-meme db account-id text respond-to)
 
-    :help (help db account-id respond-to)
+    (re-matches #"(?i):help$" text)
+    (generate-help db account-id respond-to)
 
-    :unknown (throw (IllegalArgumentException. invalid-meme-syntax))))
+    :else (throw (IllegalArgumentException. invalid-meme-syntax))))

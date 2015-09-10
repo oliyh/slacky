@@ -72,7 +72,7 @@
       (meme/handle-request (:db-connection request)
                            (::account-id request)
                            (:text form-params)
-                           (fn [destination meme-url]
+                           (fn [_ destination meme-url]
                              (deliver response-promise
                                       (condp = destination
                                         :error {:status 500

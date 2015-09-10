@@ -21,7 +21,9 @@
 
 (def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
 
-(defn meme-message [user-name meme-command meme-url]
+(defmulti ->message (fn [message-type & args] message-type))
+
+(defmethod ->message :meme [_ user-name meme-command meme-url]
   {:attachments
    [{:fallback (str user-name ": " meme-command)
      :pretext nil
@@ -29,6 +31,17 @@
      :title user-name
      :text (str meme-command "\n" meme-url)
      :image_url meme-url}]})
+
+(defmethod ->message :add-template [_ user-name _ name image-url]
+  {:attachments
+   [{:fallback (format "%s added a template called '%s' for %s" user-name name image-url)
+     :pretext nil
+     :color "#D00000"
+     :title (format "%s added a template called '%s'" user-name name)
+     :image_url image-url}]})
+
+(defmethod ->message :error [_ _ _ error]
+  error)
 
 (defn send-message [webhook-url channel slack-message]
   (let [message (merge (cond (map? slack-message)
@@ -45,7 +58,7 @@
     (log/info "Sent message to" channel "and recieved response" (:status response))))
 
 (defn build-responder [webhook-url {:keys [channel_name user_name text]}]
-  (fn [destination meme-url]
+  (fn [message-type destination & args]
     (try
       (send-message webhook-url
                     (get {:error (str "@" user_name)
@@ -53,6 +66,6 @@
                                      (str "@" user_name)
                                      (str "#" channel_name))}
                          destination)
-                    (meme-message user_name text meme-url))
+                    (apply ->message message-type user_name text args))
       (catch Exception e
         (log/warn "Could not send message to Slack" e)))))

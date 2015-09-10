@@ -5,7 +5,7 @@
             [conjure.core :as cj]
             [slacky
              [memecaptain :as memecaptain]
-             [fixture :refer [with-web-api]]
+             [fixture :refer [with-web-api with-database]]
              [service :as service]
              [google :as google]
              [slack :as slack]])
@@ -15,7 +15,7 @@
 (def meme-url (str memecaptain/memecaptain-url "/gend_images/a1jB3q.jpg"))
 (def template-id "b7k3me")
 
-(use-fixtures :once with-web-api)
+(use-fixtures :once with-web-api with-database)
 
 (deftest can-generate-memes
   (cj/stubbing [memecaptain/create-template template-id
@@ -29,6 +29,8 @@
 
                (cj/verify-called-once-with-args memecaptain/create-template "http://images.com/cat.jpg")
                (cj/verify-called-once-with-args memecaptain/create-instance template-id "cute cats" "FTW")))
+
+
 
 (deftest can-integrate-with-slack
   (let [token (clojure.string/replace (str (UUID/randomUUID)) "-" "")
@@ -63,5 +65,27 @@
                                                            :command "/meme"
                                                            :text "cats | cute cats | FTW"}}))))
 
-                   (is (= [webhook-url (str "#" channel-name) (slack/meme-message user-name "cats | cute cats | FTW" meme-url)]
-                          (first (a/alts!! [slack-messages (a/timeout 500)]))))))))
+                   (is (= [webhook-url (str "#" channel-name)
+                           (slack/->message :meme user-name "cats | cute cats | FTW" meme-url)]
+                          (first (a/alts!! [slack-messages (a/timeout 500)])))))
+
+                 (testing "can register a template"
+                   (is (= "Your template is being registered"
+                          (:body (http/post "http://localhost:8080/api/slack/meme"
+                                            {:throw-exceptions? false
+                                             :form-params {:token token
+                                                           :team_id "a"
+                                                           :team_domain "b"
+                                                           :channel_id "c"
+                                                           :channel_name channel-name
+                                                           :user_id "d"
+                                                           :user_name user-name
+                                                           :command "/meme"
+                                                           :text ":template cute cats http://cats.com/cute.jpg"}}))))
+
+                   (is (= [webhook-url (str "#" channel-name)
+                           (slack/->message :add-template user-name nil
+                                            "cute cats" "http://cats.com/cute.jpg")]
+                          (first (a/alts!! [slack-messages (a/timeout 500)]))))
+
+                   (cj/verify-nth-call-args-for 2 memecaptain/create-template "http://cats.com/cute.jpg")))))
