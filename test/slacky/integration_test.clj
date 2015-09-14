@@ -28,7 +28,19 @@
   (let [token (clojure.string/replace (str (UUID/randomUUID)) "-" "")
         webhook-url "https://hooks.slack.com/services/foobarbaz"
         channel-name "my-channel"
-        user-name "the-user"]
+        user-name "the-user"
+        slack-post! (fn [text]
+                      (:body (http/post "http://localhost:8080/api/slack/meme"
+                                        {:throw-exceptions? false
+                                         :form-params {:token token
+                                                       :team_id "a"
+                                                       :team_domain "b"
+                                                       :channel_id "c"
+                                                       :channel_name channel-name
+                                                       :user_id "d"
+                                                       :user_name user-name
+                                                       :command "/meme"
+                                                       :text text}})))]
 
     (testing "can create an account"
       (is (= 200 (:status (http/post "http://localhost:8080/api/account"
@@ -39,37 +51,16 @@
     (testing "can meme from a channel"
       (with-fake-internet {}
         (is (= "Your meme is on its way"
-               (:body (http/post "http://localhost:8080/api/slack/meme"
-                                 {:throw-exceptions? false
-                                  :form-params {:token token
-                                                :team_id "a"
-                                                :team_domain "b"
-                                                :channel_id "c"
-                                                :channel_name channel-name
-                                                :user_id "d"
-                                                :user_name user-name
-                                                :command "/meme"
-                                                :text "cats | cute cats | FTW"}}))))
+               (slack-post! "cats | cute cats | FTW")))
 
         (is (= [webhook-url (str "#" channel-name)
                 (slack/->message :meme user-name "cats | cute cats | FTW" meme-url)]
                (first (a/alts!! [slack-channel (a/timeout 500)]))))))
 
-
     (testing "can register a template"
       (with-fake-internet {:template-id "cute-cat-template-id"}
         (is (= "Your template is being registered"
-               (:body (http/post "http://localhost:8080/api/slack/meme"
-                                 {:throw-exceptions? false
-                                  :form-params {:token token
-                                                :team_id "a"
-                                                :team_domain "b"
-                                                :channel_id "c"
-                                                :channel_name channel-name
-                                                :user_id "d"
-                                                :user_name user-name
-                                                :command "/meme"
-                                                :text ":template cute cats http://cats.com/cute.jpg"}}))))
+               (slack-post! ":template cute cats http://cats.com/cute.jpg")))
 
         (is (= [webhook-url (str "#" channel-name)
                 (slack/->message :add-template user-name nil
@@ -80,17 +71,7 @@
 
         (testing "and can use it in a meme"
           (is (= "Your meme is on its way"
-                 (:body (http/post "http://localhost:8080/api/slack/meme"
-                                   {:throw-exceptions? false
-                                    :form-params {:token token
-                                                  :team_id "a"
-                                                  :team_domain "b"
-                                                  :channel_id "c"
-                                                  :channel_name channel-name
-                                                  :user_id "d"
-                                                  :user_name user-name
-                                                  :command "/meme"
-                                                  :text "cute cats | omg | so cute"}}))))
+                 (slack-post! "cute cats | omg | so cute")))
 
           (is (= [webhook-url (str "#" channel-name)
                   (slack/->message :meme user-name "cute cats | omg | so cute" meme-url)]
