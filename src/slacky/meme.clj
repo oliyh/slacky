@@ -179,7 +179,8 @@
                                "/meme :template [name of template] https://cats.com/cat.jpg"]
                               (when-let [templates (and account-id
                                                         (not-empty (templates/list db account-id)))]
-                                (cons "Custom templates:" (map :name templates)))))))
+                                (cons "Custom templates:" (map :name templates))))))
+  "Help has been provided in private chat")
 
 (defn handle-request [db account-id text respond-with]
   (cond
@@ -194,4 +195,5 @@
     (generate-help db account-id respond-with)
 
     :else
-    (respond-with :error "Your command was not recognised, try /meme :help")))
+    (do (respond-with :error "Sorry, the command was not recognised, try '/meme :help' for help")
+        "Sorry, the command was not recognised, try '/meme :help' for help")))

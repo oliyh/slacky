@@ -30,7 +30,8 @@
                                 {:throw-exceptions? false
                                  :form-params {:text "nil"}})]
         (is (= 400 (:status response)))
-        (is (= "Your command was not recognised, try /meme :help" (:body response))))
+        (is (= "Sorry, the command was not recognised, try '/meme :help' for help"
+               (:body response))))
 
       (cj/verify-call-times-for google/image-search 0)
       (cj/verify-call-times-for memecaptain/create-template 0)
@@ -77,6 +78,11 @@
                                      {:throw-exceptions? false
                                       :form-params {:token token
                                                     :key webhook-url}})))))
+
+    (testing "alerts on bad syntax"
+      (with-fake-internet {}
+        (is (= "Sorry, the command was not recognised, try '/meme :help' for help"
+               (slack-post! "how does this work?")))))
 
     (testing "can ask for help"
       (with-fake-internet {}

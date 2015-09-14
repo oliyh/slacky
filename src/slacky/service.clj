@@ -68,7 +68,7 @@
       (meme/handle-request (:db-connection request)
                            (::account-id request)
                            (:text form-params)
-                           (fn [message-type meme-or-error]
+                           (fn [message-type meme-or-error & _]
                              (deliver response-promise
                                       (if (= :error message-type)
                                         {:status 400
