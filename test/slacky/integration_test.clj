@@ -83,7 +83,7 @@
         (slack-post! ":help")
 
         (is (= [webhook-url (str "@" user-name)
-                (slack/->message :error nil nil basic-help-message)]
+                (slack/->message :help nil nil basic-help-message)]
                (first (a/alts!! [slack-channel (a/timeout 500)]))))))
 
     (testing "can meme from a channel"
@@ -118,4 +118,15 @@
           (cj/verify-call-times-for memecaptain/create-template 1)
           (cj/verify-first-call-args-for memecaptain/create-instance template-id "omg" "so cute")))
 
-      (testing "templates show up in help message"))))
+      (testing "templates show up in help message"
+        (with-fake-internet {}
+        (slack-post! ":help")
+
+        (is (= [webhook-url (str "@" user-name)
+                (slack/->message :help nil nil
+                                 (str basic-help-message
+                                      "\n"
+                                      (string/join "\n"
+                                                   ["Custom templates:"
+                                                    "cute cats"])))]
+               (first (a/alts!! [slack-channel (a/timeout 500)])))))))))

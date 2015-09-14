@@ -1,5 +1,6 @@
 (ns slacky.templates
   (:require [clojure.java.jdbc :as jdbc]
+            [clojure.set :refer [rename-keys]]
             [clojure.string :as string]
             [honeysql.core :as sql]))
 
@@ -21,3 +22,10 @@
                                       :name (-> name string/trim string/lower-case)
                                       :source_url source-url
                                       :template_id template-id})))
+
+(defn list [db account-id]
+  (->>
+   (jdbc/query db (sql/format {:select [:name :source_url]
+                               :from [:meme_templates]
+                               :where [:= :account_id account-id]}))
+   (map #(rename-keys % {:source_url :source-url}))))

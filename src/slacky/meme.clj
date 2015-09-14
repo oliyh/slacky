@@ -176,7 +176,10 @@
                               (map :pattern (describe-meme-patterns))
                               [""
                                "Create a template to use in memes:"
-                               "/meme :template [name of template] https://cats.com/cat.jpg"]))))
+                               "/meme :template [name of template] https://cats.com/cat.jpg"]
+                              (when-let [templates (and account-id
+                                                        (not-empty (templates/list db account-id)))]
+                                (cons "Custom templates:" (map :name templates)))))))
 
 (defn handle-request [db account-id text respond-with]
   (cond
