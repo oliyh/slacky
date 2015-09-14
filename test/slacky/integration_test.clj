@@ -37,6 +37,23 @@
       (cj/verify-call-times-for memecaptain/create-instance 0))))
 
 
+(def basic-help-message
+  (str "Create a meme using one of the following patterns:\n"
+       "y u no [lower]\n"
+       "one does not simply [lower]\n"
+       "not sure if [upper] or [lower]\n"
+       "brace yoursel(f|ves) [lower]\n"
+       "success when [upper] then [lower]\n"
+       "cry when [upper] then [lower]\n"
+       "what if i told you [lower]\n"
+       "[upper] how do they work?\n"
+       "[upper] all the [lower]\n"
+       "[upper] [upper] everywhere\n"
+       "[search terms or image url] | [upper] | [lower] \n\n"
+       "Create a template to use in memes:\n"
+       "/meme :template [name of template] https://cats.com/cat.jpg"))
+
+
 (deftest can-integrate-with-slack
   (let [token (clojure.string/replace (str (UUID/randomUUID)) "-" "")
         webhook-url "https://hooks.slack.com/services/foobarbaz"
@@ -66,21 +83,7 @@
         (slack-post! ":help")
 
         (is (= [webhook-url (str "@" user-name)
-                (slack/->message :error nil nil
-                                 (str "Create a meme using one of the following patterns:\n"
-                                      "y u no [lower]\n"
-                                      "one does not simply [lower]\n"
-                                      "not sure if [upper] or [lower]\n"
-                                      "brace yoursel(f|ves) [lower]\n"
-                                      "success when [upper] then [lower]\n"
-                                      "cry when [upper] then [lower]\n"
-                                      "what if i told you [lower]\n"
-                                      "[upper] how do they work?\n"
-                                      "[upper] all the [lower]\n"
-                                      "[upper] [upper] everywhere\n"
-                                      "[search terms or image url] | [upper] | [lower] \n\n"
-                                      "Create a template to use in memes:\n"
-                                      "/meme :template [name of template] https://cats.com/cat.jpg"))]
+                (slack/->message :error nil nil basic-help-message)]
                (first (a/alts!! [slack-channel (a/timeout 500)]))))))
 
     (testing "can meme from a channel"
@@ -113,4 +116,6 @@
                  (first (a/alts!! [slack-channel (a/timeout 500)]))))
 
           (cj/verify-call-times-for memecaptain/create-template 1)
-          (cj/verify-first-call-args-for memecaptain/create-instance template-id "omg" "so cute"))))))
+          (cj/verify-first-call-args-for memecaptain/create-instance template-id "omg" "so cute")))
+
+      (testing "templates show up in help message"))))
