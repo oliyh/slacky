@@ -22,7 +22,19 @@
                               :form-params {:text "cats | cute cats | FTW"}}))))
 
     (cj/verify-called-once-with-args memecaptain/create-template "http://images.com/cat.jpg")
-    (cj/verify-called-once-with-args memecaptain/create-instance template-id "cute cats" "FTW")))
+    (cj/verify-called-once-with-args memecaptain/create-instance template-id "cute cats" "FTW"))
+
+  (testing "400 when bad meme syntax"
+    (with-fake-internet {}
+      (let [response (http/post "http://localhost:8080/api/meme"
+                                {:throw-exceptions? false
+                                 :form-params {:text "nil"}})]
+        (is (= 400 (:status response)))
+        (is (= "Your command was not recognised, try /meme :help" (:body response))))
+
+      (cj/verify-call-times-for google/image-search 0)
+      (cj/verify-call-times-for memecaptain/create-template 0)
+      (cj/verify-call-times-for memecaptain/create-instance 0))))
 
 
 (deftest can-integrate-with-slack

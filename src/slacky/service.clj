@@ -70,7 +70,7 @@
                            (:text form-params)
                            (fn [message-type meme-or-error]
                              (deliver response-promise
-                                      (if (= :help message-type)
+                                      (if (= :error message-type)
                                         {:status 400
                                          :body meme-or-error}
                                         (response meme-or-error)))))
