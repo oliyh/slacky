@@ -121,7 +121,7 @@
     (let [[template-search text-upper text-lower] (resolve-meme-pattern db account-id text)]
       (if-let [template-id (resolve-template-id template-search)]
         (try (let [meme-url (memecaptain/create-instance template-id text-upper text-lower)]
-               (log/info "Generated meme" meme-url)
+               (log/info "Generated meme" meme-url "from command" text)
                (respond-with :meme meme-url))
              (catch Exception e
                (log/error "Blew up attempting to generate meme" e)
@@ -191,4 +191,4 @@
     (generate-help db account-id respond-with)
 
     :else
-    (respond-with :help "Your command was not recognised, try /meme :help")))
+    (respond-with :error "Your command was not recognised, try /meme :help")))

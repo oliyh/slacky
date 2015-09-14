@@ -48,7 +48,7 @@
                                ":template angry martin http://foo.bar/baz.jpg"
                                (fn [& args] (deliver result (vec args))))
 
-                 (is (= [:add-template :success "angry martin" "http://foo.bar/baz.jpg"]
+                 (is (= [:add-template "angry martin" "http://foo.bar/baz.jpg"]
                         (deref result 500 false)))
                  (cj/verify-called-once-with-args memecaptain/create-template "http://foo.bar/baz.jpg")
 
