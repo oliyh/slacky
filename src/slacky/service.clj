@@ -43,7 +43,7 @@
 (swagger/defhandler slack-meme
   {:summary "Responds asynchonously with a meme to a Slash command from Slack"
    :parameters {:formData slack/SlackRequest}
-   :responses {200 {:schema s/Str}}}
+   :responses {200 {:schema (s/maybe s/Str)}}}
   [{:keys [form-params] :as request}]
   (try
     {:status 200
@@ -51,10 +51,6 @@
                                 (::account-id request)
                                 (:text form-params)
                                 (slack/build-responder (::slack-webhook-url request) form-params))}
-
-    (catch IllegalArgumentException e
-      {:status 200
-       :body (.getMessage e)})
 
     (catch Exception e
       (log/error e)
@@ -72,21 +68,17 @@
       (meme/handle-request (:db-connection request)
                            (::account-id request)
                            (:text form-params)
-                           (fn [_ destination meme-url]
+                           (fn [message-type meme-or-error]
                              (deliver response-promise
-                                      (condp = destination
-                                        :error {:status 500
-                                                :body meme-url}
-                                        :success (response meme-url)))))
+                                      (if (= :help message-type)
+                                        {:status 400
+                                         :body meme-or-error}
+                                        (response meme-or-error)))))
 
       (if-let [response (deref response-promise 180000 false)]
         response
         {:status 504
          :body "Your request timed out"}))
-
-     (catch IllegalArgumentException e
-       {:status 400
-        :body (.getMessage e)})
 
      (catch Exception e
        (log/error e)

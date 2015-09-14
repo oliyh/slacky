@@ -40,8 +40,8 @@
      :title (format "%s added a template called '%s'" user-name name)
      :image_url image-url}]})
 
-(defmethod ->message :error [_ _ _ error]
-  error)
+(defmethod ->message :default [_ _ _ string-message]
+  string-message)
 
 (defn send-message [webhook-url channel slack-message]
   (let [message (merge (cond (map? slack-message)
@@ -58,14 +58,18 @@
     (log/info "Sent message to" channel "and recieved response" (:status response))))
 
 (defn build-responder [webhook-url {:keys [channel_name user_name text]}]
-  (fn [message-type destination & args]
-    (try
-      (send-message webhook-url
-                    (get {:error (str "@" user_name)
-                          :success (if (= "directmessage" channel_name)
-                                     (str "@" user_name)
-                                     (str "#" channel_name))}
-                         destination)
-                    (apply ->message message-type user_name text args))
-      (catch Exception e
-        (log/warn "Could not send message to Slack" e)))))
+  (let [to-user (str "@" user_name)
+        to-channel (str "#" channel_name)]
+    (fn [message-type & args]
+      (try
+        (send-message webhook-url
+                      (get {:add-template to-channel
+                            :meme (if (= "directmessage" channel_name)
+                                    to-user
+                                    to-channel)
+                            :help to-user}
+                           message-type
+                           to-user)
+                      (apply ->message message-type user_name text args))
+        (catch Exception e
+          (log/warn "Could not send message to Slack" e))))))
