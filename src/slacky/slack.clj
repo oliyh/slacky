@@ -37,7 +37,7 @@
    [{:fallback (format "%s added a template called '%s' for %s" user-name name image-url)
      :pretext nil
      :color "#D00000"
-     :title (format "%s added a template called '%s'" user-name name)
+     :title (format "%s added a meme template called '%s'" user-name name)
      :image_url image-url}]})
 
 (defmethod ->message :default [_ _ _ string-message]

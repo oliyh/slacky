@@ -29,6 +29,11 @@
                   :content "width=device-width, initial-scale=1"}]
 
           [:title "Slacky"]
+          [:link {:id "favicon"
+                  :rel "shortcut icon"
+                  :href "/images/slacky-64.png"
+                  :sizes "16x16 32x32 48x48"
+                  :type "image/png"}]
 
           (include-css "css/bootstrap.min.css"
                        "https://fonts.googleapis.com/css?family=Quicksand:300"
