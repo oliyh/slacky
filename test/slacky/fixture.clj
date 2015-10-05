@@ -8,7 +8,7 @@
              [server :as server]
              [db :refer [create-fresh-db-connection]]]))
 
-(def test-database-url "jdbc:sqlite:memory:test")
+(def test-database-url "jdbc:h2:./db/test")
 
 (def ^:dynamic *db* nil)
 (defn with-database [f]

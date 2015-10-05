@@ -1,16 +1,13 @@
 (ns jdbc.0003
   (:require [clojure.java.jdbc :as sql]
-            [joplin.jdbc.database]
-            [slacky.db :refer [db-provider]]))
+            [joplin.jdbc.database]))
 
 (defn up [db]
   (sql/with-db-connection [db db]
     (sql/db-do-commands
      db
      (sql/create-table-ddl :meme_templates
-                           [:id (condp = (db-provider db)
-                                  :sqlite "integer primary key"
-                                  :postgres "bigserial primary key")]
+                           [:id "bigserial primary key"]
                            [:account_id "integer not null references accounts(id)"]
                            [:name "varchar(128) not null"]
                            [:source_url "varchar(256) not null"]

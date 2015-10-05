@@ -13,7 +13,7 @@
 (defn database-url []
   (or (when-let [provided-url (System/getenv "DATABASE_URL")]
         (rewrite-heroku-database-url provided-url))
-      "jdbc:sqlite:memory:slacky"))
+      "jdbc:h2:./db/test"))
 
 (defn web-port []
   (Integer. (or (System/getenv "PORT") 8080)))

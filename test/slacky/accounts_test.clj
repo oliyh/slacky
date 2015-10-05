@@ -10,7 +10,6 @@
   (add-account! *db* "foo" "bar")
 
   (is (= {:id 1
-          :token "foo"
           :key "bar"}
          (lookup-account *db* "foo")))
 

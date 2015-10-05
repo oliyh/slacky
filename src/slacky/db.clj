@@ -1,16 +1,16 @@
 (ns slacky.db
-  (:require [joplin.core :as joplin]
+  (:require [clojure.java.jdbc :as jdbc]
+            [joplin.core :as joplin]
             [joplin.jdbc.database])
-  (:import [com.mchange.v2.c3p0 ComboPooledDataSource]
-           org.sqlite.JDBC))
+  (:import [com.mchange.v2.c3p0 ComboPooledDataSource]))
 
 (defn db-provider
   "Utility fn used from migrators"
   [db]
   (let [url (get-in db [:db :url])]
     (condp re-find url
-      #":sqlite:" :sqlite
       #":postgresql:" :postgres
+      #":h2:" :h2
       :unknown)))
 
 (defn- migrate-db [url]
@@ -51,8 +51,8 @@
   (migrate-db url)
 
   (condp re-find url
-    #":sqlite:" (pool "org.sqlite.JDBC" url)
-    #":postgresql:" (pool "org.postgresql.Driver" url)
+    #":postgresql:" (with-meta (pool "org.postgresql.Driver" url) {:type :postgres})
+    #":h2:" (with-meta (pool "org.h2.Driver" url) {:type :h2})
 
     (throw (RuntimeException. "Don't know what driver to use with" url))))
 

@@ -131,7 +131,7 @@
         (is (= [webhook-url (str "@" user-name)
                 (slack/->message :help nil nil
                                  (str basic-help-message
-                                      "\n"
+                                      "\n\n"
                                       (string/join "\n"
                                                    ["Custom templates:"
                                                     "cute cats"])))]
