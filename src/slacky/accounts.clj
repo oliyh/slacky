@@ -3,24 +3,25 @@
             [honeysql.core :as sql])
   (:import [java.sql Statement]))
 
-(defn lookup-account [db token]
+(defn lookup-slack-account [db token]
   (first (jdbc/query db (sql/format {:select [[:account_id :id]
                                               :key]
                                      :from [:slack_authentication]
                                      :where [:= :token token]
                                      :limit 1}))))
 
-(defmulti add-authentication! (fn [db account-id type & args] type))
+(defn add-authentication! [db account-id authentications]
+  (doseq [[type auth] authentications]
+    (condp = type
+      :slack (jdbc/insert! db :slack_authentication (merge {:account_id account-id} auth)))))
 
-(defmethod add-authentication! :slack [db account-id _ token key]
-  (jdbc/insert! db :slack_authentication {:account_id account-id :token token :key key}))
-
-(defn add-account! [db token key]
+(defn add-account! [db & [authentications]]
   (jdbc/with-db-transaction [db db]
     (let [id (-> (jdbc/insert! db :accounts {}) first vals first)]
-      (add-authentication! db id :slack token key)
+      (add-authentication! db id authentications)
       (jdbc/insert! db :api_stats {:account_id id
-                                   :hits 0}))))
+                                   :hits 0})
+      {:id id})))
 
 (defn api-hit! [db ^Number account-id]
   (let [command "UPDATE api_stats SET hits = hits + 1 WHERE account_id = ?"]

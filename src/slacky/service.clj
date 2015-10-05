@@ -101,16 +101,15 @@
   [{:keys [form-params] :as req}]
   (let [db (:db-connection req)]
     (try
-      (if (accounts/lookup-account db (:token form-params))
+      (if (accounts/lookup-slack-account db (:token form-params))
         (-> (response "Account already exists")
             (status 409))
-        (do (accounts/add-account! db (:token form-params) (:key form-params))
+        (do (accounts/add-account! db {:slack (select-keys form-params [:token :key])})
             (response "Account added")))
       (catch Exception e
         (log/error "Failed to add account" e)
         (-> (response "Failed to add account")
             (status 500))))))
-
 
 ;; authentication
 
@@ -122,7 +121,7 @@
   (log/info "Authenticating")
   (let [db (:db-connection request)
         token (get-in request [:form-params :token])
-        account (accounts/lookup-account db token)]
+        account (accounts/lookup-slack-account db token)]
     (if-let [webhook-url (:key account)]
       (update context :request merge {::slack-webhook-url webhook-url
                                       ::account-id (:id account)})

@@ -1,6 +1,6 @@
 (ns slacky.meme-test
   (:require [slacky
-             [accounts :refer [add-account! lookup-account]]
+             [accounts :refer [add-account!]]
              [fixture :refer [with-database *db*]]
              [meme :refer :all]
              [memecaptain :as memecaptain]]
@@ -37,8 +37,7 @@
 (def resolve-meme-pattern #'slacky.meme/resolve-meme-pattern)
 
 (deftest register-template-test
-  (add-account! *db* "foo" "bar")
-  (let [account-id (:id (lookup-account *db* "foo"))
+  (let [account-id (:id (add-account! *db*))
         result (promise)]
 
     (cj/stubbing [memecaptain/create-template "some-template-id"]
