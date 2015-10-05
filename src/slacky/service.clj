@@ -118,7 +118,7 @@
    :parameters {:formData {:token s/Str}}
    :responses {403 {}}}
   [{:keys [request response] :as context}]
-  (log/info "Authenticating")
+  (log/info "Authenticating Slack account")
   (let [db (:db-connection request)
         token (get-in request [:form-params :token])
         account (accounts/lookup-slack-account db token)]
@@ -133,6 +133,17 @@
                                             "Please register your token '"
                                             token
                                             "' at https://slacky-server.herokuapp.com")})))))
+
+(swagger/defbefore authenticate-browser-plugin-call
+  {:description "Uses or creates an account for someone calling the service via a browser plugin"
+   :parameters {:formData {:token s/Str}}}
+  [{:keys [request response] :as context}]
+  (log/info "Authenticating browser plugin")
+  (let [db (:db-connection request)
+        token (get-in request [:form-params :token])
+        account (or (accounts/lookup-browser-plugin-account db token)
+                    (accounts/add-account! db {:browser-plugin {:token token}}))]
+    (update context :request merge {::account-id (:id account)})))
 
 ;; usage stats
 
@@ -177,6 +188,10 @@
        ["/slack" ^:interceptors [(angel/provides authenticate-slack-call :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
          {:post slack-meme}]]
+
+       ["/browser-plugin" ^:interceptors [(angel/provides authenticate-browser-plugin-call :account)]
+        ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
+         {:post [::browser-plugin-meme rest-meme]}]]
 
        ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
         {:post rest-meme}

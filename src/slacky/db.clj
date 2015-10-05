@@ -14,17 +14,19 @@
       :unknown)))
 
 (defn- migrate-db [url]
-  (joplin/migrate-db
-   {:db {:type :jdbc
-         :url url}
-    :migrator "migrators/jdbc"}))
+  (with-out-str
+    (joplin/migrate-db
+     {:db {:type :jdbc
+           :url url}
+      :migrator "migrators/jdbc"})))
 
 (defn- wipe-db [url]
-  (joplin/rollback-db
-   {:db {:type :jdbc
-         :url url}
-    :migrator "migrators/jdbc"}
-   Integer/MAX_VALUE))
+  (with-out-str
+    (joplin/rollback-db
+     {:db {:type :jdbc
+           :url url}
+      :migrator "migrators/jdbc"}
+     Integer/MAX_VALUE)))
 
 (defn- pool [driver url]
   (let [cpds (doto (ComboPooledDataSource.)

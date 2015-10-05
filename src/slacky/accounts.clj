@@ -10,10 +10,17 @@
                                      :where [:= :token token]
                                      :limit 1}))))
 
+(defn lookup-browser-plugin-account [db token]
+  (first (jdbc/query db (sql/format {:select [[:account_id :id]]
+                                     :from [:browser_plugin_authentication]
+                                     :where [:= :token token]
+                                     :limit 1}))))
+
 (defn add-authentication! [db account-id authentications]
   (doseq [[type auth] authentications]
     (condp = type
-      :slack (jdbc/insert! db :slack_authentication (merge {:account_id account-id} auth)))))
+      :slack (jdbc/insert! db :slack_authentication (merge {:account_id account-id} auth))
+      :browser-plugin (jdbc/insert! db :browser_plugin_authentication (merge {:account_id account-id} auth)))))
 
 (defn add-account! [db & [authentications]]
   (jdbc/with-db-transaction [db db]

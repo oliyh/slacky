@@ -136,3 +136,29 @@
                                                    ["Custom templates:"
                                                     "cute cats"])))]
                (first (a/alts!! [slack-channel (a/timeout 500)])))))))))
+
+
+(deftest can-integrate-with-browser-plugins
+  (with-fake-internet {}
+    (is (= meme-url
+           (:body (http/post "http://localhost:8080/api/browser-plugin/meme"
+                             {:throw-exceptions? false
+                              :form-params {:token (str (UUID/randomUUID))
+                                            :text "cats | cute cats | FTW"}}))))
+
+    (cj/verify-called-once-with-args memecaptain/create-template "http://images.com/cat.jpg")
+    (cj/verify-called-once-with-args memecaptain/create-instance template-id "cute cats" "FTW"))
+
+  (testing "400 when bad meme syntax"
+    (with-fake-internet {}
+      (let [response (http/post "http://localhost:8080/api/browser-plugin/meme"
+                                {:throw-exceptions? false
+                                 :form-params {:token (str (UUID/randomUUID))
+                                               :text "nil"}})]
+        (is (= 400 (:status response)))
+        (is (= "Sorry, the command was not recognised, try '/meme :help' for help"
+               (:body response))))
+
+      (cj/verify-call-times-for google/image-search 0)
+      (cj/verify-call-times-for memecaptain/create-template 0)
+      (cj/verify-call-times-for memecaptain/create-instance 0))))
