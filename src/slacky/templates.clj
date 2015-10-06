@@ -1,4 +1,5 @@
 (ns slacky.templates
+  (:refer-clojure :exclude [list])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.set :refer [rename-keys]]
             [clojure.string :as string]
