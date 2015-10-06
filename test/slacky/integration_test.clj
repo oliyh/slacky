@@ -40,6 +40,7 @@
 
 (def basic-help-message
   (str "Create a meme using one of the following patterns:\n"
+       "[search terms or image url] | [upper] | [lower] \n"
        "y u no [lower]\n"
        "one does not simply [lower]\n"
        "not sure if [upper] or [lower]\n"
@@ -49,8 +50,8 @@
        "what if i told you [lower]\n"
        "[upper] how do they work?\n"
        "[upper] all the [lower]\n"
-       "[upper] [upper] everywhere\n"
-       "[search terms or image url] | [upper] | [lower] \n\n"
+       "[upper] [upper] everywhere\n\n"
+
        "Create a template to use in memes:\n"
        "/meme :template [name of template] https://cats.com/cat.jpg"))
 

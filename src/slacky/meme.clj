@@ -33,7 +33,11 @@
 
 ;; from https://bitbucket.org/atlassianlabs/ac-koa-hipchat-sassy/src/1d0a72839002d9dc9f911825de73d819d7f94f5c/lib/commands/meme.js?at=master
 (def ^:private meme-patterns
-  [{:pattern #"^(?i)y u no (?<lower>.+)"
+  [{:pattern #"<?([^>]+)>?\s?\|\s?(?<upper>.*)\s?\|\s?(?<lower>.*)\s?"
+    :parser (fn [_ template-search text-upper text-lower]
+              (mapv string/trim [template-search text-upper text-lower]))}
+
+   {:pattern #"^(?i)y u no (?<lower>.+)"
     :template :NryNmg
     :parser (fn [_ text-lower] ["y u no" text-lower])}
 
@@ -72,10 +76,6 @@
    {:pattern #"^(?i)(?<upper>.+),? (?:\1) everywhere"
     :template :yDcY5w
     :parser (fn [_ text-upper] [text-upper (str text-upper " everywhere")])}
-
-   {:pattern #"<?([^>]+)>?\s?\|\s?(?<upper>.*)\s?\|\s?(?<lower>.*)\s?"
-    :parser (fn [_ template-search text-upper text-lower]
-              (mapv string/trim [template-search text-upper text-lower]))}
    ])
 
 

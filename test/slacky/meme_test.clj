@@ -17,6 +17,7 @@
     "one does not simply photograph the photographer" [:da2i4A "one does not simply" "photograph the photographer"]
 
     "ceiling cat | ceiling cat | watching you" ["ceiling cat" "ceiling cat" "watching you"]
+    "ceiling cat | | watching all the things" ["ceiling cat" "" "watching all the things"]
 
     "angry arnold | | thiiiings!!11one" ["angry arnold" "" "thiiiings!!11one"]
     "angry arnold | thiiiings!!11one |" ["angry arnold" "thiiiings!!11one" ""]
@@ -31,7 +32,7 @@
   (let [descriptions (describe-meme-patterns)]
     (is (= {:pattern "y u no [lower]"
             :template "http://i.memecaptain.com/src_images/NryNmg.jpg"}
-           (first descriptions)))))
+           (second descriptions)))))
 
 (def add-template #'slacky.meme/add-template)
 (def resolve-meme-pattern #'slacky.meme/resolve-meme-pattern)
