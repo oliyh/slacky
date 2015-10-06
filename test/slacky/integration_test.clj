@@ -87,11 +87,8 @@
 
     (testing "can ask for help"
       (with-fake-internet {}
-        (slack-post! ":help")
-
-        (is (= [webhook-url (str "@" user-name)
-                (slack/->message :help nil nil basic-help-message)]
-               (first (a/alts!! [slack-channel (a/timeout 500)]))))))
+        (is (= basic-help-message)
+            (slack-post! ":help"))))
 
     (testing "can meme from a channel"
       (with-fake-internet {}
@@ -127,16 +124,12 @@
 
       (testing "templates show up in help message"
         (with-fake-internet {}
-        (slack-post! ":help")
-
-        (is (= [webhook-url (str "@" user-name)
-                (slack/->message :help nil nil
-                                 (str basic-help-message
-                                      "\n\n"
-                                      (string/join "\n"
-                                                   ["Custom templates:"
-                                                    "cute cats"])))]
-               (first (a/alts!! [slack-channel (a/timeout 500)])))))))))
+          (is (= (str basic-help-message
+                      "\n\n"
+                      (string/join "\n"
+                                   ["Custom templates:"
+                                    "cute cats"]))
+                 (slack-post! ":help"))))))))
 
 
 (deftest can-integrate-with-browser-plugins

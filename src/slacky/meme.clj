@@ -80,7 +80,7 @@
    ])
 
 
-(defn- resolve-meme-pattern
+(defn resolve-meme-pattern
   ([text] (resolve-meme-pattern nil nil text))
   ([db account-id text]
    (when-let [pattern
@@ -97,25 +97,6 @@
                      template)]
 
        (into [template] (rest pattern))))))
-
-
-(defn- clean-pattern [p]
-  (-> p
-      (.pattern)
-      (string/replace "<?([^>]+)>?" "[search terms or image url]") ;; pipe
-      (string/replace "(?<upper>.*)" "[upper]")
-      (string/replace "(?<upper>.+)" "[upper]")
-      (string/replace "(?<lower>.*)" "[lower]")
-      (string/replace "(?<lower>.+)" "[lower]")
-      (string/replace "(?:\\1)" "[upper]")
-
-      (string/replace "^(?i)" "") ;; case insensitivity
-      (string/replace "(?:" "(") ;; non-capturing group
-      (string/replace "\\s?" " ") ;; optional space
-      (string/replace "\\??" "?") ;; optional question mark
-      (string/replace ",?" "") ;; optional comma
-      (string/replace "\\|" "|") ;; pipe
-      ))
 
 (defn generate-meme [db account-id text]
   (let [response-chan (a/chan)]
@@ -138,19 +119,39 @@
       (a/close! response-chan))
     response-chan))
 
-(defn- resolve-template-addition [text]
+(defn resolve-template-addition [text]
   (re-matches #"(?i):template (.+) (https?://.+$)" text))
 
-(defn- add-template [db account-id text respond-with]
-  (future
-    (let [[_ name source-url] (resolve-template-addition text)]
-      (try
-        (let [template-id (memecaptain/create-template source-url)]
-          (templates/persist! db account-id name source-url template-id)
-          (respond-with :add-template name source-url))
-        (catch Exception e
-          (respond-with :error (format "Could not create template from %s" source-url))))))
-  "Your template is being registered")
+(defn add-template [db account-id text]
+  (let [response-chan (a/chan)]
+    (a/thread
+      (let [[_ name source-url] (resolve-template-addition text)]
+        (try
+          (let [template-id (memecaptain/create-template source-url)]
+            (templates/persist! db account-id name source-url template-id)
+            (a/>!! response-chan [:add-template name source-url]))
+          (catch Exception e
+            (a/>!! response-chan [:error (format "Could not create template from %s" source-url)]))))
+      (a/close! response-chan))
+    response-chan))
+
+(defn- clean-pattern [p]
+  (-> p
+      (.pattern)
+      (string/replace "<?([^>]+)>?" "[search terms or image url]") ;; pipe
+      (string/replace "(?<upper>.*)" "[upper]")
+      (string/replace "(?<upper>.+)" "[upper]")
+      (string/replace "(?<lower>.*)" "[lower]")
+      (string/replace "(?<lower>.+)" "[lower]")
+      (string/replace "(?:\\1)" "[upper]")
+
+      (string/replace "^(?i)" "") ;; case insensitivity
+      (string/replace "(?:" "(") ;; non-capturing group
+      (string/replace "\\s?" " ") ;; optional space
+      (string/replace "\\??" "?") ;; optional question mark
+      (string/replace ",?" "") ;; optional comma
+      (string/replace "\\|" "|") ;; pipe
+      ))
 
 (defn describe-meme-patterns []
   (mapv
@@ -165,46 +166,14 @@
       (dissoc :parser))
    meme-patterns))
 
-(def ^:private invalid-meme-syntax
-  (string/join
-   "\n"
-   (concat ["Sorry, this is not a valid command syntax"
-            "Try one the following patterns:"
-            ""]
-           )))
-
-(defn- generate-help [db account-id respond-with]
-  (respond-with :help
-                (string/join "\n"
-                             (concat
-                              ["Create a meme using one of the following patterns:"]
-                              (map :pattern (describe-meme-patterns))
-                              [""
-                               "Create a template to use in memes:"
-                               "/meme :template [name of template] https://cats.com/cat.jpg"]
-                              (when-let [templates (and account-id
-                                                        (not-empty (templates/list db account-id)))]
-                                (cons "\nCustom templates:" (map :name templates))))))
-  "Help has been provided in private chat")
-
-
-(defn handle-generic-request [db account-id text respond-with]
-  (cond
-
-    (not (nil? (resolve-template-addition text)))
-    (add-template db account-id text respond-with)
-
-    (not (nil? (resolve-meme-pattern text)))
-    (let [response-chan (generate-meme db account-id text)]
-      (a/go
-        (when-let [msg (a/<! response-chan)]
-          (apply respond-with msg)
-          (a/close! response-chan)))
-      "Your meme is on its way")
-
-    (re-matches #"(?i):help$" text)
-    (generate-help db account-id respond-with)
-
-    :else
-    (do (respond-with :error "Sorry, the command was not recognised, try '/meme :help' for help")
-        "Sorry, the command was not recognised, try '/meme :help' for help")))
+(defn generate-help [db account-id]
+  (string/join "\n"
+               (concat
+                ["Create a meme using one of the following patterns:"]
+                (map :pattern (describe-meme-patterns))
+                [""
+                 "Create a template to use in memes:"
+                 "/meme :template [name of template] https://cats.com/cat.jpg"]
+                (when-let [templates (and account-id
+                                          (not-empty (templates/list db account-id)))]
+                  (cons "\nCustom templates:" (map :name templates))))))

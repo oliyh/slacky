@@ -1,15 +1,16 @@
 (ns slacky.meme-test
-  (:require [slacky
+  (:require [clojure.core.async :as a]
+            [clojure.test :refer :all]
+            [conjure.core :as cj]
+            [slacky
              [accounts :refer [add-account!]]
              [fixture :refer [with-database *db*]]
              [meme :refer :all]
-             [memecaptain :as memecaptain]]
-            [clojure.test :refer :all]
-            [conjure.core :as cj]))
+             [memecaptain :as memecaptain]]))
 
-(def resolve-meme #'slacky.meme/resolve-meme-pattern)
 (use-fixtures :once with-database)
 
+(def resolve-meme #'slacky.meme/resolve-meme-pattern)
 (deftest resolve-meme-pattern-test
   (are [text meme-pattern] (= meme-pattern (resolve-meme text))
 
@@ -34,22 +35,19 @@
             :template "http://i.memecaptain.com/src_images/NryNmg.jpg"}
            (second descriptions)))))
 
-(def add-template #'slacky.meme/add-template)
-(def resolve-meme-pattern #'slacky.meme/resolve-meme-pattern)
+(defn- safe-read [chan]
+  (first (a/alts!! [chan (a/timeout 500)])))
 
 (deftest register-template-test
-  (let [account-id (:id (add-account! *db*))
-        result (promise)]
-
+  (let [account-id (:id (add-account! *db*))]
     (cj/stubbing [memecaptain/create-template "some-template-id"]
 
-                 (add-template *db*
-                               account-id
-                               ":template angry martin http://foo.bar/baz.jpg"
-                               (fn [& args] (deliver result (vec args))))
+                 (let [response (add-template *db*
+                                              account-id
+                                              ":template angry martin http://foo.bar/baz.jpg")]
 
-                 (is (= [:add-template "angry martin" "http://foo.bar/baz.jpg"]
-                        (deref result 500 false)))
+                   (is (= [:add-template "angry martin" "http://foo.bar/baz.jpg"]
+                          (safe-read response))))
                  (cj/verify-called-once-with-args memecaptain/create-template "http://foo.bar/baz.jpg")
 
                  (is (= [:some-template-id "" "bidi!!!111one"]

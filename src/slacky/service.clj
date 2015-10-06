@@ -41,22 +41,35 @@
 
 ;; api handlers
 
+(defn- divert-to-slack [slack-responder result-channel]
+  (a/go
+    (when-let [msg (a/<! result-channel)]
+      (apply slack-responder msg))))
+
 (swagger/defhandler slack-meme
   {:summary "Responds asynchonously with a meme to a Slash command from Slack"
    :parameters {:formData slack/SlackRequest}
    :responses {200 {:schema (s/maybe s/Str)}}}
   [{:keys [form-params] :as request}]
-  (try
-    {:status 200
-     :body (meme/handle-generic-request (:db-connection request)
-                                        (::account-id request)
-                                        (:text form-params)
-                                        (slack/build-responder (::slack-webhook-url request) form-params))}
+  (let [db (:db-connection request)
+        account-id (::account-id request)
+        text (:text form-params)
+        slack-responder (slack/build-responder (::slack-webhook-url request) form-params)]
 
-    (catch Exception e
-      (log/error e)
-      {:status 500
-       :body "Something went wrong, check my logs"})))
+    (cond
+      (not (nil? (meme/resolve-template-addition text)))
+      (do (divert-to-slack slack-responder (meme/add-template db account-id text))
+          (response "Your template is being registered"))
+
+      (not (nil? (meme/resolve-meme-pattern text)))
+      (do (divert-to-slack slack-responder (meme/generate-meme db account-id text))
+          (response "Your meme is on its way"))
+
+      (re-matches #"(?i):help$" text)
+      (response (meme/generate-help db account-id))
+
+      :else
+      (response "Sorry, the command was not recognised, try '/meme :help' for help"))))
 
 (swagger/defhandler rest-meme
   {:summary "Responds synchronously with a meme"
@@ -73,7 +86,7 @@
       (if-let [[[message-type msg]] (a/alts! [meme-chan (a/timeout 180000)])]
         (if (= :error message-type)
           (a/>! response-chan {:status 400
-                 :body msg})
+                               :body msg})
           (a/>! response-chan (response msg)))
         (a/>! response-chan {:status 504
                              :body "Your request timed out"})))
@@ -160,7 +173,6 @@
   (if (satisfies? clojure.core.async.impl.protocols/Channel (:response context))
     (a/pipe (:response context) (a/chan 1 (map #(assoc context :response %))))
     context))
-
 
 ;; app-routes
 
