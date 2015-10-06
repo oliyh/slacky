@@ -47,7 +47,7 @@
   [{:keys [form-params] :as request}]
   (try
     {:status 200
-     :body (meme/handle-request (:db-connection request)
+     :body (meme/handle-generic-request (:db-connection request)
                                 (::account-id request)
                                 (:text form-params)
                                 (slack/build-responder (::slack-webhook-url request) form-params))}
@@ -65,7 +65,7 @@
 
   (try
     (let [response-promise (promise)]
-      (meme/handle-request (:db-connection request)
+      (meme/handle-generic-request (:db-connection request)
                            (::account-id request)
                            (:text form-params)
                            (fn [message-type meme-or-error & _]

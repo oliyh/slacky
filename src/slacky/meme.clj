@@ -3,6 +3,7 @@
             [clj-http
              [client :as http]
              [conn-mgr :refer [make-reusable-conn-manager]]]
+            [clojure.core.async :as a]
             [clojure.java.jdbc :as jdbc]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
@@ -116,22 +117,22 @@
       (string/replace "\\|" "|") ;; pipe
       ))
 
-(defn- generate-meme [db account-id text respond-with]
-  (future
-    (let [[template-search text-upper text-lower] (resolve-meme-pattern db account-id text)]
-      (if-let [template-id (resolve-template-id template-search)]
-        (try (let [meme-url (memecaptain/create-instance template-id text-upper text-lower)]
-               (log/info "Generated meme" meme-url "from command" text)
-               (respond-with :meme meme-url))
-             (catch Exception e
-               (log/error "Blew up attempting to generate meme" e)
-               (respond-with :error (str "You broke me. Check my logs for details!"
-                                       "\n`" text "`" ))))
+(defn- generate-meme [db account-id text]
+  (let [response-chan (a/chan)
+        [template-search text-upper text-lower] (resolve-meme-pattern db account-id text)]
+    (if-let [template-id (resolve-template-id template-search)]
+      (try (let [meme-url (memecaptain/create-instance template-id text-upper text-lower)]
+             (log/info "Generated meme" meme-url "from command" text)
+             (a/put! response-chan [:meme meme-url]))
+           (catch Exception e
+             (log/error "Blew up attempting to generate meme" e)
+             (a/put! response-chan [:error (str "You broke me. Check my logs for details!"
+                                                "\n`" text "`" )])))
 
-        (respond-with :error
-                    (str "Couldn't find a good template for the meme, try specifying a url instead"
-                         "\n`" text "`")))))
-  "Your meme is on its way")
+      (a/put! response-chan [:error
+                             (str "Couldn't find a good template for the meme, try specifying a url instead"
+                                  "\n`" text "`")]))
+    response-chan))
 
 (defn- resolve-template-addition [text]
   (re-matches #"(?i):template (.+) (https?://.+$)" text))
@@ -182,14 +183,20 @@
                                 (cons "\nCustom templates:" (map :name templates))))))
   "Help has been provided in private chat")
 
-(defn handle-request [db account-id text respond-with]
+
+(defn handle-generic-request [db account-id text respond-with]
   (cond
 
     (not (nil? (resolve-template-addition text)))
     (add-template db account-id text respond-with)
 
     (not (nil? (resolve-meme-pattern text)))
-    (generate-meme db account-id text respond-with)
+    (let [response-chan (generate-meme db account-id text)]
+      (a/go
+        (when-let [msg (a/<! response-chan)]
+          (apply respond-with msg)
+          (a/close! response-chan)))
+      "Your meme is on its way")
 
     (re-matches #"(?i):help$" text)
     (generate-help db account-id respond-with)
