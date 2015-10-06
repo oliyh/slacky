@@ -117,21 +117,25 @@
       (string/replace "\\|" "|") ;; pipe
       ))
 
-(defn- generate-meme [db account-id text]
-  (let [response-chan (a/chan)
-        [template-search text-upper text-lower] (resolve-meme-pattern db account-id text)]
-    (if-let [template-id (resolve-template-id template-search)]
-      (try (let [meme-url (memecaptain/create-instance template-id text-upper text-lower)]
-             (log/info "Generated meme" meme-url "from command" text)
-             (a/put! response-chan [:meme meme-url]))
-           (catch Exception e
-             (log/error "Blew up attempting to generate meme" e)
-             (a/put! response-chan [:error (str "You broke me. Check my logs for details!"
-                                                "\n`" text "`" )])))
+(defn generate-meme [db account-id text]
+  (let [response-chan (a/chan)]
+    (a/thread
+      (if-let [[template-search text-upper text-lower] (resolve-meme-pattern db account-id text)]
+        (if-let [template-id (resolve-template-id template-search)]
+          (try (let [meme-url (memecaptain/create-instance template-id text-upper text-lower)]
+                 (log/info "Generated meme" meme-url "from command" text)
+                 (a/>!! response-chan [:meme meme-url]))
+               (catch Exception e
+                 (log/error "Blew up attempting to generate meme" e)
+                 (a/>!! response-chan [:error (str "You broke me. Check my logs for details!"
+                                                    "\n`" text "`" )])))
 
-      (a/put! response-chan [:error
-                             (str "Couldn't find a good template for the meme, try specifying a url instead"
-                                  "\n`" text "`")]))
+          (a/>!! response-chan [:error
+                                 (str "Couldn't find a good template for the meme, try specifying a url instead"
+                                      "\n`" text "`")]))
+        (a/>!! response-chan [:error
+                              (str "Sorry, the command was not recognised, try '/meme :help' for help")]))
+      (a/close! response-chan))
     response-chan))
 
 (defn- resolve-template-addition [text]
