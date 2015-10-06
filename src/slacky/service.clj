@@ -1,5 +1,6 @@
 (ns slacky.service
   (:require [angel.interceptor :as angel]
+            [clojure.core.async :as a]
             [clojure.java.io :as io]
             [io.pedestal.http :as bootstrap]
             [io.pedestal.http.body-params :as body-params]
@@ -47,10 +48,10 @@
   [{:keys [form-params] :as request}]
   (try
     {:status 200
-     :body (meme/handle-request (:db-connection request)
-                                (::account-id request)
-                                (:text form-params)
-                                (slack/build-responder (::slack-webhook-url request) form-params))}
+     :body (meme/handle-generic-request (:db-connection request)
+                                        (::account-id request)
+                                        (:text form-params)
+                                        (slack/build-responder (::slack-webhook-url request) form-params))}
 
     (catch Exception e
       (log/error e)
@@ -63,27 +64,21 @@
    :responses {200 {:schema s/Str}}}
   [{:keys [form-params] :as request}]
 
-  (try
-    (let [response-promise (promise)]
-      (meme/handle-request (:db-connection request)
-                           (::account-id request)
-                           (:text form-params)
-                           (fn [message-type meme-or-error & _]
-                             (deliver response-promise
-                                      (if (= :error message-type)
-                                        {:status 400
-                                         :body meme-or-error}
-                                        (response meme-or-error)))))
+  (let [response-chan (a/chan)
+        meme-chan (meme/generate-meme (:db-connection request)
+                                      (::account-id request)
+                                      (:text form-params))]
 
-      (if-let [response (deref response-promise 180000 false)]
-        response
-        {:status 504
-         :body "Your request timed out"}))
+    (a/go
+      (if-let [[[message-type msg]] (a/alts! [meme-chan (a/timeout 180000)])]
+        (if (= :error message-type)
+          (a/>! response-chan {:status 400
+                 :body msg})
+          (a/>! response-chan (response msg)))
+        (a/>! response-chan {:status 504
+                             :body "Your request timed out"})))
 
-     (catch Exception e
-       (log/error e)
-       {:status 500
-        :body "Something went wrong, check my logs"})))
+    response-chan))
 
 (swagger/defhandler get-meme-patterns
   {:summary "Responds synchronously with a meme"
@@ -159,6 +154,14 @@
 (defn- annotate "Adds metatata m to a swagger route" [m]
   (sw.doc/annotate m (before ::annotate identity)))
 
+(swagger/defafter async-handler
+  {:description "Wraps asynchronous responses into the context (lets you use defhandler)"}
+  [context]
+  (if (satisfies? clojure.core.async.impl.protocols/Channel (:response context))
+    (a/pipe (:response context) (a/chan 1 (map #(assoc context :response %))))
+    context))
+
+
 ;; app-routes
 
 (def home
@@ -183,6 +186,7 @@
                               bootstrap/json-body
                               (swagger/coerce-request)
                               (swagger/validate-response)
+                              async-handler
                               (angel/prefers increment-api-usage :account)]
 
        ["/slack" ^:interceptors [(angel/provides authenticate-slack-call :account)]
