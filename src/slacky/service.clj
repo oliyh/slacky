@@ -43,12 +43,13 @@
 
 (defn- divert-to-slack [slack-responder result-channel]
   (a/go
-    (if-let [[msg] (a/alts! [result-channel (a/timeout 180000)])]
-      (apply slack-responder msg)
-      (slack-responder :error "Sorry, your request timed out"))))
+    (let [[msg] (a/alts! [result-channel (a/timeout 180000)])]
+      (if msg
+        (apply slack-responder msg)
+        (slack-responder :error "Sorry, your request timed out")))))
 
 (swagger/defhandler slack-meme
-  {:summary "Responds asynchonously with a meme to a Slash command from Slack"
+  {:summary "Responds asynchonously to a Slash command from Slack"
    :parameters {:formData slack/SlackRequest}
    :responses {200 {:schema (s/maybe s/Str)}}}
   [{:keys [form-params] :as request}]
@@ -83,18 +84,17 @@
 
     (if (meme/resolve-meme-pattern db account-id text)
       (let [response-chan (a/chan)
-            meme-chan (meme/generate-meme (:db-connection request)
-                                          (::account-id request)
-                                          (:text form-params))]
+            meme-chan (meme/generate-meme db account-id text)]
 
         (a/go
-          (if-let [[[message-type msg]] (a/alts! [meme-chan (a/timeout 180000)])]
-            (if (= :error message-type)
-              (a/>! response-chan {:status 400
-                                   :body msg})
-              (a/>! response-chan (response msg)))
-            (a/>! response-chan {:status 504
-                                 :body "Your request timed out"})))
+          (let [[[message-type msg]] (a/alts! [meme-chan (a/timeout 180000)])]
+            (if message-type
+              (if (= :error message-type)
+                (a/>! response-chan {:status 400
+                                     :body msg})
+                (a/>! response-chan (response msg)))
+              (a/>! response-chan {:status 504
+                                   :body "Your request timed out"}))))
 
         response-chan)
       {:status 400
