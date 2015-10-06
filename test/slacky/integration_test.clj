@@ -30,7 +30,7 @@
                                 {:throw-exceptions? false
                                  :form-params {:text "nil"}})]
         (is (= 400 (:status response)))
-        (is (= "Sorry, the command was not recognised, try '/meme :help' for help"
+        (is (= "Sorry, the command was not recognised"
                (:body response))))
 
       (cj/verify-call-times-for google/image-search 0)
@@ -150,7 +150,7 @@
                                  :form-params {:token (str (UUID/randomUUID))
                                                :text "nil"}})]
         (is (= 400 (:status response)))
-        (is (= "Sorry, the command was not recognised, try '/meme :help' for help"
+        (is (= "Sorry, the command was not recognised"
                (:body response))))
 
       (cj/verify-call-times-for google/image-search 0)
