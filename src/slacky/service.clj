@@ -199,7 +199,7 @@
             :externalDocs {:description "Find out more"
                            :url "https://github.com/oliyh/slacky"}
             :version "2.0"}
-     :tags [{:name "memes"
+     :tags [{:name "meme"
              :description "All the memes!"}]}
     [[["/api" ^:interceptors [(swagger/body-params)
                               bootstrap/json-body
