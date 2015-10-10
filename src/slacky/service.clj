@@ -140,14 +140,12 @@
     (if-let [webhook-url (:key account)]
       (update context :request merge {::slack-webhook-url webhook-url
                                       ::account-id (:id account)})
-      (-> context
-          terminate
-          (assoc-in [:response] {:status 403
-                                 :headers {}
-                                 :body (str "You are not permitted to use this service.\n"
-                                            "Please register your token '"
-                                            token
-                                            "' at https://slacky-server.herokuapp.com")})))))
+      (-> (terminate context)
+          (assoc :response {:status 403
+                            :headers {}
+                            :body (str "You are not permitted to use this service.\n"
+                                       "Please register your token '" token
+                                       "' at https://slacky-server.herokuapp.com")})))))
 
 (swagger/defbefore authenticate-browser-plugin-call
   {:description "Uses or creates an account for someone calling the service via a browser plugin"

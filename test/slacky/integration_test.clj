@@ -74,6 +74,19 @@
                                                        :command "/meme"
                                                        :text text}})))]
 
+    (testing "must register token with webhook url to use service"
+      (is (= 403 (:status (http/post "http://localhost:8080/api/slack/meme"
+                                     {:throw-exceptions? false
+                                      :form-params {:token token
+                                                    :team_id "a"
+                                                    :team_domain "b"
+                                                    :channel_id "c"
+                                                    :channel_name channel-name
+                                                    :user_id "d"
+                                                    :user_name user-name
+                                                    :command "/meme"
+                                                    :text "i'm not authenticated"}})))))
+
     (testing "can create an account"
       (is (= 200 (:status (http/post "http://localhost:8080/api/account"
                                      {:throw-exceptions? false
