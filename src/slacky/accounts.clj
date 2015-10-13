@@ -1,8 +1,9 @@
 (ns slacky.accounts
   (:require [clojure.java.jdbc :as jdbc]
             [honeysql.core :as sql]
-            [clojure.tools.logging :as log])
-  (:import [java.sql Statement]))
+            [clojure.tools.logging :as log]
+            [slacky.db :refer [db-provider]])
+  (:import [java.sql Statement Timestamp]))
 
 (defn lookup-slack-account [db token]
   (first (jdbc/query db (sql/format {:select [[:account_id :id]
@@ -25,7 +26,7 @@
 
 (defn add-account! [db & [authentications]]
   (jdbc/with-db-transaction [db db]
-    (let [result (jdbc/insert! db :accounts {:id nil}) ;; works because column has NULL_TO_DEFAULT
+    (let [result (jdbc/insert! db :accounts {:created_on (java.sql.Timestamp. (System/currentTimeMillis))})
           id (-> result first vals first)]
       (log/warn "account insert result")
       (log/warn "id is" id)
