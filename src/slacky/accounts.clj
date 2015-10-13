@@ -25,7 +25,7 @@
 
 (defn add-account! [db & [authentications]]
   (jdbc/with-db-transaction [db db]
-    (let [result (jdbc/insert! db :accounts {})
+    (let [result (jdbc/insert! db :accounts {:id nil}) ;; works because column has NULL_TO_DEFAULT
           id (-> result first vals first)]
       (log/warn "account insert result")
       (log/warn "id is" id)
