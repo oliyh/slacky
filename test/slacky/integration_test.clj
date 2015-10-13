@@ -8,16 +8,20 @@
              [memecaptain :as memecaptain]
              [fixture :refer [with-web-api with-database with-fake-internet]]
              [service :as service]
+             [settings :refer [web-port]]
              [google :as google]
              [slack :as slack]])
   (:import [java.util UUID]))
 
 (use-fixtures :once with-web-api with-database)
 
+(defn- slacky-url [path]
+  (format "http://localhost:%s%s" (web-port) path))
+
 (deftest can-generate-memes
   (with-fake-internet {}
     (is (= meme-url
-           (:body (http/post "http://localhost:8080/api/meme"
+           (:body (http/post (slacky-url "/api/meme")
                              {:throw-exceptions? false
                               :form-params {:text "cats | cute cats | FTW"}}))))
 
@@ -26,7 +30,7 @@
 
   (testing "400 when bad meme syntax"
     (with-fake-internet {}
-      (let [response (http/post "http://localhost:8080/api/meme"
+      (let [response (http/post (slacky-url "/api/meme")
                                 {:throw-exceptions? false
                                  :form-params {:text "nil"}})]
         (is (= 400 (:status response)))
@@ -62,7 +66,7 @@
         channel-name "my-channel"
         user-name "the-user"
         slack-post! (fn [text]
-                      (:body (http/post "http://localhost:8080/api/slack/meme"
+                      (:body (http/post (slacky-url "/api/slack/meme")
                                         {:throw-exceptions? false
                                          :form-params {:token token
                                                        :team_id "a"
@@ -75,7 +79,7 @@
                                                        :text text}})))]
 
     (testing "must register token with webhook url to use service"
-      (is (= 403 (:status (http/post "http://localhost:8080/api/slack/meme"
+      (is (= 403 (:status (http/post (slacky-url "/api/slack/meme")
                                      {:throw-exceptions? false
                                       :form-params {:token token
                                                     :team_id "a"
@@ -88,7 +92,7 @@
                                                     :text "i'm not authenticated"}})))))
 
     (testing "can create an account"
-      (is (= 200 (:status (http/post "http://localhost:8080/api/account"
+      (is (= 200 (:status (http/post (slacky-url "/api/account")
                                      {:throw-exceptions? false
                                       :form-params {:token token
                                                     :key webhook-url}})))))
@@ -100,8 +104,8 @@
 
     (testing "can ask for help"
       (with-fake-internet {}
-        (is (= basic-help-message)
-            (slack-post! ":help"))))
+        (is (= basic-help-message
+               (slack-post! ":help")))))
 
     (testing "can meme from a channel"
       (with-fake-internet {}
@@ -148,7 +152,7 @@
 (deftest can-integrate-with-browser-plugins
   (with-fake-internet {}
     (is (= meme-url
-           (:body (http/post "http://localhost:8080/api/browser-plugin/meme"
+           (:body (http/post (slacky-url "/api/browser-plugin/meme")
                              {:throw-exceptions? false
                               :form-params {:token (str (UUID/randomUUID))
                                             :text "cats | cute cats | FTW"}}))))
@@ -158,7 +162,7 @@
 
   (testing "400 when bad meme syntax"
     (with-fake-internet {}
-      (let [response (http/post "http://localhost:8080/api/browser-plugin/meme"
+      (let [response (http/post (slacky-url "/api/browser-plugin/meme")
                                 {:throw-exceptions? false
                                  :form-params {:token (str (UUID/randomUUID))
                                                :text "nil"}})]

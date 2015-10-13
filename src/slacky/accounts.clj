@@ -1,6 +1,7 @@
 (ns slacky.accounts
   (:require [clojure.java.jdbc :as jdbc]
-            [honeysql.core :as sql])
+            [honeysql.core :as sql]
+            [clojure.tools.logging :as log])
   (:import [java.sql Statement]))
 
 (defn lookup-slack-account [db token]
@@ -24,7 +25,10 @@
 
 (defn add-account! [db & [authentications]]
   (jdbc/with-db-transaction [db db]
-    (let [id (-> (jdbc/insert! db :accounts {}) first vals first)]
+    (let [result (jdbc/insert! db :accounts {})
+          id (-> result first vals first)]
+      (log/warn "account insert result")
+      (log/warn "id is" id)
       (add-authentication! db id authentications)
       (jdbc/insert! db :api_stats {:account_id id
                                    :hits 0})
