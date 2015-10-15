@@ -73,7 +73,6 @@
   :figwheel {:server-port 8083
              :nrepl-port 7888
              :nrepl-middleware ["cider.nrepl/cider-middleware"
-                                "refactor-nrepl.middleware/wrap-refactor"
                                 "cemerick.piggieback/wrap-cljs-repl"]}
   :uberjar-name "slacky-standalone.jar"
   :repl-options {:init-ns user

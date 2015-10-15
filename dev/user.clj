@@ -7,3 +7,6 @@
   #_ (dev/start))
 
 (def refresh repl/refresh)
+
+(defn cljs-repl []
+  (cemerick.piggieback/cljs-repl (cljs.repl.rhino/repl-env)))
