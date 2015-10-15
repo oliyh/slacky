@@ -142,7 +142,7 @@
   [request]
   (if-let [error (get-in request [:query-params :error])]
     (do (log/error "User denied authentication")
-        (redirect (url-for ::home :query-params {:add-to-slack "denied"})))
+        (redirect (url-for ::home :path-params {:route "slack/denied"})))
     (if-let [api-access (slack/api-access
                          (:slack-client-id request)
                          (:slack-client-secret request)
@@ -150,8 +150,8 @@
       (do (accounts/register-slack-account!
            (:db-connection request)
            api-access)
-          (redirect (url-for ::home :query-params {:add-to-slack "success"})))
-      (redirect (url-for ::home :query-params {:add-to-slack "failure"})))))
+          (redirect (url-for ::home :path-params {:route "slack/success"})))
+      (redirect (url-for ::home :path-params {:route "slack/failure"})))))
 
 ;; usage stats
 
@@ -180,7 +180,6 @@
   (handler ::home-handler
            (fn [{:keys [google-analytics-key slack-client-id]}]
              (-> (response (index/index {:google-analytics-key google-analytics-key
-                                         :meme-descriptions (meme/describe-meme-patterns)
                                          :slack-oauth-url (format "https://slack.com/oauth/authorize?scope=incoming-webhook,commands&client_id=%s"
                                                                   slack-client-id)}))
                  (content-type "text/html")))))
@@ -223,7 +222,7 @@
        ["/*resource" {:get [(swagger/swagger-ui)]}]]]]))
 
 (defroutes app-routes
-  [[["/" {:get home}]]])
+  [[["/*route" {:get home}]]])
 
 (def routes
   (concat api-routes app-routes))

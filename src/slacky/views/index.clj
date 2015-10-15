@@ -13,13 +13,7 @@
      "ga('create', '" google-analytics-key "', 'auto');"
      "ga('send', 'pageview');"]))
 
-(defn- example [img-src command]
-  [:div.col-xs-12.col-md-4
-   [:div.example {:data-command command}
-    [:img.img-thumbnail {:src img-src}]
-    [:code command]]])
-
-(defn index [{:keys [google-analytics-key meme-descriptions slack-oauth-url]}]
+(defn index [{:keys [google-analytics-key slack-oauth-url]}]
   (html5 {:lang "en"}
          [:head
           [:meta {:charset "utf-8"}]
@@ -35,14 +29,13 @@
                   :sizes "16x16 32x32 48x48"
                   :type "image/png"}]
 
-          (include-css "css/bootstrap.min.css"
+          (include-css "/css/bootstrap.min.css"
                        "https://fonts.googleapis.com/css?family=Quicksand:300"
-                       "css/avgrund.css"
-                       "css/typeahead.css"
-                       "css/main.css")
+                       "/css/typeahead.css"
+                       "/css/main.css")
           [:link {:rel "chrome-webstore-item"
                   :href "https://chrome.google.com/webstore/detail/nikjbdhcbfledkekdacecmegploaelpe"}]]
-         [:body.avgrund-parent
+         [:body
 
           [:a.hidden-xs {:href "https://github.com/oliyh/slacky"}
            [:img {:style "position: absolute; top: 0; right: 0; border: 0;"
@@ -50,186 +43,18 @@
                   :alt "Fork me on GitHub"
                   :data-canonical-src "https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"}]]
 
-          [:div.avgrund-cover]
-
-          [:div.container.avgrund-contents
+          [:div#app.container
+           {:data-slack-oauth-url slack-oauth-url}
            [:div.header
             [:h1 "Slacky"]
             [:h4 "Memes as a Service"]]
+           [:div#loading-notice.jumbotron
+            [:h1 "Slacky is loading..."]
+            [:p [:small "Slacky is a modern website with modern requirements. If you cannot see anything, try upgrading your browser."]]
+            [:p [:small "Stuck? Contact "
+                 [:a {:href "https://twitter.com/oliyh"
+                      :target "_blank"} "@oliyh"]
+                 " for help."]]]]
 
-           [:div.row
-            [:div.col-xs-10.col-xs-offset-1
-
-
-             [:div.jumbotron
-              [:a {:name "demo"}]
-              [:div.leader
-               [:h1 "How can haz meme?"]]
-
-              [:div.row
-               (example "/images/pai-mei-approves.png" "pai mei | pai mei | approves")
-               (example "/images/slacky-wins.png" "https://goo.gl/h9eUDM | slacky | wins")
-               (example "/images/all-the-memes.png" "create all the memes!")]
-
-              [:div.row
-               [:div.col-xs-12
-                [:form#demo.form-horizontal
-                 [:div.col-xs-12.col-md-11
-                  [:div.form-group.form-group-lg
-                   [:div.input-group
-                    [:div.input-group-addon "/meme"]
-                    [:input#demo-text.form-control {:type "text"
-                                                    :placeholder "search term or url | upper text | lower text"}]
-                    [:script {:type "text/javascript"}
-                     "patterns = " (json/encode meme-descriptions)]]]]
-
-                 [:div.col-xs-12.col-md-1
-                  [:div.form-group.form-group-lg
-                   [:button.btn.btn-success.btn-lg {:type "submit"}
-                    "Try!"]]]]]]]
-
-
-             [:div.jumbotron
-              [:div
-               [:a {:name "slack"}]
-               [:div.leader
-                [:div#memes-in-slack
-                 [:span.h1 "Memes in"]
-                 [:img {:src "/images/slack-logo.png"
-                        :alt "Slack"}]]
-                [:a#slack-install {:href slack-oauth-url
-                                   :target "_blank"}
-                 [:img {:alt "Add to Slack"
-                        :height 80
-                        :width 278
-                        :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
-
-                [:p
-                 [:a {:href "#slack-upgrade-modal"
-                      :onClick "Avgrund.show('#upgrade-slack-modal');"}
-                  "Already installed Slacky the old way?"]]]]
-
-              [:div.row
-               [:div.col-xs-6
-                [:a {:name "chrome"}]
-                [:div.leader
-                 [:a#chrome-install {:href "#chrome"}
-                  [:img {:src "/images/chrome-logo.png"
-                         :alt "Chrome"}]
-                  [:p "Click here to add to Chrome"]]]]
-
-               [:div.col-xs-6
-                [:a {:name "firefox"}]
-                [:div.leader
-                 [:a#firefox-install {:href "https://addons.mozilla.org/en-US/firefox/addon/slacky/"
-                                      :target "_blank"}
-                  [:img {:src "/images/firefox-logo.png"
-                         :alt "Firefox"}]
-                  [:p "Click here to add to Firefox"]]]]]]
-
-             [:div#footer.col-xs-12
-              [:h4 "Help"]
-              [:small "Contact "
-               [:a {:href "https://twitter.com/oliyh"
-                    :target "_blank"} "@oliyh"]
-               " on Twitter"]
-              [:h4 "Privacy"]
-              [:small "Slacky stores a randomly generated token to identify your account, allowing
-you to take advantage of various features."]]]]]
-
-          [:div#demo-meme-popup.avgrund-popup
-           [:div
-            [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-             [:h4.modal-title "Brace yourself..."]]
-            [:div.modal-body
-             [:img#demo-meme.center-block {:src ""}]]
-            [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]
-
-          [:div#add-to-slack-success.avgrund-popup
-           [:div
-            [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-             [:h4.modal-title "Success!"]]
-            [:div.modal-body
-             [:p "Start using in Slack right away by typing "
-              [:code "/meme"]
-              " in any channel"]
-             [:p "Stuck? Type "
-              [:code "/meme :help"]
-              " or try the demos on this page"]]
-            [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]
-
-          [:div#add-to-slack-failure.avgrund-popup
-           [:div
-            [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-             [:h4.modal-title "Failure"]]
-            [:div.modal-body
-             [:p "Something went wrong. Contact me at @oliyh on Twitter if you need help!"]]
-            [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]
-
-          [:div#add-to-slack-denied.avgrund-popup
-           [:div
-            [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-             [:h4.modal-title "Denied"]]
-            [:div.modal-body
-             [:p "You will have to authorise Slacky to be able to use it in Slack."]]
-            [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]
-
-          [:div#upgrade-slack-modal.avgrund-popup {:tabindex "-1"
-                                                   :role "dialog"
-                                                   :aria-labelledby "myModalLabel"}
-           [:div {:role "document"}
-            [:div
-             [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-              [:h4#myModalLabel.modal-title "Upgrade Slack"]]
-             [:div.modal-body
-              [:h3 "1. Use Slacky once more"]
-              [:p "Type "
-               [:code "/meme :help"]
-               " in any channel in Slack. This will prepare your account to be upgraded."]
-              [:h3 "2. Authenticate the app"]
-              [:p "Press "
-               [:a#slack-upgrade {:href slack-oauth-url
-                                  :target "_blank"}
-                [:img {:alt "Add to Slack"
-                       :height 40
-                       :width 139
-                       :src "https://platform.slack-edge.com/img/add_to_slack.png"
-                        :srcset "https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"}]]]]
-             [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]]
-
-          (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
-                      "js/bootstrap.min.js"
-                      "js/typeahead.jquery.js"
-                      "js/avgrund.js"
-                      "js/home.js")
+          (include-js "/cljs/main.js")
           (google-analytics google-analytics-key)]))

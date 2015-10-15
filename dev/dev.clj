@@ -1,16 +1,20 @@
 (ns dev
   (:require [angel.interceptor :as angel]
+            [cemerick.piggieback :as piggieback]
+            [clojure.test]
+            [clojure.tools.namespace.repl :as repl]
+            [io.pedestal.http :as bootstrap]
+            [slacky.db :as db]
             [slacky
              [service :as service]
              [server :as server]
-             [settings :as settings]]
-            [io.pedestal.http :as bootstrap]
-            [clojure.tools.namespace.repl :as repl]
-            [clojure.test]
-            [slacky.db :as db]))
+             [settings :as settings]]))
 
 (def clear repl/clear)
 (def refresh repl/refresh)
+
+(defn cljs-repl []
+  (piggieback/cljs-repl (cljs.repl.rhino/repl-env)))
 
 (def service (-> service/service ;; start with production configuration
                  (merge  {:env :dev
