@@ -40,6 +40,44 @@
              :dev {:source-paths ["dev"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [clj-http-fake "1.0.1"]
-                                  [org.clojars.runa/conjure "2.1.3"]]}}
+                                  [org.clojars.runa/conjure "2.1.3"]
+
+                                  ;; cljs
+                                  [org.clojure/clojurescript "1.7.48"]
+                                  [com.cemerick/piggieback "0.2.1"]
+                                  [org.clojure/tools.nrepl "0.2.10"]
+                                  [org.clojure/tools.reader "0.10.0-alpha3"]
+                                  [org.clojure/tools.trace "0.7.6"]
+
+                                  [org.omcljs/om "0.9.0"]
+                                  [sablono "0.3.6"]]
+                   :plugins [[lein-cljsbuild "1.0.6"]
+                             [lein-figwheel "0.4.0"]]
+                   :cljsbuild {:builds {:dev
+                                        {:source-paths ["resources/src/cljs"]
+                                         :figwheel true
+                                         :compiler {:output-to "resources/public/cljs/main.js"
+                                                    :output-dir "resources/public/cljs/dev"
+                                                    :source-map true
+                                                    :main "slacky.app"
+                                                    :asset-path "/cljs/dev"
+                                                    :optimizations :none
+                                                    :pretty-print true}}
+                                        :prod
+                                        {:source-paths ["resources/src/cljs"]
+                                         :compiler {:output-to "resources/public/cljs/main.js"
+                                                    :output-dir "resources/public/cljs/prod"
+                                                    :main "slacky.app"
+                                                    :asset-path "/cljs/prod"
+                                                    :optimizations :advanced}}}}}}
+  :figwheel {:server-port 8083
+             :nrepl-port 7888
+             :nrepl-middleware ["cider.nrepl/cider-middleware"
+                                "refactor-nrepl.middleware/wrap-refactor"
+                                "cemerick.piggieback/wrap-cljs-repl"]}
   :uberjar-name "slacky-standalone.jar"
-  :repl-options {:init-ns user})
+  :repl-options {:init-ns user
+                 ;; :timeout 200000
+                 ;; :host "0.0.0.0"
+                 ;; :port 44814
+                 :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]})

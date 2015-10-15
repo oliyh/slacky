@@ -231,5 +231,7 @@ you to take advantage of various features."]]]]]
                       "js/bootstrap.min.js"
                       "js/typeahead.jquery.js"
                       "js/avgrund.js"
-                      "js/home.js")
+
+                      "js/home.js"
+                      "/cljs/main.js")
           (google-analytics google-analytics-key)]))

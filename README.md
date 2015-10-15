@@ -30,6 +30,13 @@ Some pre-defined memes are also provided, documentation will follow shortly:
 
 `/meme create all the memes!`
 
+#Development
+
+## ClojureScript
+
+Sources files are in `resources/src/cljs`. Run `lein figwheel` or `lein cljsbuild auto dev` to automatically build during development.
+To build for production use run `lein cljsbuild once prod`.
+
 Copyright © 2015  oliyh
 
 Distributed under the Eclipse Public License either version 1.0 or (at
