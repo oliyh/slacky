@@ -7,6 +7,7 @@
             [schema.core :as s]))
 
 (def req s/required-key)
+(def opt s/optional-key)
 
 (s/defschema SlackRequest
   {(req :token)        s/Str
@@ -17,7 +18,8 @@
    (req :user_id)      s/Str
    (req :user_name)    s/Str
    (req :command)      s/Str
-   (req :text)         s/Str})
+   (req :text)         s/Str
+   (opt :response_url) s/Str})
 
 (def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
 
