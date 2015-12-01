@@ -62,7 +62,7 @@
 
 (deftest can-integrate-with-slack
   (let [token (clojure.string/replace (str (UUID/randomUUID)) "-" "")
-        webhook-url "https://hooks.slack.com/services/foobarbaz"
+        response-url "https://hooks.slack.com/services/foobarbaz"
         channel-name "my-channel"
         user-name "the-user"
         slack-post! (fn [text]
@@ -76,26 +76,8 @@
                                                        :user_id "d"
                                                        :user_name user-name
                                                        :command "/meme"
-                                                       :text text}})))]
-
-    (testing "must register token with webhook url to use service"
-      (is (= 403 (:status (http/post (slacky-url "/api/slack/meme")
-                                     {:throw-exceptions? false
-                                      :form-params {:token token
-                                                    :team_id "a"
-                                                    :team_domain "b"
-                                                    :channel_id "c"
-                                                    :channel_name channel-name
-                                                    :user_id "d"
-                                                    :user_name user-name
-                                                    :command "/meme"
-                                                    :text "i'm not authenticated"}})))))
-
-    (testing "can create an account"
-      (is (= 200 (:status (http/post (slacky-url "/api/account")
-                                     {:throw-exceptions? false
-                                      :form-params {:token token
-                                                    :key webhook-url}})))))
+                                                       :text text
+                                                       :response_url response-url}})))]
 
     (testing "alerts on bad syntax"
       (with-fake-internet {}
@@ -112,7 +94,7 @@
         (is (= "Your meme is on its way"
                (slack-post! "cats | cute cats | FTW")))
 
-        (is (= [webhook-url (str "#" channel-name)
+        (is (= [response-url (str "#" channel-name)
                 (slack/->message :meme user-name "cats | cute cats | FTW" meme-url)]
                (first (a/alts!! [slack-channel (a/timeout 500)]))))))
 
@@ -121,7 +103,7 @@
         (is (= "Your template is being registered"
                (slack-post! ":template cute cats http://cats.com/cute.jpg")))
 
-        (is (= [webhook-url (str "#" channel-name)
+        (is (= [response-url (str "#" channel-name)
                 (slack/->message :add-template user-name nil
                                  "cute cats" "http://cats.com/cute.jpg")]
                (first (a/alts!! [slack-channel (a/timeout 500)]))))
@@ -132,7 +114,7 @@
           (is (= "Your meme is on its way"
                  (slack-post! "cute cats | omg | so cute")))
 
-          (is (= [webhook-url (str "#" channel-name)
+          (is (= [response-url (str "#" channel-name)
                   (slack/->message :meme user-name "cute cats | omg | so cute" meme-url)]
                  (first (a/alts!! [slack-channel (a/timeout 500)]))))
 

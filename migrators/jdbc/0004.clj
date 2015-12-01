@@ -23,5 +23,4 @@
      "ALTER TABLE accounts ADD COLUMN token varchar(128);"
      "ALTER TABLE accounts ADD COLUMN key varchar(256);"
      "CREATE UNIQUE INDEX accounts_token_idx ON accounts(token);"
-     "UPDATE accounts a SET token = (SELECT token FROM slack_authentication sa WHERE sa.account_id = a.id), key = (SELECT key FROM slack_authentication sa WHERE sa.account_id = a.id);"
-     (sql/drop-table-ddl :slack_authentication))))
+     "DROP TABLE IF EXISTS slack_authentication")))

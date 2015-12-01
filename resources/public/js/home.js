@@ -1,46 +1,5 @@
 $(document).ready(
   function() {
-    $('#new-account').submit(function(e) {
-
-      e.preventDefault();
-      $('#success-message, #failure-message').hide();
-      $('#failure-message').text('');
-      $('#new-account .has-error').removeClass('has-error');
-
-      if (window.ga != undefined) {
-        ga('send', 'event', 'account', 'register');
-      }
-
-      $.ajax({
-        url: '/api/account',
-        type: 'POST',
-        data: {token: $('#token').val(),
-               key: $('#key').val()},
-        success: function() {
-          $('#success-message').css({display: 'inline-block'});
-          $('#token, #key').val('');
-        },
-        error: function(response) {
-          if (response.status === 409) {
-            $('#failure-message').css({display: 'inline-block'}).text('Account already exists');
-
-          } else if (response.status === 400) {
-            console.log(response);
-            $('#failure-message').css({display: 'inline-block'}).html('<strong>Please correct the following:</strong>');
-            var errors = response.responseJSON['error']['form-params'];
-            for (input in errors) {
-              console.log('adding error class to ' + input);
-              $('#' + input).closest('.form-group').addClass('has-error');
-              $('#failure-message').append('<br/>\n- ' + input + ' ' + errors[input]);
-            }
-
-          } else {
-            $('#failure-message').css({display: 'inline-block'}).text('Oh noes, something broke...');
-          }
-        }
-      });
-    });
-
     $('#demo').submit(function(e) {
       e.preventDefault();
 

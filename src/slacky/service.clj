@@ -31,14 +31,6 @@
 (s/defschema MemeRequest
   {(req :text) s/Str})
 
-(s/defschema AddAccount
-  {(req :token) (s/both s/Str
-                        (s/named (s/pred #(<= 20 (count %))) "must be at least 20 characters long")
-                        (s/named (s/pred #(re-matches #"\w*" %)) "must be alphanumeric"))
-   (req :key)   (s/both s/Str
-                        (s/named (s/pred #(re-matches #"^https://hooks\.slack\.com/services/.+" %))
-                                 "must be of the form https://hooks.slack.com/services/..."))})
-
 ;; api handlers
 
 (defn- divert-to-slack [slack-responder result-channel]
@@ -56,7 +48,7 @@
   (let [db (:db-connection request)
         account-id (::account-id request)
         text (:text form-params)
-        slack-responder (slack/build-responder (::slack-webhook-url request) form-params)]
+        slack-responder (slack/build-responder (:response_url form-params) form-params)]
 
     (cond
       (not (nil? (meme/resolve-template-addition text)))
@@ -108,54 +100,17 @@
   {:status 200
    :body (meme/describe-meme-patterns)})
 
-(swagger/defhandler add-account
-  {:summary "Adds an account"
-   :parameters {:formData AddAccount}
-   :responses {200 {:schema s/Any}
-               409 {:schema s/Str}}}
-  [{:keys [form-params] :as req}]
-  (let [db (:db-connection req)]
-    (try
-      (if (accounts/lookup-slack-account db (:token form-params))
-        (-> (response "Account already exists")
-            (status 409))
-        (do (accounts/add-account! db {:slack (select-keys form-params [:token :key])})
-            (response "Account added")))
-      (catch Exception e
-        (log/error "Failed to add account" e)
-        (-> (response "Failed to add account")
-            (status 500))))))
-
 ;; authentication
 
-(swagger/defbefore authenticate-slack-call
-  {:description "Ensures the caller has registered their token and an incoming webhook"
-   :parameters {:formData {:token s/Str}}
-   :responses {403 {}}}
-  [{:keys [request response] :as context}]
-  (log/info "Authenticating Slack account")
-  (let [db (:db-connection request)
-        token (get-in request [:form-params :token])
-        account (accounts/lookup-slack-account db token)]
-    (if-let [webhook-url (:key account)]
-      (update context :request merge {::slack-webhook-url webhook-url
-                                      ::account-id (:id account)})
-      (-> (terminate context)
-          (assoc :response {:status 403
-                            :headers {}
-                            :body (str "You are not permitted to use this service.\n"
-                                       "Please register your token '" token
-                                       "' at https://slacky-server.herokuapp.com")})))))
-
-(swagger/defbefore authenticate-browser-plugin-call
-  {:description "Uses or creates an account for someone calling the service via a browser plugin"
+(swagger/defbefore authenticate-request
+  {:description "Uses or creates an account"
    :parameters {:formData {:token s/Str}}}
   [{:keys [request response] :as context}]
-  (log/info "Authenticating browser plugin")
+  (log/info "Authenticating...")
   (let [db (:db-connection request)
         token (get-in request [:form-params :token])
-        account (or (accounts/lookup-browser-plugin-account db token)
-                    (accounts/add-account! db {:browser-plugin {:token token}}))]
+        account (or (accounts/lookup-account db token)
+                    (accounts/add-account! db token))]
     (update context :request merge {::account-id (:id account)})))
 
 ;; usage stats
@@ -206,11 +161,11 @@
                               async-handler
                               (angel/prefers increment-api-usage :account)]
 
-       ["/slack" ^:interceptors [(angel/provides authenticate-slack-call :account)]
+       ["/slack" ^:interceptors [(angel/provides authenticate-request :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
          {:post slack-meme}]]
 
-       ["/browser-plugin" ^:interceptors [(angel/provides authenticate-browser-plugin-call :account)]
+       ["/browser-plugin" ^:interceptors [(angel/provides authenticate-request :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
          {:post [::browser-plugin-meme rest-meme]}]]
 
@@ -218,9 +173,6 @@
         {:post rest-meme}
         ["/patterns"
          {:get get-meme-patterns}]]
-
-       ["/account" ^:interceptors [(annotate {:tags ["account"]})]
-        {:post add-account}]
 
        ["/swagger.json" {:get [(swagger/swagger-json)]}]
        ["/*resource" {:get [(swagger/swagger-ui)]}]]]]))

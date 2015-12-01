@@ -94,40 +94,12 @@
                 [:span.h1 "Memes in"]
                 [:img {:src "/images/slack-logo.png"
                        :alt "Slack"}]]
-               [:p "Register your slash command token with your incoming webhook url below."
+               [:p "Create your slash command"
                 "&nbsp;"
                 [:a {:href "#guide"
                      :onClick "Avgrund.show('#guide-modal');"}
-                 "Need help?"]]]
-
-              [:form#new-account.form-horizontal
-               [:div.form-group.form-group-lg
-                [:label.col-sm-4.control-label {:for "token"}
-                 "Slash command token"]
-                [:div.col-sm-8
-                 [:input#token.form-control {:type "text"
-                                             :placeholder ""}]]]
-               [:div.form-group.form-group-lg
-                [:label.col-sm-4.control-label {:for "key"}
-                 "Incoming webhook url"]
-                [:div.col-sm-8
-                 [:input#key.form-control {:type "text"
-                                           :placeholder "https://hooks.slack.com/services/..."}]]]
-
-               [:div.form-group.form-group-lg
-                [:label.col-sm-offset-4.col-sm-8
-                 [:button.btn.btn-success.btn-lg {:type "submit"}
-                  "Let's go!"]
-                 [:div#success-message.alert.alert-success
-                  [:span.glyphicon.glyphicon-ok {:aria-hidden "true"}]
-                  "&nbsp;"
-                  [:strong "Success!"]
-                  " Let the memes begin!"]
-                 [:div#failure-message.alert.alert-danger
-                  [:span.glyphicon.glyphicon-fire {:aria-hidden "true"}]
-                  "&nbsp;"
-                  [:strong "Oh noes!"]
-                  " Something broke! You can try again, or give up..."]]]]]
+                 "by following these simple steps"]
+                "."]]]
 
              #_[:div.jumbotron
               [:a {:name "firefox"}]
@@ -179,27 +151,11 @@
                [:strong "Method"] ": " [:code "POST"] [:br]
                [:strong "Autocomplete description"] ": " [:code "Create a meme"] [:br]
                [:strong "Autocomplete usage hint"] ": " [:code "image url or search term | upper text | lower text"] [:br]]
-              [:p "Take note of the "
-               [:strong "token"]
-               ". You will use this to register your account."]
 
-              [:h3 "2. Create an incoming webhook"]
-              [:p "Create an "
-               [:a {:href "https://my.slack.com/services/new/incoming-webhook/"
-                    :target "_blank"}
-                "incoming webhook"]
-               "."]
-              [:p "Take note of the "
-               [:strong "webhook url"]
-               ". This is the second piece of information needed to register your account."]
-
-              [:h3 "3. Register your account"]
-              [:p "Fill in and submit the form using the information you have collected."]
-
-              [:h3 "4. Create all the memes!"]
+              [:h3 "2. Create all the memes!"]
               [:p "Type "
                [:code "/meme"]
-               " into your Slack and never look back! See the examples below."]]
+               " into your Slack and never look back! See the examples on this page."]]
              [:div.modal-footer
               [:button.btn.btn-default {:type "button"
                                         :onClick "Avgrund.hide();"}
@@ -210,5 +166,4 @@
                       "js/typeahead.jquery.js"
                       "js/avgrund.js"
                       "js/home.js")
-          (google-analytics google-analytics-key)])
-  )
+          (google-analytics google-analytics-key)]))

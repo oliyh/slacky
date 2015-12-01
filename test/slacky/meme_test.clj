@@ -39,7 +39,7 @@
   (first (a/alts!! [chan (a/timeout 500)])))
 
 (deftest register-template-test
-  (let [account-id (:id (add-account! *db*))]
+  (let [account-id (:id (add-account! *db* "foo"))]
     (cj/stubbing [memecaptain/create-template "some-template-id"]
 
                  (let [response (add-template *db*

@@ -16,4 +16,4 @@
   (sql/with-db-transaction [db db]
     (sql/db-do-commands
      db
-     (sql/drop-table-ddl :browser_plugin_authentication))))
+     "DROP TABLE IF EXISTS browser_plugin_authentication")))
