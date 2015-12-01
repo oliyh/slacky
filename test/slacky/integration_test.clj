@@ -94,7 +94,7 @@
         (is (= "Your meme is on its way"
                (slack-post! "cats | cute cats | FTW")))
 
-        (is (= [response-url (str "#" channel-name)
+        (is (= [response-url "in_channel"
                 (slack/->message :meme user-name "cats | cute cats | FTW" meme-url)]
                (first (a/alts!! [slack-channel (a/timeout 500)]))))))
 
@@ -103,7 +103,7 @@
         (is (= "Your template is being registered"
                (slack-post! ":template cute cats http://cats.com/cute.jpg")))
 
-        (is (= [response-url (str "#" channel-name)
+        (is (= [response-url "in_channel"
                 (slack/->message :add-template user-name nil
                                  "cute cats" "http://cats.com/cute.jpg")]
                (first (a/alts!! [slack-channel (a/timeout 500)]))))
@@ -114,7 +114,7 @@
           (is (= "Your meme is on its way"
                  (slack-post! "cute cats | omg | so cute")))
 
-          (is (= [response-url (str "#" channel-name)
+          (is (= [response-url "in_channel"
                   (slack/->message :meme user-name "cute cats | omg | so cute" meme-url)]
                  (first (a/alts!! [slack-channel (a/timeout 500)]))))
 
