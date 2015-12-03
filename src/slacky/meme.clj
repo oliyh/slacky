@@ -9,7 +9,7 @@
             [clojure.tools.logging :as log]
             [honeysql.core :as sql]
             [slacky
-             [google :as google]
+             [bing :as bing]
              [memecaptain :as memecaptain]
              [slack :as slack]
              [templates :as templates]]))
@@ -30,7 +30,7 @@
     (memecaptain/create-template term)
 
     :else
-    (memecaptain/create-template (google/image-search term))))
+    (memecaptain/create-template (bing/image-search term))))
 
 ;; from https://bitbucket.org/atlassianlabs/ac-koa-hipchat-sassy/src/1d0a72839002d9dc9f911825de73d819d7f94f5c/lib/commands/meme.js?at=master
 (def ^:private meme-patterns

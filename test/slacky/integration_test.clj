@@ -9,7 +9,7 @@
              [fixture :refer [with-web-api with-database with-fake-internet]]
              [service :as service]
              [settings :refer [web-port]]
-             [google :as google]
+             [bing :as bing]
              [slack :as slack]])
   (:import [java.util UUID]))
 
@@ -37,7 +37,7 @@
         (is (= "Sorry, the command was not recognised"
                (:body response))))
 
-      (cj/verify-call-times-for google/image-search 0)
+      (cj/verify-call-times-for bing/image-search 0)
       (cj/verify-call-times-for memecaptain/create-template 0)
       (cj/verify-call-times-for memecaptain/create-instance 0))))
 
@@ -152,6 +152,6 @@
         (is (= "Sorry, the command was not recognised"
                (:body response))))
 
-      (cj/verify-call-times-for google/image-search 0)
+      (cj/verify-call-times-for bing/image-search 0)
       (cj/verify-call-times-for memecaptain/create-template 0)
       (cj/verify-call-times-for memecaptain/create-instance 0))))

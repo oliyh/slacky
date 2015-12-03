@@ -4,7 +4,7 @@
             [slacky
              [memecaptain :as memecaptain]
              [slack :as slack]
-             [google :as google]
+             [bing :as bing]
              [server :as server]
              [db :refer [create-fresh-db-connection]]]))
 
@@ -37,7 +37,7 @@
   `(let [slack-channel# (a/chan)]
      (cj/stubbing [memecaptain/create-template ~template-id
                    memecaptain/create-instance ~meme-url
-                   google/image-search ~search-result
+                   bing/image-search ~search-result
                    slack/send-message (fn [& args#]
                                         (a/put! slack-channel# args#))]
 

@@ -20,6 +20,7 @@
 
                  ;; web
                  [hiccup "1.0.5"]
+                 [enlive "1.1.6"]
 
                  ;; persistence
                  [org.clojure/java.jdbc "0.3.5"]
