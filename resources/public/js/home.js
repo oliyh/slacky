@@ -30,6 +30,15 @@ $(document).ready(
     });
 
 
+     $('#chrome-install').click(function () {
+        if (!chrome.app.isInstalled) {
+           chrome.webstore.install(undefined, undefined, function(err) {
+              console.log(err);
+           });
+        }
+     });
+
+
     function tokenisedMatches(q, pattern) {
       var queryTokens, patternTokens, match;
       queryTokens = q.trim().split(' ');

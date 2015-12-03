@@ -39,7 +39,9 @@
                        "https://fonts.googleapis.com/css?family=Quicksand:300"
                        "css/avgrund.css"
                        "css/typeahead.css"
-                       "css/main.css")]
+                       "css/main.css")
+          [:link {:rel "chrome-webstore-item"
+                  :href "https://chrome.google.com/webstore/detail/nikjbdhcbfledkekdacecmegploaelpe"}]]
          [:body.avgrund-parent
 
           [:a.hidden-xs {:href "https://github.com/oliyh/slacky"}
@@ -88,18 +90,29 @@
 
 
              [:div.jumbotron
-              [:a {:name "slack"}]
-              [:div.leader
-               [:div#memes-in-slack
-                [:span.h1 "Memes in"]
-                [:img {:src "/images/slack-logo.png"
-                       :alt "Slack"}]]
-               [:p "Create your slash command"
-                "&nbsp;"
-                [:a {:href "#guide"
-                     :onClick "Avgrund.show('#guide-modal');"}
-                 "by following these simple steps"]
-                "."]]]
+              [:div
+               [:a {:name "slack"}]
+               [:div.leader
+                [:div#memes-in-slack
+                 [:span.h1 "Memes in"]
+                 [:img {:src "/images/slack-logo.png"
+                        :alt "Slack"}]]
+                [:p "Create your slash command"
+                 "&nbsp;"
+                 [:a {:href "#guide"
+                      :onClick "Avgrund.show('#guide-modal');"}
+                  "by following these simple steps"]
+                 "."]]]
+
+              [:div
+               [:a {:name "chrome"}]
+               [:div.leader
+                [:a#chrome-install {:href "#chrome"}
+                 [:img {:src "/images/chrome-logo.png"
+                        :alt "Chrome"}]
+                 [:p "Click here to add to Chrome"]]]]]
+
+
 
              #_[:div.jumbotron
               [:a {:name "firefox"}]
