@@ -104,28 +104,22 @@
                   "by following these simple steps"]
                  "."]]]
 
-              [:div
-               [:a {:name "chrome"}]
-               [:div.leader
-                [:a#chrome-install {:href "#chrome"}
-                 [:img {:src "/images/chrome-logo.png"
-                        :alt "Chrome"}]
-                 [:p "Click here to add to Chrome"]]]]]
+              [:div.row
+               [:div.col-xs-6
+                [:a {:name "chrome"}]
+                [:div.leader
+                 [:a#chrome-install {:href "#chrome"}
+                  [:img {:src "/images/chrome-logo.png"
+                         :alt "Chrome"}]
+                  [:p "Click here to add to Chrome"]]]]
 
-
-
-             #_[:div.jumbotron
-              [:a {:name "firefox"}]
-              [:div.leader
-               [:div#memes-in-slack
-                [:span.h1 "Memes in "]
-                [:img {:src "/images/firefox-logo.png"
-                       :alt "Firefox"}]]
-               [:p "Download the plugin and install by dragging the file into your Firefox window."
-                [:a.btn.btn-success.btn-lg {:href "/plugins/@slacky-0.0.1.xpi"}
-                 "Click here to download"]]
-
-               [:p "Once installed, type '/meme' into any text input to bring up the Slacky dialogue, or click the icon on the toolbar."]]]]]]
+               [:div.col-xs-6
+                [:a {:name "firefox"}]
+                [:div.leader
+                 [:a#firefox-install {:href "https://addons.mozilla.org/firefox/downloads/latest/670960/addon-670960-latest.xpi?src=dp-btn-primary"}
+                  [:img {:src "/images/firefox-logo.png"
+                         :alt "Firefox"}]
+                  [:p "Click here to add to Firefox"]]]]]]]]]
 
           [:div#demo-meme-popup.avgrund-popup
            [:div
