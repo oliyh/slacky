@@ -116,7 +116,8 @@
                [:div.col-xs-6
                 [:a {:name "firefox"}]
                 [:div.leader
-                 [:a#firefox-install {:href "https://addons.mozilla.org/firefox/downloads/latest/670960/addon-670960-latest.xpi?src=dp-btn-primary"}
+                 [:a#firefox-install {:href "https://addons.mozilla.org/en-US/firefox/addon/slacky/"
+                                      :target "_blank"}
                   [:img {:src "/images/firefox-logo.png"
                          :alt "Firefox"}]
                   [:p "Click here to add to Firefox"]]]]]]]]]
