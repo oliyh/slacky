@@ -18,6 +18,10 @@ The generic template is:
 
 `/meme search term | upper text | lower text`
 
+The _search term_ can optionally include the keyword `:anim` to search for animated images, e.g.
+
+`/meme :anim gandalf vs balrog | you shall not | pass!`
+
 You can provide an image to use by providing the url instead:
 
 `/meme http://path/to/image.jpg | upper text | lower text`
