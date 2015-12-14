@@ -1,5 +1,7 @@
 (ns user
-  (:require [clojure.tools.namespace.repl :as repl]))
+  (:require [clojure.tools.namespace.repl :as repl]
+     ;;       [cemerick.piggieback :refer [cljs-repl]]
+            ))
 
 (defn dev []
   (require 'dev)
@@ -8,5 +10,5 @@
 
 (def refresh repl/refresh)
 
-(defn cljs-repl []
-  (cemerick.piggieback/cljs-repl (cljs.repl.rhino/repl-env)))
+#_(defn cljs-repl []
+  (cljs-repl (cljs.repl.rhino/repl-env)))

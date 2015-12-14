@@ -51,6 +51,11 @@
 
                                   [org.omcljs/om "0.9.0"]
                                   [sablono "0.3.6"]]
+                   :repl-options {:init-ns user
+                                  ;; :timeout 200000
+                                  ;; :host "0.0.0.0"
+                                  ;; :port 44814
+                                  :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
                    :plugins [[lein-cljsbuild "1.0.6"]
                              [lein-figwheel "0.4.0"]]
                    :cljsbuild {:builds {:dev
@@ -75,8 +80,4 @@
              :nrepl-middleware ["cider.nrepl/cider-middleware"
                                 "cemerick.piggieback/wrap-cljs-repl"]}
   :uberjar-name "slacky-standalone.jar"
-  :repl-options {:init-ns user
-                 ;; :timeout 200000
-                 ;; :host "0.0.0.0"
-                 ;; :port 44814
-                 :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]})
+)
