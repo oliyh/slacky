@@ -34,7 +34,14 @@ Some pre-defined memes are also provided, documentation will follow shortly:
 
 ## ClojureScript
 
-Sources files are in `resources/src/cljs`. Run `lein figwheel` or `lein cljsbuild auto dev` to automatically build during development.
+Sources files are in `resources/src/cljs`.
+
+Run `lein figwheel` for a live-reloading development environment. Once the homepage has been loaded
+in a browser, the figwheel terminal will provide a REPL running inside the browser's Javascript engine.
+
+Alternatively run `(dev/cljs-repl)` to obtain a fresh CLJS REPL running inside the Clojure JVM, and type `:cljs/quit` to exit it.
+
+Run `lein cljsbuild auto dev` to automatically build during development without figwheel.
 To build for production use run `lein cljsbuild once prod`.
 
 Copyright © 2015  oliyh
