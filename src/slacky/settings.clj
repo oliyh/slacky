@@ -20,3 +20,9 @@
 
 (defn google-analytics-key []
   (System/getenv "GOOGLE_ANALYTICS_KEY"))
+
+(defn slack-client-id []
+  (System/getenv "SLACK_CLIENT_ID"))
+
+(defn slack-client-secret []
+  (System/getenv "SLACK_CLIENT_SECRET"))

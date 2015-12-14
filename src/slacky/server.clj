@@ -19,7 +19,10 @@
                                     angel/satisfy
                                     (bootstrap/default-interceptors)
                                     (service/with-database (db/create-db-connection (or db-url (settings/database-url))))
-                                    (service/with-google-analytics (settings/google-analytics-key))))))))
+                                    (service/with-google-analytics (settings/google-analytics-key))
+                                    (service/with-slack-client
+                                      (settings/slack-client-id)
+                                      (settings/slack-client-secret))))))))
 
 (defn -main [& args]
   (create-server)

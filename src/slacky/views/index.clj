@@ -19,7 +19,7 @@
     [:img.img-thumbnail {:src img-src}]
     [:code command]]])
 
-(defn index [{:keys [google-analytics-key meme-descriptions]}]
+(defn index [{:keys [google-analytics-key meme-descriptions slack-oauth-url]}]
   (html5 {:lang "en"}
          [:head
           [:meta {:charset "utf-8"}]
@@ -91,7 +91,7 @@
 
              [:div.jumbotron
               [:div
-               [:a {:name "slack"}]
+               [:a {:name "slack" :href slack-oauth-url}]
                [:div.leader
                 [:div#memes-in-slack
                  [:span.h1 "Memes in"]

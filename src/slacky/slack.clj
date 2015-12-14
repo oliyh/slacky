@@ -73,3 +73,12 @@
                     (apply ->message message-type user_name text args))
       (catch Exception e
         (log/warn "Could not send message to Slack" e)))))
+
+(defn register-application [db client-id client-secret oauth-code]
+  (let [result (-> (http/post "https://slack.com/api/oauth.access"
+                              {:query-params {:client-id client-id
+                                              :client-secret client-secret
+                                              :code oauth-code}})
+                   :body
+                   (json/decode true))]
+    (log/info result)))

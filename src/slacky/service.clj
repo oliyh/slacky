@@ -113,6 +113,21 @@
                     (accounts/add-account! db token))]
     (update context :request merge {::account-id (:id account)})))
 
+(swagger/defhandler slack-oauth
+  {:description "Records the Slack credentials provided after successful authentication"
+   :parameters {:query {(s/optional-key :code) s/Str
+                        (s/optional-key :error) s/Str}}}
+  [{:keys [request]}]
+  (if-let [error (get-in request [:query-params :error])]
+    (log/error "User denied authentication")
+    (do (slack/register-application
+         (:db-connection request)
+         (:slack-client-id request)
+         (:slack-client-secret request)
+         (get-in request [:query-params :code]))
+        {:status 200
+         :body "Ready to go!"})))
+
 ;; usage stats
 
 (swagger/defbefore increment-api-usage
@@ -138,9 +153,11 @@
 
 (def home
   (handler ::home-handler
-           (fn [{:keys [google-analytics-key]}]
+           (fn [{:keys [google-analytics-key slack-client-id]}]
              (-> (response (index/index {:google-analytics-key google-analytics-key
-                                         :meme-descriptions (meme/describe-meme-patterns)}))
+                                         :meme-descriptions (meme/describe-meme-patterns)
+                                         :slack-oauth-url (format "https://slack.com/oauth/authorize?scope=incoming-webhook&client_id=%s"
+                                                                  slack-client-id)}))
                  (content-type "text/html")))))
 
 ;; routes
@@ -163,7 +180,9 @@
 
        ["/slack" ^:interceptors [(angel/provides authenticate-request :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
-         {:post slack-meme}]]
+         {:post slack-meme}]
+        ["/oauth"
+         {:get slack-oauth}]]
 
        ["/browser-plugin" ^:interceptors [(angel/provides authenticate-request :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
@@ -206,3 +225,12 @@
              (before ::inject-google-analytics-key
                      (fn [context]
                        (assoc-in context [:request :google-analytics-key] google-analytics-key)))))
+
+(defn with-slack-client [service slack-client-id slack-client-secret]
+  (update-in service
+             [::bootstrap/interceptors] conj
+             (before ::inject-slack-client-id
+                     (fn [context]
+                       (update context :request merge
+                               {:slack-client-id slack-client-id
+                                :slack-client-secret slack-client-secret})))))
