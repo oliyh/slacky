@@ -119,7 +119,7 @@
    :parameters {:query {(s/optional-key :code)  s/Str
                         (s/optional-key :error) s/Str
                         (s/optional-key :state) s/Str}}}
-  [{:keys [request]}]
+  [request]
   (if-let [error (get-in request [:query-params :error])]
     (log/error "User denied authentication")
     (if (slack/register-application

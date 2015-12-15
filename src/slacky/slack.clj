@@ -81,8 +81,5 @@
                                              :code oauth-code}})
                    :body
                    (json/decode true))]
-    (log/info {:form-params {:client-id client-id
-                             :client-secret client-secret
-                             :code oauth-code}})
     (log/info result)
     (true? (:ok result))))
