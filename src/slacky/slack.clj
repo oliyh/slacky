@@ -76,9 +76,13 @@
 
 (defn register-application [db client-id client-secret oauth-code]
   (let [result (-> (http/post "https://slack.com/api/oauth.access"
-                              {:query-params {:client-id client-id
-                                              :client-secret client-secret
-                                              :code oauth-code}})
+                              {:form-params {:client-id client-id
+                                             :client-secret client-secret
+                                             :code oauth-code}})
                    :body
                    (json/decode true))]
-    (log/info result)))
+    (log/info {:form-params {:client-id client-id
+                             :client-secret client-secret
+                             :code oauth-code}})
+    (log/info result)
+    (true? (:ok result))))

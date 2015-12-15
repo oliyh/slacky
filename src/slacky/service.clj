@@ -116,17 +116,19 @@
 
 (swagger/defhandler slack-oauth
   {:description "Records the Slack credentials provided after successful authentication"
-   :parameters {:query {(s/optional-key :code) s/Str
-                        (s/optional-key :error) s/Str}}}
+   :parameters {:query {(s/optional-key :code)  s/Str
+                        (s/optional-key :error) s/Str
+                        (s/optional-key :state) s/Str}}}
   [{:keys [request]}]
   (if-let [error (get-in request [:query-params :error])]
     (log/error "User denied authentication")
-    (do (slack/register-application
+    (if (slack/register-application
          (:db-connection request)
          (:slack-client-id request)
          (:slack-client-secret request)
          (get-in request [:query-params :code]))
-        (redirect (url-for ::home-handler :query-params {:add-to-slack "success"})))))
+      (redirect (url-for ::home :query-params {:add-to-slack "success"}))
+      (redirect (url-for ::home :query-params {:add-to-slack "failure"})))))
 
 ;; usage stats
 
