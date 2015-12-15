@@ -12,7 +12,7 @@
             [pedestal.swagger.core :as swagger]
             [pedestal.swagger.doc :as sw.doc]
             [ring.util.codec :as codec]
-            [ring.util.response :refer [response not-found created resource-response content-type status]]
+            [ring.util.response :refer [response not-found created resource-response content-type status redirect]]
             [schema.core :as s]
             [slacky
              [accounts :as accounts]
@@ -27,6 +27,7 @@
 ;; schemas
 
 (def req s/required-key)
+(declare url-for)
 
 (s/defschema MemeRequest
   {(req :text) s/Str})
@@ -125,8 +126,7 @@
          (:slack-client-id request)
          (:slack-client-secret request)
          (get-in request [:query-params :code]))
-        {:status 200
-         :body "Ready to go!"})))
+        (redirect (url-for ::home-handler :query-params {:add-to-slack "success"})))))
 
 ;; usage stats
 
@@ -180,9 +180,10 @@
 
        ["/slack" ^:interceptors [(angel/provides authenticate-request :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
-         {:post slack-meme}]
-        ["/oauth"
-         {:get slack-oauth}]]
+         {:post slack-meme}]]
+
+       ["/oauth/slack"
+        {:get slack-oauth}]
 
        ["/browser-plugin" ^:interceptors [(angel/provides authenticate-request :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
@@ -201,6 +202,8 @@
 
 (def routes
   (concat api-routes app-routes))
+
+(def url-for (route/url-for-routes routes))
 
 ;; service
 
