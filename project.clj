@@ -7,7 +7,7 @@
                  [frankiesardo/pedestal-swagger "0.4.3"]
                  [io.pedestal/pedestal.service "0.4.0"]
                  [io.pedestal/pedestal.jetty "0.4.0"]
-                 [angel-interceptor "0.1.0-SNAPSHOT"]
+                 [angel-interceptor "0.1.0"]
 
                  [ch.qos.logback/logback-classic "1.1.2" :exclusions [org.slf4j/slf4j-api]]
                  [org.slf4j/jul-to-slf4j "1.7.7"]
@@ -17,6 +17,8 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [clj-http "1.1.2"]
                  [cheshire "5.4.0"]
+                 [org.clojure/core.memoize "0.5.8"]
+
 
                  ;; web
                  [hiccup "1.0.5"]

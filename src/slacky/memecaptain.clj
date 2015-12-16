@@ -1,10 +1,12 @@
 (ns slacky.memecaptain
-  (:require [clj-http
+  (:require [cheshire.core :as json]
+            [clj-http
              [client :as http]
              [conn-mgr :refer [make-reusable-conn-manager]]]
-            [cheshire.core :as json]
+            [clojure.core.memoize :as memo]
             [clojure.tools.logging :as log]))
 
+(def ^:private one-hour-in-millis (* 60 60 1000))
 (def memecaptain-url "http://memecaptain.com")
 (def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
 
@@ -31,24 +33,27 @@
         (throw (ex-info (str "Unexpected response from " polling-url)
                         resp))))))
 
-(defn create-template [image-url]
-  (when image-url
-    (log/info "Creating template for image" image-url)
-    (let [resp (http/post (str memecaptain-url "/src_images")
-                          {:connection-manager connection-pool
-                           :headers {:Content-Type "application/json"
-                                     :Accept "application/json"}
-                           :follow-redirects false
-                           :body (json/encode {:url (.trim image-url)})})]
+(def create-template
+  (memo/ttl
+   (fn [image-url]
+     (when image-url
+       (log/info "Creating template for image" image-url)
+       (let [resp (http/post (str memecaptain-url "/src_images")
+                             {:connection-manager connection-pool
+                              :headers {:Content-Type "application/json"
+                                        :Accept "application/json"}
+                              :follow-redirects false
+                              :body (json/encode {:url (.trim image-url)})})]
 
-      (if-let [polling-url (and (= 202 (:status resp))
-                                (not-empty (get-in resp [:headers "location"])))]
+         (if-let [polling-url (and (= 202 (:status resp))
+                                   (not-empty (get-in resp [:headers "location"])))]
 
-        (do (poll-for-result polling-url)
-            (-> resp :body (json/decode keyword) :id))
+           (do (poll-for-result polling-url)
+               (-> resp :body (json/decode keyword) :id))
 
-        (throw (ex-info (str "Unexpected response from /src_images")
-                        resp))))))
+           (throw (ex-info (str "Unexpected response from /src_images")
+                           resp))))))
+   :ttl/threshold one-hour-in-millis))
 
 (defn create-instance [template-id text-upper text-lower]
   (log/info "Generating meme based on template" template-id)
