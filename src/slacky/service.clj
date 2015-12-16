@@ -50,7 +50,7 @@
         account-id (::account-id request)
         text (:text form-params)
         slack-responder (slack/build-responder (:response_url form-params) form-params)]
-
+    (log/info "Slack request:" request)
     (cond
       (not (nil? (meme/resolve-template-addition text)))
       (do (divert-to-slack slack-responder (meme/add-template db account-id text))
