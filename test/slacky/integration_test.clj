@@ -34,7 +34,7 @@
                                 {:throw-exceptions? false
                                  :form-params {:text "nil"}})]
         (is (= 400 (:status response)))
-        (is (= "Sorry, the command was not recognised"
+        (is (= "Sorry, the command was not recognised - visit https://slacky-server.herokuapp.com to learn usage"
                (:body response))))
 
       (cj/verify-call-times-for bing/image-search 0)
@@ -149,7 +149,7 @@
                                  :form-params {:token (str (UUID/randomUUID))
                                                :text "nil"}})]
         (is (= 400 (:status response)))
-        (is (= "Sorry, the command was not recognised"
+        (is (= "Sorry, the command was not recognised - visit https://slacky-server.herokuapp.com to learn usage"
                (:body response))))
 
       (cj/verify-call-times-for bing/image-search 0)
