@@ -91,7 +91,7 @@
 
         response-chan)
       {:status 400
-       :body "Sorry, the command was not recognised"})))
+       :body "Sorry, the command was not recognised - visit https://slacky-server.herokuapp.com to learn usage"})))
 
 (swagger/defhandler get-meme-patterns
   {:summary "Responds synchronously with a meme"
