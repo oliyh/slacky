@@ -61,11 +61,16 @@ $(document).ready(
       }
     });
 
+    $('#firefox-install').click(function() {
+      if (window.ga != undefined) {
+        ga('send', 'event', 'firefox-install');
+      }
+    });
+
     $('#slack-install').click(function() {
       if (window.ga != undefined) {
         ga('send', 'event', 'slack-install');
       }
-      console.log('installed slack');
     });
 
     $('#slack-upgrade').click(function() {
@@ -73,7 +78,6 @@ $(document).ready(
         ga('send', 'event', 'slack-install');
         ga('send', 'event', 'slack-upgrade');
       }
-      console.log('upgraded slack');
     });
 
     function tokenisedMatches(q, pattern) {

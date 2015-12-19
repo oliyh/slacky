@@ -97,7 +97,8 @@
                  [:span.h1 "Memes in"]
                  [:img {:src "/images/slack-logo.png"
                         :alt "Slack"}]]
-                [:a {:href slack-oauth-url}
+                [:a#slack-install {:href slack-oauth-url
+                                   :target "_blank"}
                  [:img {:alt "Add to Slack"
                         :height 80
                         :width 278
@@ -204,7 +205,8 @@
                " in any channel in Slack. This will prepare your account to be upgraded."]
               [:h3 "2. Authenticate the app"]
               [:p "Press "
-               [:a {:href slack-oauth-url}
+               [:a#slack-upgrade {:href slack-oauth-url
+                                  :target "_blank"}
                 [:img {:alt "Add to Slack"
                        :height 40
                        :width 139
