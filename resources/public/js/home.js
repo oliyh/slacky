@@ -1,5 +1,25 @@
+var getUrlParameter = function getUrlParameter(sParam) {
+  var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+      sURLVariables = sPageURL.split('&'),
+      sParameterName,
+      i;
+
+  for (i = 0; i < sURLVariables.length; i++) {
+    sParameterName = sURLVariables[i].split('=');
+
+    if (sParameterName[0] === sParam) {
+      return sParameterName[1] === undefined ? true : sParameterName[1];
+    }
+  }
+};
+
 $(document).ready(
   function() {
+    var addToSlack = getUrlParameter('add-to-slack');
+    if (addToSlack) {
+      Avgrund.show('#add-to-slack-' + addToSlack);
+    }
+
     $('#demo').submit(function(e) {
       e.preventDefault();
 
@@ -29,15 +49,32 @@ $(document).ready(
       $('#demo-text').val($(this).data('command'));
     });
 
+    $('#chrome-install').click(function() {
+      if (window.ga != undefined) {
+        ga('send', 'event', 'chrome-install');
+      }
 
-     $('#chrome-install').click(function () {
-        if (!chrome.app.isInstalled) {
-           chrome.webstore.install(undefined, undefined, function(err) {
-              console.log(err);
-           });
-        }
-     });
+      if (!chrome.app.isInstalled) {
+        chrome.webstore.install(undefined, undefined, function(err) {
+          console.log(err);
+        });
+      }
+    });
 
+    $('#slack-install').click(function() {
+      if (window.ga != undefined) {
+        ga('send', 'event', 'slack-install');
+      }
+      console.log('installed slack');
+    });
+
+    $('#slack-upgrade').click(function() {
+      if (window.ga != undefined) {
+        ga('send', 'event', 'slack-install');
+        ga('send', 'event', 'slack-upgrade');
+      }
+      console.log('upgraded slack');
+    });
 
     function tokenisedMatches(q, pattern) {
       var queryTokens, patternTokens, match;

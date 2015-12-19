@@ -140,6 +140,53 @@
                                         :onClick "Avgrund.hide();"}
                "Close"]]]]
 
+          [:div#add-to-slack-success.avgrund-popup
+           [:div
+            [:div.modal-header
+              [:button.close {:type "button"
+                              :onClick "Avgrund.hide();"}
+               [:span {:aria-hidden "true"} "&times;"]]
+             [:h4.modal-title "Success!"]]
+            [:div.modal-body
+             [:p "Start using in Slack right away by typing "
+              [:code "/meme"]
+              " in any channel"]
+             [:p "Stuck? Type "
+              [:code "/meme :help"]
+              " or try the demos on this page"]]
+            [:div.modal-footer
+              [:button.btn.btn-default {:type "button"
+                                        :onClick "Avgrund.hide();"}
+               "Close"]]]]
+
+          [:div#add-to-slack-failure.avgrund-popup
+           [:div
+            [:div.modal-header
+              [:button.close {:type "button"
+                              :onClick "Avgrund.hide();"}
+               [:span {:aria-hidden "true"} "&times;"]]
+             [:h4.modal-title "Failure"]]
+            [:div.modal-body
+             [:p "Something went wrong. Contact me at @oliyh on Twitter if you need help!"]]
+            [:div.modal-footer
+              [:button.btn.btn-default {:type "button"
+                                        :onClick "Avgrund.hide();"}
+               "Close"]]]]
+
+          [:div#add-to-slack-denied.avgrund-popup
+           [:div
+            [:div.modal-header
+              [:button.close {:type "button"
+                              :onClick "Avgrund.hide();"}
+               [:span {:aria-hidden "true"} "&times;"]]
+             [:h4.modal-title "Denied"]]
+            [:div.modal-body
+             [:p "You will have to authorise Slacky to be able to use it in Slack."]]
+            [:div.modal-footer
+              [:button.btn.btn-default {:type "button"
+                                        :onClick "Avgrund.hide();"}
+               "Close"]]]]
+
           [:div#upgrade-slack-modal.avgrund-popup {:tabindex "-1"
                                                    :role "dialog"
                                                    :aria-labelledby "myModalLabel"}
