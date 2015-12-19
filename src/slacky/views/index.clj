@@ -97,12 +97,16 @@
                  [:span.h1 "Memes in"]
                  [:img {:src "/images/slack-logo.png"
                         :alt "Slack"}]]
-                [:p "Create your slash command"
-                 "&nbsp;"
-                 [:a {:href "#guide"
-                      :onClick "Avgrund.show('#guide-modal');"}
-                  "by following these simple steps"]
-                 [:a {:href slack-oauth-url} "."]]]]
+                [:a {:href slack-oauth-url}
+                 [:img {:alt "Add to Slack"
+                        :height 80
+                        :width 278
+                        :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
+
+                [:p
+                 [:a {:href "#slack-upgrade-modal"
+                      :onClick "Avgrund.show('#upgrade-slack-modal');"}
+                  "Already installed Slacky the old way?"]]]]
 
               [:div.row
                [:div.col-xs-6
@@ -136,34 +140,29 @@
                                         :onClick "Avgrund.hide();"}
                "Close"]]]]
 
-          [:div#guide-modal.avgrund-popup {:tabindex "-1"
-                                           :role "dialog"
-                                           :aria-labelledby "myModalLabel"}
+          [:div#upgrade-slack-modal.avgrund-popup {:tabindex "-1"
+                                                   :role "dialog"
+                                                   :aria-labelledby "myModalLabel"}
            [:div {:role "document"}
             [:div
              [:div.modal-header
               [:button.close {:type "button"
                               :onClick "Avgrund.hide();"}
                [:span {:aria-hidden "true"} "&times;"]]
-              [:h4#myModalLabel.modal-title "Guide"]]
+              [:h4#myModalLabel.modal-title "Upgrade Slack"]]
              [:div.modal-body
-              [:h3 "1. Create a Slash command"]
-              [:p "Create a "
-               [:a {:href "https://my.slack.com/services/new/slash-commands/"
-                    :target "_blank"}
-                "Slash command"]
-               " with the following attributes"]
-              [:p
-               [:strong "Command"] ": " [:code "/meme"] [:br]
-               [:strong "URL"] ": " [:code "https://slacky-server.herokuapp.com:443/api/slack/meme"] [:br]
-               [:strong "Method"] ": " [:code "POST"] [:br]
-               [:strong "Autocomplete description"] ": " [:code "Create a meme"] [:br]
-               [:strong "Autocomplete usage hint"] ": " [:code "image url or search term | upper text | lower text"] [:br]]
-
-              [:h3 "2. Create all the memes!"]
+              [:h3 "1. Use Slacky once more"]
               [:p "Type "
-               [:code "/meme"]
-               " into your Slack and never look back! See the examples on this page."]]
+               [:code "/meme :help"]
+               " in any channel in Slack. This will prepare your account to be upgraded."]
+              [:h3 "2. Authenticate the app"]
+              [:p "Press "
+               [:a {:href slack-oauth-url}
+                [:img {:alt "Add to Slack"
+                       :height 40
+                       :width 139
+                       :src "https://platform.slack-edge.com/img/add_to_slack.png"
+                        :srcset "https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"}]]]]
              [:div.modal-footer
               [:button.btn.btn-default {:type "button"
                                         :onClick "Avgrund.hide();"}
