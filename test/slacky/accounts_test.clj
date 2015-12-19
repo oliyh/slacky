@@ -32,3 +32,13 @@
       (is (= {:hits 0} (api-stats *db* account-id)))
       (api-hit! *db* account-id)
       (is (= {:hits 1} (api-stats *db* account-id))))))
+
+(deftest can-convert-basic-account-to-slack-account
+  (let [account-id (:id (register-basic-account! *db* "foo2"))]
+    (is (= {:id account-id} (lookup-basic-account *db* "foo2")))
+
+    (convert-to-slack-account! *db* account-id {:team-id "XXXXXX002"
+                                                :team-name "team-slacky-2"})
+
+    (is (= {:id account-id} (lookup-slack-account *db* "XXXXXX002")))
+    (is (= {:id account-id} (lookup-basic-account *db* "foo2")))))

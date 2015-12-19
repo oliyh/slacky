@@ -49,6 +49,13 @@
                      (->snake api-access)))
       account)))
 
+(defn convert-to-slack-account! [db account-id api-access]
+  (jdbc/with-db-transaction [db db]
+    (jdbc/insert! db :slack_app_authentication
+                  (merge
+                   {:account_id account-id}
+                   (->snake api-access)))))
+
 (defn api-hit! [db ^Number account-id]
   (let [command "UPDATE api_stats SET hits = hits + 1 WHERE account_id = ?"]
     (jdbc/execute! db [command account-id])))

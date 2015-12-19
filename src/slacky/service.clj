@@ -121,12 +121,21 @@
   [{:keys [request response] :as context}]
   (log/info "Authenticating Slack request...")
   (let [db (:db-connection request)
-        token (get-in request [:form-params :token])
-        team-id (get-in request [:form-params :team_id])
-        account (or (accounts/lookup-slack-account db team-id)
-                    (accounts/lookup-basic-account db token)
-                    (accounts/register-basic-account! db token))]
-    (update context :request merge {::account-id (:id account)})))
+        form-params (:form-params request)
+        token (:token form-params)
+        team-id (:team_id form-params)]
+
+    (if-let [account (accounts/lookup-slack-account db team-id)]
+      (update context :request merge {::account-id (:id account)})
+
+      (if-let [account (accounts/lookup-basic-account db token)]
+        (do (accounts/convert-to-slack-account! db (:id account) {:team-id team-id
+                                                                 :team-name (:team_name form-params)})
+            (update context :request merge {::account-id (:id account)}))
+
+        (let [account (accounts/register-slack-account! db {:team-id team-id
+                                                            :team-name (:team_name form-params)})]
+          (update context :request merge {::account-id (:id account)}))))))
 
 (swagger/defhandler slack-oauth
   {:description "Records the Slack credentials provided after successful authentication"
