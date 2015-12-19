@@ -16,7 +16,7 @@
                              [:webhook_url "varchar(128)"]
                              [:webhook_channel "varchar(128)"]
                              [:webhook_config_url "varchar(128)"])
-       "CREATE UNIQUE INDEX slack_app_authentication_team_name_idx ON slack_app_authentication(team_name);"))))
+       "CREATE UNIQUE INDEX slack_app_authentication_team_id_idx ON slack_app_authentication(team_id);"))))
 
 (defn down [db]
   (sql/with-db-transaction [db db]

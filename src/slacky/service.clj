@@ -129,12 +129,10 @@
       (update context :request merge {::account-id (:id account)})
 
       (if-let [account (accounts/lookup-basic-account db token)]
-        (do (accounts/convert-to-slack-account! db (:id account) {:team-id team-id
-                                                                 :team-name (:team_name form-params)})
+        (do (accounts/convert-to-slack-account! db (:id account) {:team-id team-id})
             (update context :request merge {::account-id (:id account)}))
 
-        (let [account (accounts/register-slack-account! db {:team-id team-id
-                                                            :team-name (:team_name form-params)})]
+        (let [account (accounts/register-slack-account! db {:team-id team-id})]
           (update context :request merge {::account-id (:id account)}))))))
 
 (swagger/defhandler slack-oauth

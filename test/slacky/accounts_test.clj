@@ -37,8 +37,7 @@
   (let [account-id (:id (register-basic-account! *db* "foo2"))]
     (is (= {:id account-id} (lookup-basic-account *db* "foo2")))
 
-    (convert-to-slack-account! *db* account-id {:team-id "XXXXXX002"
-                                                :team-name "team-slacky-2"})
+    (convert-to-slack-account! *db* account-id {:team-id "XXXXXX002"})
 
     (is (= {:id account-id} (lookup-slack-account *db* "XXXXXX002")))
     (is (= {:id account-id} (lookup-basic-account *db* "foo2")))))
