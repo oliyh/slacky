@@ -74,15 +74,18 @@
       (catch Exception e
         (log/warn "Could not send message to Slack" e)))))
 
-(defn register-application [db client-id client-secret oauth-code]
+(defn api-access [db client-id client-secret oauth-code]
   (let [result (-> (http/post "https://slack.com/api/oauth.access"
                               {:form-params {:client_id client-id
                                              :client_secret client-secret
                                              :code oauth-code}})
                    :body
                    (json/decode true))]
-    (log/info "Params for oauth:" {:form-params {:client-id client-id
-                                                 :client-secret client-secret
-                                                 :code oauth-code}})
-    (log/info result)
-    (true? (:ok result))))
+
+    (when (:ok result)
+      {:team-name (:team_name result)
+       :team-id (:team_id result)
+       :access-token (:access_token result)
+       :webhook-url (get-in result [:incoming_webhook :url])
+       :webhook-channel (get-in result [:incoming_webhook :channel])
+       :webhook-config-url (get-in result [:incoming_webhook :configuration_url])})))
