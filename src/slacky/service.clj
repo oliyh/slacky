@@ -103,15 +103,29 @@
 
 ;; authentication
 
-(swagger/defbefore authenticate-request
-  {:description "Uses or creates an account"
+(swagger/defbefore authenticate-basic-request
+  {:description "Uses or creates a basic account"
    :parameters {:formData {:token s/Str}}}
   [{:keys [request response] :as context}]
-  (log/info "Authenticating...")
+  (log/info "Authenticating basic request...")
   (let [db (:db-connection request)
         token (get-in request [:form-params :token])
-        account (or (accounts/lookup-account db token)
-                    (accounts/add-account! db token))]
+        account (or (accounts/lookup-basic-account db token)
+                    (accounts/register-basic-account! db token))]
+    (update context :request merge {::account-id (:id account)})))
+
+(swagger/defbefore authenticate-slack-request
+  {:description "Uses or creates an account"
+   :parameters {:formData {:token s/Str
+                           :team_id s/Str}}}
+  [{:keys [request response] :as context}]
+  (log/info "Authenticating Slack request...")
+  (let [db (:db-connection request)
+        token (get-in request [:form-params :token])
+        team-id (get-in request [:form-params :team_id])
+        account (or (accounts/lookup-slack-account db team-id)
+                    (accounts/lookup-basic-account db token)
+                    (accounts/register-basic-account! db token))]
     (update context :request merge {::account-id (:id account)})))
 
 (swagger/defhandler slack-oauth
@@ -121,13 +135,16 @@
                         (s/optional-key :state) s/Str}}}
   [request]
   (if-let [error (get-in request [:query-params :error])]
-    (log/error "User denied authentication")
-    (if (slack/register-application
-         (:db-connection request)
-         (:slack-client-id request)
-         (:slack-client-secret request)
-         (get-in request [:query-params :code]))
-      (redirect (url-for ::home :query-params {:add-to-slack "success"}))
+    (do (log/error "User denied authentication")
+        (redirect (url-for ::home :query-params {:add-to-slack "denied"})))
+    (if-let [api-access (slack/api-access
+                         (:slack-client-id request)
+                         (:slack-client-secret request)
+                         (get-in request [:query-params :code]))]
+      (do (accounts/register-slack-account!
+           (:db-connection request)
+           api-access)
+          (redirect (url-for ::home :query-params {:add-to-slack "success"})))
       (redirect (url-for ::home :query-params {:add-to-slack "failure"})))))
 
 ;; usage stats
@@ -180,14 +197,14 @@
                               async-handler
                               (angel/prefers increment-api-usage :account)]
 
-       ["/slack" ^:interceptors [(angel/provides authenticate-request :account)]
+       ["/slack" ^:interceptors [(angel/provides authenticate-slack-request :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
          {:post slack-meme}]]
 
        ["/oauth/slack"
         {:get slack-oauth}]
 
-       ["/browser-plugin" ^:interceptors [(angel/provides authenticate-request :account)]
+       ["/browser-plugin" ^:interceptors [(angel/provides authenticate-basic-request :account)]
         ["/meme" ^:interceptors [(annotate {:tags ["meme"]})]
          {:post [::browser-plugin-meme rest-meme]}]]
 

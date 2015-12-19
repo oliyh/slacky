@@ -3,7 +3,7 @@
             [clojure.test :refer :all]
             [conjure.core :as cj]
             [slacky
-             [accounts :refer [add-account!]]
+             [accounts :refer [register-basic-account!]]
              [fixture :refer [with-database *db*]]
              [meme :refer :all]
              [memecaptain :as memecaptain]]))
@@ -39,7 +39,7 @@
   (first (a/alts!! [chan (a/timeout 500)])))
 
 (deftest register-template-test
-  (let [account-id (:id (add-account! *db* "foo"))]
+  (let [account-id (:id (register-basic-account! *db* "foo"))]
     (cj/stubbing [memecaptain/create-template "some-template-id"]
 
                  (let [response (add-template *db*
