@@ -125,7 +125,17 @@
                                       :target "_blank"}
                   [:img {:src "/images/firefox-logo.png"
                          :alt "Firefox"}]
-                  [:p "Click here to add to Firefox"]]]]]]]]]
+                  [:p "Click here to add to Firefox"]]]]]]
+
+             [:div#footer.col-xs-12
+              [:h4 "Help"]
+              [:small "Contact "
+               [:a {:href "https://twitter.com/oliyh"
+                    :target "_blank"} "@oliyh"]
+               " on Twitter"]
+              [:h4 "Privacy"]
+              [:small "Slacky stores a randomly generated token to identify your account, allowing
+you to take advantage of various features."]]]]]
 
           [:div#demo-meme-popup.avgrund-popup
            [:div
