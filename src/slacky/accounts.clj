@@ -42,12 +42,18 @@
 
 (defn register-slack-account! [db api-access]
   (jdbc/with-db-transaction [db db]
-    (let [account (create-account! db)]
-      (jdbc/insert! db :slack_app_authentication
-                    (merge
-                     {:account_id (:id account)}
-                     (->snake api-access)))
-      account)))
+    (if-let [account (lookup-slack-account db (:team-id api-access))]
+      (do (jdbc/update! db :slack_app_authentication
+                        (->snake api-access)
+                        ["account_id = ?" (:id account)])
+          account)
+
+      (let [account (create-account! db)]
+        (jdbc/insert! db :slack_app_authentication
+                      (merge
+                       {:account_id (:id account)}
+                       (->snake api-access)))
+        account))))
 
 (defn convert-to-slack-account! [db account-id api-access]
   (jdbc/with-db-transaction [db db]

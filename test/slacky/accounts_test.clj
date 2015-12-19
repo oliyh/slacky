@@ -40,4 +40,15 @@
     (convert-to-slack-account! *db* account-id {:team-id "XXXXXX002"})
 
     (is (= {:id account-id} (lookup-slack-account *db* "XXXXXX002")))
-    (is (= {:id account-id} (lookup-basic-account *db* "foo2")))))
+    (is (= {:id account-id} (lookup-basic-account *db* "foo2")))
+
+    (testing "can then register slack account"
+      (register-slack-account! *db*
+                               {:team-name "team-slacky"
+                                :team-id "XXXXXX002"
+                                :access-token "xoxp-XXXXXXXX-XXXXXXXX-XXXXX"
+                                :webhook-url "https://hooks.slack.com/TXXXXX/BXXXXX/XXXXXXXXXX"
+                                :webhook-channel "#channel-it-will-post-to"
+                                :webhook-config-url "https://teamname.slack.com/services/BXXXXX"})
+
+      (is (= {:id account-id} (lookup-slack-account *db* "XXXXXX002"))))))
