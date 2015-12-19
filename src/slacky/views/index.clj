@@ -91,7 +91,7 @@
 
              [:div.jumbotron
               [:div
-               [:a {:name "slack" :href slack-oauth-url}]
+               [:a {:name "slack"}]
                [:div.leader
                 [:div#memes-in-slack
                  [:span.h1 "Memes in"]
@@ -102,7 +102,7 @@
                  [:a {:href "#guide"
                       :onClick "Avgrund.show('#guide-modal');"}
                   "by following these simple steps"]
-                 "."]]]
+                 [:a {:href slack-oauth-url} "."]]]]
 
               [:div.row
                [:div.col-xs-6
