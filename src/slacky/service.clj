@@ -115,7 +115,7 @@
     (update context :request merge {::account-id (:id account)})))
 
 (swagger/defbefore authenticate-slack-request
-  {:description "Uses or creates an account"
+  {:description "Uses or creates a Slack account, converting existing basic accounts to Slack accounts"
    :parameters {:formData {:token s/Str
                            :team_id s/Str}}}
   [{:keys [request response] :as context}]
