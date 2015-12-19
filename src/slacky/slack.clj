@@ -74,7 +74,7 @@
       (catch Exception e
         (log/warn "Could not send message to Slack" e)))))
 
-(defn api-access [db client-id client-secret oauth-code]
+(defn api-access [client-id client-secret oauth-code]
   (let [result (-> (http/post "https://slack.com/api/oauth.access"
                               {:form-params {:client_id client-id
                                              :client_secret client-secret
