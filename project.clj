@@ -31,7 +31,10 @@
                  [com.mchange/c3p0 "0.9.5.1"]
                  [joplin.core "0.2.12"]
                  [joplin.jdbc "0.2.12"]
-                 [honeysql "0.6.1"]]
+                 [honeysql "0.6.1"]
+
+                 ;;cljs
+                 [secretary "1.2.3"]]
   :main ^:skip-aot slacky.server
   :min-lein-version "2.0.0"
   :target-path "target/%s"
