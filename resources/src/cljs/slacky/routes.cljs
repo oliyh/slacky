@@ -1,14 +1,26 @@
 (ns slacky.routes
-  (:require [secretary.core :as secretary :refer-macros [defroute]]
-            [goog.events :as events])
-  (:import goog.History
-           goog.history.EventType))
+  (:require [goog.events :as events]
+            [reagent.dom :as r]
+            [secretary.core :as secretary :refer-macros [defroute]]
+            [slacky.views.demo :as demo])
+  (:import [goog.history Html5History EventType]))
 
-(secretary/set-config! :prefix "#")
+(def app (js/document.getElementById "app"))
+
+(defn- home-component []
+  [:div.row
+   [:div.col-xs-10.col-xs-offset-1
+    [demo/component]]
+
+   [:div.col-xs-10.col-xs-offset-1
+    [:p "Hello world"]]])
 
 (defroute "/demo" {:as params}
-  (println "Demoing!"))
+  (r/render [demo/component] app))
 
-(let [h (History.)]
-  (goog.events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
+(defroute "/" {:as params}
+  (r/render [demo/component] app))
+
+(let [h (Html5History.)]
+  (goog.events/listen h EventType.NAVIGATE #(secretary/dispatch! (.-token %)))
   (doto h (.setEnabled true)))

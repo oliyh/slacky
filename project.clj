@@ -31,10 +31,7 @@
                  [com.mchange/c3p0 "0.9.5.1"]
                  [joplin.core "0.2.12"]
                  [joplin.jdbc "0.2.12"]
-                 [honeysql "0.6.1"]
-
-                 ;;cljs
-                 [secretary "1.2.3"]]
+                 [honeysql "0.6.1"]]
   :main ^:skip-aot slacky.server
   :min-lein-version "2.0.0"
   :target-path "target/%s"
@@ -46,14 +43,14 @@
                                   [org.clojars.runa/conjure "2.1.3"]
 
                                   ;; cljs
-                                  [org.clojure/clojurescript "1.7.48"]
+                                  [org.clojure/clojurescript "1.7.107"]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/tools.nrepl "0.2.10"]
                                   [org.clojure/tools.reader "0.10.0-alpha3"]
                                   [org.clojure/tools.trace "0.7.6"]
 
-                                  [org.omcljs/om "0.9.0"]
-                                  [sablono "0.3.6"]]
+                                  [secretary "1.2.3"]
+                                  [reagent "0.6.0-alpha"]]
                    :repl-options {:init-ns user
                                   ;; :timeout 200000
                                   ;; :host "0.0.0.0"
