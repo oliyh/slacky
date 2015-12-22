@@ -52,7 +52,9 @@
 
           [:div.avgrund-cover]
 
-          [:div.container.avgrund-contents
+          [:div#app.container.avgrund-contents
+           {:data-slack-oauth-url slack-oauth-url}
+
            [:div.header
             [:h1 "Slacky"]
             [:h4 "Memes as a Service"]]
