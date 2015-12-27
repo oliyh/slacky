@@ -52,6 +52,12 @@ body {
     cursor: pointer;
 }
 
+#meme-output {
+    border-radius: 4px;
+    text-align: center;
+    margin-bottom: 2em;
+}
+
 button {
     width: 100%;
 }
