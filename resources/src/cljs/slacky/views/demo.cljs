@@ -1,13 +1,60 @@
 (ns slacky.views.demo
-  (:require [reagent.core :as r]))
+  (:require [reagent.core :as r]
+            [ajax.core :refer [POST]]
+            [clojure.string :as string]))
 
 (def meme-input (r/atom nil))
+(def meme-output (r/atom nil))
+
+(defn- classes [& classes]
+  (string/join " " (remove nil? classes)))
 
 (defn- example [img-src command]
   [:div.col-xs-12.col-md-4
    [:div.example {:on-click #(reset! meme-input command)}
     [:img.img-thumbnail {:src img-src}]
     [:code command]]])
+
+(defn- meme []
+  (when-let [{:keys [url command]} @meme-output]
+    [:div
+     [:img {:src url}]
+     [:code command]]))
+
+(defn- generate-meme []
+  (let [command @meme-input]
+    (reset! meme-output {:url "/images/loading.gif"
+                         :command command})
+    (POST "/api/meme"
+        {:format :raw
+         :params {:text @meme-input}
+         :handler #(reset! meme-output {:url %
+                                        :command command})
+         :error-handler #(reset! meme-output :error)})))
+
+(defn- meme-form []
+  [:div.row
+   [:div.col-xs-12
+    [:div#demo.form-horizontal
+     [:div.col-xs-12.col-md-11
+      [:div.form-group.form-group-lg
+       [:div
+        {:class (classes ".input-group"
+                         (when (= :error @meme-output) "has-error"))}
+        [:div.input-group-addon "/meme"]
+        [:input#demo-text.form-control {:type "text"
+                                        :value @meme-input
+                                        :on-change #(reset! meme-input (-> % .-target .-value))
+                                        :on-key-down #(case (.-which %)
+                                                        13 (generate-meme)
+                                                        27 (reset! meme-input nil)
+                                                        nil)
+                                        :placeholder "search term or url | upper text | lower text"}]]]]
+     [:div.col-xs-12.col-md-1
+      [:div.form-group.form-group-lg
+       [:button.btn.btn-success.btn-lg
+        {:on-click generate-meme}
+        "Try!"]]]]]])
 
 (defn component []
   [:div.jumbotron
@@ -20,18 +67,8 @@
     [example "/images/slacky-wins.png" "https://goo.gl/h9eUDM | slacky | wins"]
     [example "/images/all-the-memes.png" "create all the memes!"]]
 
+   [meme-form]
+
    [:div.row
-    [:div.col-xs-12
-     [:form#demo.form-horizontal
-      [:div.col-xs-12.col-md-11
-       [:div.form-group.form-group-lg
-        [:div.input-group
-         [:div.input-group-addon "/meme"]
-         [:input#demo-text.form-control {:type "text"
-                                         :value @meme-input
-                                         :on-change #(reset! meme-input (-> % .-target .-value))
-                                         :placeholder "search term or url | upper text | lower text"}]]]]
-      [:div.col-xs-12.col-md-1
-       [:div.form-group.form-group-lg
-        [:button.btn.btn-success.btn-lg {:type "submit"}
-         "Try!"]]]]]]])
+    [:div.col-xs-12.col-md-1
+     [meme]]]])

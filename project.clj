@@ -50,7 +50,8 @@
                                   [org.clojure/tools.trace "0.7.6"]
 
                                   [secretary "1.2.3"]
-                                  [reagent "0.6.0-alpha"]]
+                                  [reagent "0.6.0-alpha"]
+                                  [cljs-ajax "0.5.2"]]
                    :repl-options {:init-ns user
                                   ;; :timeout 200000
                                   ;; :host "0.0.0.0"
