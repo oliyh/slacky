@@ -18,7 +18,7 @@
 
      [:p
       [:a {:href "#slack-upgrade-modal"
-           :onClick "Avgrund.show('#upgrade-slack-modal');"}
+           #_(:onClick "Avgrund.show('#upgrade-slack-modal');")}
        "Already installed Slacky the old way?"]]]]
 
    [:div.row

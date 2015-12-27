@@ -70,6 +70,7 @@
                                                     :pretty-print true}}
                                         :prod
                                         {:source-paths ["resources/src/cljs"]
+                                         :jar true
                                          :compiler {:output-to "resources/public/cljs/main.js"
                                                     :output-dir "resources/public/cljs/prod"
                                                     :main "slacky.app"
