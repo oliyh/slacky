@@ -1,8 +1,11 @@
-(ns slacky.views.demo)
+(ns slacky.views.demo
+  (:require [reagent.core :as r]))
+
+(def meme-input (r/atom nil))
 
 (defn- example [img-src command]
   [:div.col-xs-12.col-md-4
-   [:div.example {:data-command command}
+   [:div.example {:on-click #(reset! meme-input command)}
     [:img.img-thumbnail {:src img-src}]
     [:code command]]])
 
@@ -25,6 +28,8 @@
         [:div.input-group
          [:div.input-group-addon "/meme"]
          [:input#demo-text.form-control {:type "text"
+                                         :value @meme-input
+                                         :on-change #(reset! meme-input (-> % .-target .-value))
                                          :placeholder "search term or url | upper text | lower text"}]]]]
       [:div.col-xs-12.col-md-1
        [:div.form-group.form-group-lg
