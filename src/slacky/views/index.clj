@@ -200,38 +200,9 @@ you to take advantage of various features."]]]]]
                                         :onClick "Avgrund.hide();"}
                "Close"]]]]
 
-          [:div#upgrade-slack-modal.avgrund-popup {:tabindex "-1"
-                                                   :role "dialog"
-                                                   :aria-labelledby "myModalLabel"}
-           [:div {:role "document"}
-            [:div
-             [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-              [:h4#myModalLabel.modal-title "Upgrade Slack"]]
-             [:div.modal-body
-              [:h3 "1. Use Slacky once more"]
-              [:p "Type "
-               [:code "/meme :help"]
-               " in any channel in Slack. This will prepare your account to be upgraded."]
-              [:h3 "2. Authenticate the app"]
-              [:p "Press "
-               [:a#slack-upgrade {:href slack-oauth-url
-                                  :target "_blank"}
-                [:img {:alt "Add to Slack"
-                       :height 40
-                       :width 139
-                       :src "https://platform.slack-edge.com/img/add_to_slack.png"
-                        :srcset "https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"}]]]]
-             [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]]
-
-          (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
-                      "js/bootstrap.min.js"
-                      "js/typeahead.jquery.js"
+          (include-js ;;"https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
+                      ;;"js/bootstrap.min.js"
+                      ;;"js/typeahead.jquery.js"
                       "js/avgrund.js"
                       "/cljs/main.js")
           (google-analytics google-analytics-key)]))
