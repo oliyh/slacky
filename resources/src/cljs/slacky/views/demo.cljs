@@ -16,7 +16,9 @@
     [:code command]]])
 
 (defn- meme []
-  (when-let [{:keys [url command]} @meme-output]
+  (when-let [{:keys [url command]}
+             (and (not= :error @meme-output)
+                  @meme-output)]
     [:div#meme-output
      [:img.img-thumbnail {:src url}]
      [:br]
