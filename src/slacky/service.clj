@@ -223,7 +223,7 @@
        ["/*resource" {:get [(swagger/swagger-ui)]}]]]]))
 
 (defroutes app-routes
-  [[["/" {:get home}]]])
+  [[["/*route" {:get home}]]])
 
 (def routes
   (concat api-routes app-routes))

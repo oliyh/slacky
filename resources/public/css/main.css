@@ -190,3 +190,10 @@ button.close {
     -o-transform: translate(-50%, -50%) scale( 0.8 );
     transform: translate(-50%, -50%) scale( 0.8 );
 }
+
+.slacky-modal-content {
+    border-top: 1px solid #c0c0c0;
+    border-bottom: 1px solid #c0c0c0;
+    margin-bottom: 1em;
+    padding-bottom: 1em;
+}

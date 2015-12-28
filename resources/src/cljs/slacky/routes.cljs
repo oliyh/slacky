@@ -36,8 +36,8 @@
        [:button.close {:type "button"
                        :on-click hide-modal}
         [:span {:aria-hidden "true"} "×"]]
-       [:h4 title]]
-      [:div content]
+       [:h2 title]]
+      [:div.slacky-modal-content content]
       [:div
        [:button.btn.btn-default
         {:type "button"
