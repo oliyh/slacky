@@ -32,9 +32,9 @@
       (History.))))
 
 (defn handle-url-change [e]
-  (js/console.log (str "Navigating: " (get-token)))
   (when-not (.-isNavigation e)
-    (js/window.scrollTo 0 0))
+    ;; set programmatically
+    )
   (secretary/dispatch! (get-token)))
 
 (defonce history (doto (make-history)
@@ -43,4 +43,6 @@
 
 (defn nav! [token]
   (fn [event] (do (when event (.preventDefault event))
-                  (.setToken history token))))
+                  (.setToken history token)
+                  ;; (js/window.scrollTo 0 0) ;; optional, make it look like a new page load
+                  )))

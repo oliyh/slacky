@@ -140,19 +140,7 @@ button.close {
     border-top-right-radius: 6px;
 }
 
-.slacky-modal-background {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background-position: top right;
-    background-attachment: fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    background-image: url('/images/businesscat.png');
+.slacky-modal-blur {
     -webkit-filter: blur(2px);
     -moz-filter: blur(2px);
     -ms-filter: blur(2px);
@@ -161,11 +149,13 @@ button.close {
 }
 
 .slacky-modal-cover {
-    position: absolute;
+    position: fixed;
     width: 100vw;
     height: 100vh;
     top: 0;
     left: 0;
+    bottom: 0;
+    right: 0;
     z-index: 3;
     background: rgba( 0, 0, 0, 0.5 );
 }
@@ -184,11 +174,11 @@ button.close {
     box-shadow: 0px 0px 20px rgba( 0, 0, 0, 0.6 );
     border-radius: 3px;
 
-    -webkit-transform: translate(-50%, -50%) scale( 0.8 );
-    -moz-transform: translate(-50%, -50%) scale( 0.8 );
-    -ms-transform: translate(-50%, -50%) scale( 0.8 );
-    -o-transform: translate(-50%, -50%) scale( 0.8 );
-    transform: translate(-50%, -50%) scale( 0.8 );
+    -webkit-transform: translate(-50%, -50%) scale(1);
+    -moz-transform: translate(-50%, -50%) scale(1);
+    -ms-transform: translate(-50%, -50%) scale(1);
+    -o-transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1);
 }
 
 .slacky-modal-content {

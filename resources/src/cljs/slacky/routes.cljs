@@ -9,11 +9,12 @@
 
 (def app (js/document.getElementById "app"))
 
-(defn- home-component []
+(defn- home-component [& [modal]]
   [:div
-   [:div.avgrund-cover]
-   [:div.avgrund-contents
-
+   (when modal [:div.slacky-modal-cover])
+   (when modal modal)
+   [:div
+    {:class (when modal "slacky-modal-blur")}
     [:div.header
      [:h1 "Slacky"]
      [:h4 "Memes as a Service"]]
@@ -28,25 +29,22 @@
 
 (defn- modal-component [title content]
   (let [hide-modal (nav/nav! "/")]
-    [:div
-     [:div.slacky-modal-background
-      [:div.slacky-modal-cover]]
-     [:div.slacky-modal
-      [:div
-       [:button.close {:type "button"
-                       :on-click hide-modal}
-        [:span {:aria-hidden "true"} "×"]]
-       [:h2 title]]
-      [:div.slacky-modal-content content]
-      [:div
-       [:button.btn.btn-default
-        {:type "button"
-         :on-click hide-modal}
-        "Close"]]]]))
+    [:div.slacky-modal
+     [:div
+      [:button.close {:type "button"
+                      :on-click hide-modal}
+       [:span {:aria-hidden "true"} "×"]]
+      [:h2 title]]
+     [:div.slacky-modal-content content]
+     [:div
+      [:button.btn.btn-default
+       {:type "button"
+        :on-click hide-modal}
+       "Close"]]]))
 
 (defroute "/" {:as params}
   (r/render [home-component] app))
 
 (defroute "/upgrade-slack" {:as params}
-  (r/render [modal-component "Upgrade Slack"
-             [integrations/upgrade-slack (.getAttribute app "data-slack-oauth-url")]] app))
+  (r/render [home-component [modal-component "Upgrade Slack"
+                             [integrations/upgrade-slack (.getAttribute app "data-slack-oauth-url")]]] app))
