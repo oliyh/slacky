@@ -17,6 +17,7 @@
     [:code command]]])
 
 (defn create-meme []
+  ;; todo move the POST to here
   (when-let [{:keys [url command]}
              (and (not= :error @meme-output)
                   @meme-output)]
@@ -26,6 +27,7 @@
      [:code command]]))
 
 (defn- generate-meme []
+  ;; todo navigate to /demo/pai mei/pai mei/approves or something and let the handler do the POST
   (let [command @meme-input]
     (reset! meme-output {:url "/images/loading.gif"
                          :command command})

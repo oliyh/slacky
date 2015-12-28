@@ -50,5 +50,6 @@
                              [integrations/upgrade-slack (.getAttribute app "data-slack-oauth-url")]]] app))
 
 (defroute "/demo" {:as params}
+  ;; todo use params to generate the meme
   (r/render [home-component [modal-component "Brace yourselves..."
                              [demo/create-meme]]] app))
