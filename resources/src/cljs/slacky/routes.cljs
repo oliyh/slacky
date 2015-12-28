@@ -10,17 +10,22 @@
 
 (defn- home-component []
   [:div
-   [:div.header
-    [:h1 "Slacky"]
-    [:h4 "Memes as a Service"]]
+   [:div.avgrund-cover]
+   [:div.avgrund-contents
 
-   [:div.row
-    [:div.col-xs-10.col-xs-offset-1
-     [demo/component]]]
+    [:div.header
+     [:h1 "Slacky"]
+     [:h4 "Memes as a Service"]]
 
-   [:div.row
-    [:div.col-xs-10.col-xs-offset-1
-     [integrations/component (.getAttribute app "data-slack-oauth-url")]]]])
+    [:div.row
+     [:div.col-xs-10.col-xs-offset-1
+      [demo/component]]]
+
+    [:div.row
+     [:div.col-xs-10.col-xs-offset-1
+      [integrations/component (.getAttribute app "data-slack-oauth-url")]]]]
+
+   [integrations/modals]])
 
 (defroute "/demo" {:as params}
   (r/render [demo/component] app))
