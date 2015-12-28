@@ -1,7 +1,8 @@
 (ns slacky.views.demo
   (:require [reagent.core :as r]
             [ajax.core :refer [POST]]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [slacky.nav :refer [nav!]]))
 
 (def meme-input (r/atom nil))
 (def meme-output (r/atom nil))
@@ -15,7 +16,7 @@
     [:img.img-thumbnail {:src img-src}]
     [:code command]]])
 
-(defn- meme []
+(defn create-meme []
   (when-let [{:keys [url command]}
              (and (not= :error @meme-output)
                   @meme-output)]
@@ -33,7 +34,9 @@
          :params {:text @meme-input}
          :handler #(reset! meme-output {:url %
                                         :command command})
-         :error-handler #(reset! meme-output :error)})))
+         :error-handler #(do (reset! meme-output :error)
+                             ((nav! "/")))})
+    ((nav! "/demo"))))
 
 (defn- meme-form []
   [:div#demo.form-horizontal
@@ -70,8 +73,4 @@
 
    [:div.row
     [:div.col-xs-12
-     [meme-form]]]
-
-   [:div.row
-    [:div.col-xs-12
-     [meme]]]])
+     [meme-form]]]])

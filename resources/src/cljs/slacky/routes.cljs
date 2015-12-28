@@ -48,3 +48,7 @@
 (defroute "/upgrade-slack" {:as params}
   (r/render [home-component [modal-component "Upgrade Slack"
                              [integrations/upgrade-slack (.getAttribute app "data-slack-oauth-url")]]] app))
+
+(defroute "/demo" {:as params}
+  (r/render [home-component [modal-component "Brace yourselves..."
+                             [demo/create-meme]]] app))
