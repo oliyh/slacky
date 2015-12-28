@@ -19,7 +19,6 @@
                  [cheshire "5.4.0"]
                  [org.clojure/core.memoize "0.5.8"]
 
-
                  ;; web
                  [hiccup "1.0.5"]
                  [enlive "1.1.6"]

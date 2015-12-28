@@ -34,7 +34,8 @@
              :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
 
      [:p
-      [:a {:href "#/upgrade-slack"}
+      [:a {:href "/upgrade-slack"
+           :on-click (nav/nav! "/upgrade-slack")}
        "Already installed Slacky the old way?"]]]]
 
    [:div.row

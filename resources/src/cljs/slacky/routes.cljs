@@ -27,7 +27,7 @@
       [integrations/component (.getAttribute app "data-slack-oauth-url")]]]]])
 
 (defn- modal-component [title content]
-  (let [hide-modal #(nav/nav! "/")]
+  (let [hide-modal (nav/nav! "/")]
     [:div
      [:div.slacky-modal-background
       [:div.slacky-modal-cover]]
@@ -50,9 +50,3 @@
 (defroute "/upgrade-slack" {:as params}
   (r/render [modal-component "Upgrade Slack"
              [integrations/upgrade-slack (.getAttribute app "data-slack-oauth-url")]] app))
-
-(nav/nav!
- (let [current-path (nav/current-path)]
-   (println "cuerent path is" current-path)
-   (nav/nav! current-path))
- )
