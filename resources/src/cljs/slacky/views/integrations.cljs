@@ -59,7 +59,7 @@
        "Already installed Slacky the old way?"]]]]
 
    [:div.row
-    [:div.col-xs-6
+    [:div.col-xs-12.col-md-6
      [:div.leader
       [:a#chrome {:href "#chrome"
                   :on-click #(do (event! "chrome-install")
@@ -70,7 +70,7 @@
               :alt "Chrome"}]
        [:p "Click here to add to Chrome"]]]]
 
-    [:div.col-xs-6
+    [:div.col-xs-12.col-md-6
      [:div.leader
       [:a#firefox {:href "https://addons.mozilla.org/en-US/firefox/addon/slacky/"
                    :target "_blank"
