@@ -4,7 +4,8 @@
             [secretary.core :as secretary :refer-macros [defroute]]
             [slacky.nav :as nav]
             [slacky.views.demo :as demo]
-            [slacky.views.integrations :as integrations])
+            [slacky.views.integrations :as integrations]
+            [slacky.views.footer :as footer])
   (:import [goog.history Html5History EventType]))
 
 (def app (js/document.getElementById "app"))
@@ -25,7 +26,11 @@
 
     [:div.row
      [:div.col-xs-10.col-xs-offset-1
-      [integrations/component (.getAttribute app "data-slack-oauth-url")]]]]])
+      [integrations/component (.getAttribute app "data-slack-oauth-url")]]]
+
+    [:div.row
+     [:div.col-xs-10.col-xs-offset-1
+      [footer/component]]]]])
 
 (defn- modal-component [title content]
   (let [hide-modal (nav/nav! "/")]
@@ -65,3 +70,7 @@
   ;; todo use params to generate the meme
   (r/render [home-component [modal-component "Brace yourselves..."
                              [demo/create-meme]]] app))
+
+(defroute "/privacy" {:as params}
+  (r/render [home-component [modal-component "Privacy"
+                             [footer/privacy]]] app))

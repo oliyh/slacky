@@ -44,24 +44,7 @@
                   :data-canonical-src "https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"}]]
 
           [:div#app.container.avgrund-parent
-           {:data-slack-oauth-url slack-oauth-url}
-
-           [:div.header
-            [:h1 "Slacky"]
-            [:h4 "Memes as a Service"]]
-
-           [:div.row
-            [:div.col-xs-10.col-xs-offset-1
-
-             [:div#footer.col-xs-12
-              [:h4 "Help"]
-              [:small "Contact "
-               [:a {:href "https://twitter.com/oliyh"
-                    :target "_blank"} "@oliyh"]
-               " on Twitter"]
-              [:h4 "Privacy"]
-              [:small "Slacky stores a randomly generated token to identify your account, allowing
-you to take advantage of various features."]]]]]
+           {:data-slack-oauth-url slack-oauth-url}]
 
           (include-js ;;"https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
                       ;;"js/bootstrap.min.js"
