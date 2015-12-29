@@ -45,16 +45,24 @@
   (GET "/api/meme/patterns"
       {:response-format :json
        :keywords? true
-       :handler #(reset! meme-patterns %)}))
+       :handler #(reset! meme-patterns
+                         (map
+                          (fn [p]
+                            (assoc p :pattern-tokens
+                                   (-> (:pattern p)
+                                       (string/replace #"\[([^\[]*)\]" "(.+)")
+                                       (string/split " "))))
+                          %))}))
 
 (def meme-typeahead
   (with-meta
-    (fn []
+    (fn [focused?]
       [:div.tt-menu {:style {:position "absolute"
                              :top "100%"
                              :left 0
                              :margin 0
-                             :z-index 100}}
+                             :z-index 100
+                             :display (if @focused? "block" "none")}}
        [:div
         (map (fn [{:keys [pattern template]}]
                [:div.typeahead-result.tt-suggestion.tt-selectable
@@ -63,32 +71,51 @@
                 [:span pattern]
                 (when template
                   [:div.hidden-xs
-                   [:img {:src template}]])]) @meme-patterns)]])
+                   [:img {:src template}]])])
+
+             (if (string/blank? @meme-input)
+               @meme-patterns
+               (let [query (some-> @meme-input string/trim (string/split " "))]
+                 (filter
+                  #(let [pattern (take (count query) (:pattern-tokens %))]
+                     (loop [q query
+                            p pattern]
+                       (if (or (empty? q) (empty? p))
+                         true
+
+                         (if (or (re-find (re-pattern (first p)) (first q))
+                                 (re-find (re-pattern (first q)) (first p)))
+                           (recur (rest q) (rest p))
+                           false))))
+                  @meme-patterns))))]])
     {:component-did-mount fetch-meme-patterns}))
 
 (defn- meme-form []
-  [:div#demo.form-horizontal
-   [:div.col-xs-12.col-md-11
-    [:div.form-group.form-group-lg
-     [:div
-      {:class (classes "input-group"
-                       (when (= :error @meme-output) "has-error"))}
-      [:div.input-group-addon "/meme"]
-      [:span
-       [:input#demo-text.form-control {:type "text"
-                                       :value @meme-input
-                                       :on-change #(reset! meme-input (-> % .-target .-value))
-                                       :on-key-down #(case (.-which %)
-                                                       13 (generate-meme)
-                                                       27 (reset! meme-input nil)
-                                                       nil)
-                                       :placeholder "search term or url | upper text | lower text"}]
-       [meme-typeahead]]]]]
-   [:div.col-xs-12.col-md-1
-    [:div.form-group.form-group-lg
-     [:button.btn.btn-success.btn-lg
-      {:on-click generate-meme}
-      "Try!"]]]])
+  (let [focused? (r/atom true)]
+    [:div#demo.form-horizontal
+     [:div.col-xs-12.col-md-11
+      [:div.form-group.form-group-lg
+       [:div
+        {:class (classes "input-group"
+                         (when (= :error @meme-output) "has-error"))}
+        [:div.input-group-addon "/meme"]
+        [:span
+         [:input#demo-text.form-control {:type "text"
+                                         :value @meme-input
+                                         :on-change #(reset! meme-input (-> % .-target .-value))
+                                         :on-key-down #(case (.-which %)
+                                                         13 (generate-meme)
+                                                         27 (reset! meme-input nil)
+                                                         nil)
+                                         ;;:on-focus #(reset! focused? true)
+                                         ;;:on-blur #(reset! focused? false)
+                                         :placeholder "search term or url | upper text | lower text"}]
+         [meme-typeahead focused?]]]]]
+     [:div.col-xs-12.col-md-1
+      [:div.form-group.form-group-lg
+       [:button.btn.btn-success.btn-lg
+        {:on-click generate-meme}
+        "Try!"]]]]))
 
 (defn component []
   [:div.jumbotron
