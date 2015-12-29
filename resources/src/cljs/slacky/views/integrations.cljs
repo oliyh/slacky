@@ -1,5 +1,6 @@
 (ns slacky.views.integrations
-  (:require [slacky.nav :as nav]))
+  (:require [slacky.nav :as nav]
+            [slacky.analytics :refer [event!]]))
 
 (defn- slack-success []
   [:div
@@ -27,6 +28,8 @@
    [:h3 "2. Authenticate the app"]
    [:p "Press "
     [:a {:href slack-oauth-url
+         :on-click #(do (event! "slack-upgrade")
+                        (event! "slack-install"))
          :target "_blank"}
      [:img {:alt "Add to Slack"
             :height 40
@@ -37,14 +40,14 @@
 (defn component [slack-oauth-url]
   [:div.jumbotron
    [:div
-    [:a {:name "slack"}]
     [:div.leader
      [:div#memes-in-slack
       [:span.h1 "Memes in"]
       [:img {:src "/images/slack-logo.png"
              :alt "Slack"}]]
-     [:a#slack-install {:href slack-oauth-url
-                        :target "_blank"}
+     [:a#slack {:href slack-oauth-url
+                :target "_blank"
+                :on-click #(event! "slack-install")}
       [:img {:alt "Add to Slack"
              :height 80
              :width 278
@@ -57,18 +60,21 @@
 
    [:div.row
     [:div.col-xs-6
-     [:a {:name "chrome"}]
      [:div.leader
-      [:a#chrome-install {:href "#chrome"}
+      [:a#chrome {:href "#chrome"
+                  :on-click #(do (event! "chrome-install")
+                                 (when (and js/window.chrome.webstore (not js/window.chrome.app.isInstalled))
+                                   (.install js/window.chrome.webstore js/undefined js/undefined (fn [error result-code]
+                                                                                                   (js/console.log "Failure installing Chrome extension: " result-code " - " error)))))}
        [:img {:src "/images/chrome-logo.png"
               :alt "Chrome"}]
        [:p "Click here to add to Chrome"]]]]
 
     [:div.col-xs-6
-     [:a {:name "firefox"}]
      [:div.leader
-      [:a#firefox-install {:href "https://addons.mozilla.org/en-US/firefox/addon/slacky/"
-                           :target "_blank"}
+      [:a#firefox {:href "https://addons.mozilla.org/en-US/firefox/addon/slacky/"
+                   :target "_blank"
+                   :on-click #(event! "firefox-install")}
        [:img {:src "/images/firefox-logo.png"
               :alt "Firefox"}]
        [:p "Click here to add to Firefox"]]]]]])
