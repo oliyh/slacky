@@ -45,9 +45,21 @@
 (defroute "/" {:as params}
   (r/render [home-component] app))
 
-(defroute "/upgrade-slack" {:as params}
+(defroute "/slack/upgrade" {:as params}
   (r/render [home-component [modal-component "Upgrade Slack"
-                             [integrations/upgrade-slack (.getAttribute app "data-slack-oauth-url")]]] app))
+                             [integrations/slack-upgrade (.getAttribute app "data-slack-oauth-url")]]] app))
+
+(defroute "/slack/success" {:as params}
+  (r/render [home-component [modal-component "Success!"
+                             [integrations/slack-success]]] app))
+
+(defroute "/slack/failure" {:as params}
+  (r/render [home-component [modal-component "Failure!"
+                             [integrations/slack-failure]]] app))
+
+(defroute "/slack/denied" {:as params}
+  (r/render [home-component [modal-component "Denied"
+                             [integrations/slack-denied]]] app))
 
 (defroute "/demo" {:as params}
   ;; todo use params to generate the meme

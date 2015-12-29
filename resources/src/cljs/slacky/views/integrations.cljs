@@ -1,7 +1,24 @@
 (ns slacky.views.integrations
   (:require [slacky.nav :as nav]))
 
-(defn upgrade-slack [slack-oauth-url]
+(defn- slack-success []
+  [:div
+   [:p "Start using in Slack right away by typing "
+    [:code "/meme"]
+    " in any channel"]
+   [:p "Stuck? Type "
+    [:code "/meme :help"]
+    " or try the demos on this page"]])
+
+(defn- slack-failure []
+  [:div
+   [:p "Something went wrong. Contact me at @oliyh on Twitter if you need help!"]])
+
+(defn- slack-denied []
+  [:div
+   [:p "You will have to authorise Slacky to be able to use it in Slack."]])
+
+(defn slack-upgrade [slack-oauth-url]
   [:div
    [:h3 "1. Use Slacky once more"]
    [:p "Type "
@@ -34,8 +51,8 @@
              :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
 
      [:p
-      [:a {:href "/upgrade-slack"
-           :on-click (nav/nav! "/upgrade-slack")}
+      [:a {:href "/slack/upgrade"
+           :on-click (nav/nav! "/slack/upgrade")}
        "Already installed Slacky the old way?"]]]]
 
    [:div.row

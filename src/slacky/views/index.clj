@@ -13,12 +13,6 @@
      "ga('create', '" google-analytics-key "', 'auto');"
      "ga('send', 'pageview');"]))
 
-(defn- example [img-src command]
-  [:div.col-xs-12.col-md-4
-   [:div.example {:data-command command}
-    [:img.img-thumbnail {:src img-src}]
-    [:code command]]])
-
 (defn index [{:keys [google-analytics-key meme-descriptions slack-oauth-url]}]
   (html5 {:lang "en"}
          [:head
@@ -35,11 +29,10 @@
                   :sizes "16x16 32x32 48x48"
                   :type "image/png"}]
 
-          (include-css "css/bootstrap.min.css"
+          (include-css "/css/bootstrap.min.css"
                        "https://fonts.googleapis.com/css?family=Quicksand:300"
-                       "css/avgrund.css"
-                       "css/typeahead.css"
-                       "css/main.css")
+                       "/css/typeahead.css"
+                       "/css/main.css")
           [:link {:rel "chrome-webstore-item"
                   :href "https://chrome.google.com/webstore/detail/nikjbdhcbfledkekdacecmegploaelpe"}]]
          [:body
@@ -70,70 +63,9 @@
               [:small "Slacky stores a randomly generated token to identify your account, allowing
 you to take advantage of various features."]]]]]
 
-          [:div#demo-meme-popup.avgrund-popup
-           [:div
-            [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-             [:h4.modal-title "Brace yourself..."]]
-            [:div.modal-body
-             [:img#demo-meme.center-block {:src ""}]]
-            [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]
-
-          [:div#add-to-slack-success.avgrund-popup
-           [:div
-            [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-             [:h4.modal-title "Success!"]]
-            [:div.modal-body
-             [:p "Start using in Slack right away by typing "
-              [:code "/meme"]
-              " in any channel"]
-             [:p "Stuck? Type "
-              [:code "/meme :help"]
-              " or try the demos on this page"]]
-            [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]
-
-          [:div#add-to-slack-failure.avgrund-popup
-           [:div
-            [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-             [:h4.modal-title "Failure"]]
-            [:div.modal-body
-             [:p "Something went wrong. Contact me at @oliyh on Twitter if you need help!"]]
-            [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]
-
-          [:div#add-to-slack-denied.avgrund-popup
-           [:div
-            [:div.modal-header
-              [:button.close {:type "button"
-                              :onClick "Avgrund.hide();"}
-               [:span {:aria-hidden "true"} "&times;"]]
-             [:h4.modal-title "Denied"]]
-            [:div.modal-body
-             [:p "You will have to authorise Slacky to be able to use it in Slack."]]
-            [:div.modal-footer
-              [:button.btn.btn-default {:type "button"
-                                        :onClick "Avgrund.hide();"}
-               "Close"]]]]
-
           (include-js ;;"https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
                       ;;"js/bootstrap.min.js"
                       ;;"js/typeahead.jquery.js"
-                      "js/avgrund.js"
+                      ;;"js/avgrund.js"
                       "/cljs/main.js")
           (google-analytics google-analytics-key)]))

@@ -142,7 +142,7 @@
   [request]
   (if-let [error (get-in request [:query-params :error])]
     (do (log/error "User denied authentication")
-        (redirect (url-for ::home :query-params {:add-to-slack "denied"})))
+        (redirect (url-for ::home :route-params {:route "slack/denied"})))
     (if-let [api-access (slack/api-access
                          (:slack-client-id request)
                          (:slack-client-secret request)
@@ -150,8 +150,8 @@
       (do (accounts/register-slack-account!
            (:db-connection request)
            api-access)
-          (redirect (url-for ::home :query-params {:add-to-slack "success"})))
-      (redirect (url-for ::home :query-params {:add-to-slack "failure"})))))
+          (redirect (url-for ::home :path-params {:route "slack/success"})))
+      (redirect (url-for ::home :path-params {:route "slack/failure"})))))
 
 ;; usage stats
 
