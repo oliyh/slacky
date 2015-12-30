@@ -35,7 +35,8 @@
   :min-lein-version "2.0.0"
   :target-path "target/%s"
   :resource-paths ["config", "resources", "migrators"]
-  :profiles {:uberjar {:aot :all}
+  :profiles {:uberjar {:aot :all
+                       :prep-tasks ["javac" "compile" ["with-profile" "dev" "cljsbuild" "once" "prod"]]}
              :dev {:source-paths ["dev"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [clj-http-fake "1.0.1"]
