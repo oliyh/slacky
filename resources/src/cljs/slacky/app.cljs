@@ -4,6 +4,4 @@
 
 (enable-console-print!)
 (println "Hello world! Slacky is here! cljs running")
-
-(println (nav/get-token))
 ((nav/nav! (nav/get-token)))
