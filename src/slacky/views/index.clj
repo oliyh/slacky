@@ -43,12 +43,18 @@
                   :alt "Fork me on GitHub"
                   :data-canonical-src "https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"}]]
 
-          [:div#app.container.avgrund-parent
-           {:data-slack-oauth-url slack-oauth-url}]
+          [:div#app.container
+           {:data-slack-oauth-url slack-oauth-url}
+           [:div.header
+            [:h1 "Slacky"]
+            [:h4 "Memes as a Service"]]
+           [:div#loading-notice.jumbotron
+            [:h1 "Slacky is loading..."]
+            [:p [:small "Slacky is a modern website with modern requirements. If you cannot see anything, try upgrading your browser."]]
+            [:p [:small "Stuck? Contact "
+                 [:a {:href "https://twitter.com/oliyh"
+                      :target "_blank"} "@oliyh"]
+                 " for help."]]]]
 
-          (include-js ;;"https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
-                      ;;"js/bootstrap.min.js"
-                      ;;"js/typeahead.jquery.js"
-                      ;;"js/avgrund.js"
-                      "/cljs/main.js")
+          (include-js "/cljs/main.js")
           (google-analytics google-analytics-key)]))

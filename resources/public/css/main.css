@@ -113,7 +113,6 @@ button.close {
     }
 }
 
-
 #memes-in-slack span {
     vertical-align: middle;
 }
@@ -192,4 +191,15 @@ button.close {
     margin-bottom: 1em;
     padding-bottom: 1em;
     padding-top: 1em;
+}
+
+#loading-notice {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%) scale(1);
+    -moz-transform: translate(-50%, -50%) scale(1);
+    -ms-transform: translate(-50%, -50%) scale(1);
+    -o-transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1);
 }

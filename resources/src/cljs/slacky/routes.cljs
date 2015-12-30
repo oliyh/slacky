@@ -47,9 +47,6 @@
         :on-click hide-modal}
        "Close"]]]))
 
-(defroute "/" {:as params}
-  (r/render [home-component] app))
-
 (defroute "/slack/upgrade" {:as params}
   (r/render [home-component [modal-component "Upgrade Slack"
                              [integrations/slack-upgrade (.getAttribute app "data-slack-oauth-url")]]] app))
@@ -74,3 +71,9 @@
 (defroute "/privacy" {:as params}
   (r/render [home-component [modal-component "Privacy"
                              [footer/privacy]]] app))
+
+(defroute "/" {:as params}
+  (r/render [home-component] app))
+
+(defroute "/*" {:as params}
+  (r/render [home-component] app))
