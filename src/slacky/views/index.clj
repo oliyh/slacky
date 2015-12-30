@@ -13,7 +13,7 @@
      "ga('create', '" google-analytics-key "', 'auto');"
      "ga('send', 'pageview');"]))
 
-(defn index [{:keys [google-analytics-key meme-descriptions slack-oauth-url]}]
+(defn index [{:keys [google-analytics-key slack-oauth-url]}]
   (html5 {:lang "en"}
          [:head
           [:meta {:charset "utf-8"}]

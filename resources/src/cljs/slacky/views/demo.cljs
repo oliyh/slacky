@@ -2,7 +2,8 @@
   (:require [reagent.core :as r]
             [ajax.core :refer [POST GET]]
             [clojure.string :as string]
-            [slacky.nav :refer [nav!]]))
+            [slacky.nav :refer [nav!]]
+            [slacky.analytics :refer [event!]]))
 
 (def meme-input (r/atom nil))
 (def meme-output (r/atom nil))
@@ -29,6 +30,7 @@
 
 (defn- generate-meme []
   ;; todo navigate to /demo/pai mei/pai mei/approves or something and let the handler do the POST
+  (event! "demo")
   (let [command @meme-input]
     (reset! meme-output {:url "/images/loading.gif"
                          :command command})

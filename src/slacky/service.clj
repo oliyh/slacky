@@ -180,7 +180,6 @@
   (handler ::home-handler
            (fn [{:keys [google-analytics-key slack-client-id]}]
              (-> (response (index/index {:google-analytics-key google-analytics-key
-                                         :meme-descriptions (meme/describe-meme-patterns)
                                          :slack-oauth-url (format "https://slack.com/oauth/authorize?scope=incoming-webhook,commands&client_id=%s"
                                                                   slack-client-id)}))
                  (content-type "text/html")))))
