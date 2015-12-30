@@ -56,66 +56,75 @@
 
 (def meme-typeahead
   (with-meta
-    (fn [focused?]
-      [:div.tt-menu {:style {:position "absolute"
-                             :top "100%"
-                             :left 0
-                             :margin 0
-                             :z-index 100
-                             :display (if @focused? "block" "none")}}
-       [:div
-        (map (fn [{:keys [pattern template]}]
-               [:div.typeahead-result.tt-suggestion.tt-selectable
-                {:key (or template "no-template")
-                 :on-click #(reset! meme-input pattern)}
-                [:span pattern]
-                (when template
-                  [:div.hidden-xs
-                   [:img {:src template}]])])
+    (let [typeahead-focused? (r/atom false)]
+      (fn [input-focused?]
+        [:div.tt-menu {:style {:position "absolute"
+                               :top "100%"
+                               :left 0
+                               :margin 0
+                               :z-index 100
+                               :display (if (or @input-focused?
+                                                @typeahead-focused?) "block" "none")}}
+         [:div
+          {:on-mouseDown #(reset! typeahead-focused? true)
+           :on-blur #(reset! typeahead-focused? false)}
+          (map (fn [{:keys [pattern template]}]
+                 [:div.typeahead-result.tt-suggestion.tt-selectable
+                  {:key (or template "no-template")
+                   :on-click #(do (reset! meme-input pattern)
+                                  (reset! typeahead-focused? false)
+                                  (.. js/document (getElementById "demo-text") focus))}
+                  [:span pattern]
+                  (when template
+                    [:div.hidden-xs
+                     [:img {:src template}]])])
 
-             (if (string/blank? @meme-input)
-               @meme-patterns
-               (let [query (some-> @meme-input string/trim (string/split " "))]
-                 (filter
-                  #(let [pattern (take (count query) (:pattern-tokens %))]
-                     (loop [q query
-                            p pattern]
-                       (if (or (empty? q) (empty? p))
-                         true
+               (if (string/blank? @meme-input)
+                 @meme-patterns
+                 (let [query (some-> @meme-input string/trim (string/split " "))]
+                   (filter
+                    #(let [pattern (take (count query) (:pattern-tokens %))]
+                       (loop [q query
+                              p pattern]
+                         (if (or (empty? q) (empty? p))
+                           true
 
-                         (if (or (re-find (re-pattern (first p)) (first q))
-                                 (re-find (re-pattern (first q)) (first p)))
-                           (recur (rest q) (rest p))
-                           false))))
-                  @meme-patterns))))]])
+                           (if (or (re-find (re-pattern (first p)) (first q))
+                                   (re-find (re-pattern (first q)) (first p)))
+                             (recur (rest q) (rest p))
+                             false))))
+                    @meme-patterns))))]]))
     {:component-did-mount fetch-meme-patterns}))
 
 (defn- meme-form []
-  (let [focused? (r/atom true)]
-    [:div#demo.form-horizontal
-     [:div.col-xs-12.col-md-11
-      [:div.form-group.form-group-lg
-       [:div
-        {:class (classes "input-group"
-                         (when (= :error @meme-output) "has-error"))}
-        [:div.input-group-addon "/meme"]
-        [:span
-         [:input#demo-text.form-control {:type "text"
-                                         :value @meme-input
-                                         :on-change #(reset! meme-input (-> % .-target .-value))
-                                         :on-key-down #(case (.-which %)
-                                                         13 (generate-meme)
-                                                         27 (reset! meme-input nil)
-                                                         nil)
-                                         ;;:on-focus #(reset! focused? true)
-                                         ;;:on-blur #(reset! focused? false)
-                                         :placeholder "search term or url | upper text | lower text"}]
-         [meme-typeahead focused?]]]]]
-     [:div.col-xs-12.col-md-1
-      [:div.form-group.form-group-lg
-       [:button.btn.btn-success.btn-lg
-        {:on-click generate-meme}
-        "Try!"]]]]))
+  (let [focused? (r/atom false)]
+    (fn []
+      [:div#demo.form-horizontal
+       [:div.col-xs-12.col-md-11
+        [:div.form-group.form-group-lg
+         [:div
+          {:class (classes "input-group"
+                           (when (= :error @meme-output) "has-error"))}
+          [:div.input-group-addon "/meme"]
+          [:input#demo-text.form-control {:type "text"
+                                          :autoComplete "off"
+                                          :value @meme-input
+                                          :on-focus #(reset! focused? true)
+                                          :on-blur #(reset! focused? false)
+                                          :on-change #(reset! meme-input (-> % .-target .-value))
+                                          :on-key-down #(case (.-which %)
+                                                          13 (generate-meme)
+                                                          27 (reset! meme-input nil)
+                                                          nil)
+
+
+                                          :placeholder "search term or url | upper text | lower text"}]
+          [meme-typeahead focused?]]]]
+       [:div.col-xs-12.col-md-1
+        [:div.form-group.form-group-lg
+         [:button.btn.btn-success.btn-lg
+          {:on-click generate-meme}
+          "Try!"]]]])))
 
 (defn component []
   [:div.jumbotron
