@@ -60,42 +60,42 @@
   (with-meta
     (let [typeahead-focused? (r/atom false)]
       (fn [input-focused?]
-        [:div.tt-menu {:style {:position "absolute"
-                               :top "100%"
-                               :left 0
-                               :margin 0
-                               :z-index 100
-                               :display (if (or @input-focused?
-                                                @typeahead-focused?) "block" "none")}}
-         [:div
-          {:on-mouseDown #(reset! typeahead-focused? true)
-           :on-blur #(reset! typeahead-focused? false)}
-          (map (fn [{:keys [pattern template]}]
-                 [:div.typeahead-result.tt-suggestion.tt-selectable
-                  {:key (or template "no-template")
-                   :on-click #(do (reset! meme-input pattern)
-                                  (reset! typeahead-focused? false)
-                                  (.. js/document (getElementById "demo-text") focus))}
-                  [:span pattern]
-                  (when template
-                    [:div.hidden-xs
-                     [:img {:src template}]])])
+        (when (or @input-focused?
+                  @typeahead-focused?)
+          [:div.tt-menu {:style {:position "absolute"
+                                 :top "100%"
+                                 :left 0
+                                 :margin 0
+                                 :z-index 100}}
+           [:div
+            {:on-mouseDown #(reset! typeahead-focused? true)
+             :on-blur #(reset! typeahead-focused? false)}
+            (map (fn [{:keys [pattern template]}]
+                   [:div.typeahead-result.tt-suggestion.tt-selectable
+                    {:key (or template "no-template")
+                     :on-click #(do (reset! meme-input pattern)
+                                    (reset! typeahead-focused? false)
+                                    (.. js/document (getElementById "demo-text") focus))}
+                    [:span pattern]
+                    (when template
+                      [:div.hidden-xs
+                       [:img {:src template}]])])
 
-               (if (string/blank? @meme-input)
-                 @meme-patterns
-                 (let [query (some-> @meme-input string/trim (string/split " "))]
-                   (filter
-                    #(let [pattern (take (count query) (:pattern-tokens %))]
-                       (loop [q query
-                              p pattern]
-                         (if (or (empty? q) (empty? p))
-                           true
+                 (if (string/blank? @meme-input)
+                   @meme-patterns
+                   (let [query (some-> @meme-input string/trim (string/split " "))]
+                     (filter
+                      #(let [pattern (take (count query) (:pattern-tokens %))]
+                         (loop [q query
+                                p pattern]
+                           (if (or (empty? q) (empty? p))
+                             true
 
-                           (if (or (re-find (re-pattern (first p)) (first q))
-                                   (re-find (re-pattern (first q)) (first p)))
-                             (recur (rest q) (rest p))
-                             false))))
-                    @meme-patterns))))]]))
+                             (if (or (re-find (re-pattern (first p)) (first q))
+                                     (re-find (re-pattern (first q)) (first p)))
+                               (recur (rest q) (rest p))
+                               false))))
+                      @meme-patterns))))]])))
     {:component-did-mount fetch-meme-patterns}))
 
 (defn- meme-form []
