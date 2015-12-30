@@ -142,7 +142,7 @@
   [request]
   (if-let [error (get-in request [:query-params :error])]
     (do (log/error "User denied authentication")
-        (redirect (url-for ::home :route-params {:route "slack/denied"})))
+        (redirect (url-for ::home :path-params {:route "slack/denied"})))
     (if-let [api-access (slack/api-access
                          (:slack-client-id request)
                          (:slack-client-secret request)
