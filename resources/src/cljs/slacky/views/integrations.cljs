@@ -64,10 +64,10 @@
      [:iframe {:src "https://player.vimeo.com/video/138360289?title=0&byline=0&portrait=0"
                :width "100%"
                :height 230
-               :frameborder 0
+               :frameBorder 0
                :webkitallowfullscreen true
                :mozallowfullscreen true
-               :allowfullscreen true}]]]
+               :allowFullScreen true}]]]
 
    [:div.row
     [:div.col-xs-12.col-md-6
@@ -92,7 +92,7 @@
      [:iframe {:src "https://player.vimeo.com/video/147954001?title=0&byline=0&portrait=0"
                :width "100%"
                :height 250
-               :frameborder 0
+               :frameBorder 0
                :webkitallowfullscreen true
                :mozallowfullscreen true
-               :allowfullscreen true}]]]])
+               :allowFullScreen true}]]]])
