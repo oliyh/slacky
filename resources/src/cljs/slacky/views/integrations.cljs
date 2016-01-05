@@ -39,42 +39,60 @@
 
 (defn component [slack-oauth-url]
   [:div.jumbotron
-   [:div
-    [:div.leader
-     [:div#memes-in-slack
-      [:span.h1 "Memes in"]
-      [:img {:src "/images/slack-logo.png"
-             :alt "Slack"}]]
-     [:a#slack {:href slack-oauth-url
-                :target "_blank"
-                :on-click #(event! "slack-install")}
-      [:img {:alt "Add to Slack"
-             :height 80
-             :width 278
-             :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
+   [:div.row
+    [:div.col-xs-12.col-md-6
+     [:div.leader
+      [:div
+       [:span.h1 "Get it!"]]
 
-     [:p
-      [:a {:href "/slack/upgrade"
-           :on-click (nav/nav! "/slack/upgrade")}
-       "Already installed Slacky the old way?"]]]]
+      [:a#slack.integration-button
+       {:href slack-oauth-url
+        :target "_blank"
+        :on-click #(event! "slack-install")}
+       " "
+       [:img {:alt "Add to Slack"
+              :height 80
+              :width 278
+              :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
+
+      [:p
+       [:a {:href "/slack/upgrade"
+            :on-click (nav/nav! "/slack/upgrade")}
+        "Already installed Slacky the old way?"]]]]
+
+    [:div.col-xs-12.col-md-6 {:style {:border "none" :text-align "center"}}
+     [:iframe {:src "https://player.vimeo.com/video/138360289?title=0&byline=0&portrait=0"
+               :width "100%"
+               :height 230
+               :frameborder 0
+               :webkitallowfullscreen true
+               :mozallowfullscreen true
+               :allowfullscreen true}]]]
 
    [:div.row
     [:div.col-xs-12.col-md-6
      [:div.leader
-      [:a#chrome {:href "#chrome"
-                  :on-click #(do (event! "chrome-install")
-                                 (when (and js/window.chrome.webstore (not js/window.chrome.app.isInstalled))
-                                   (.install js/window.chrome.webstore js/undefined js/undefined (fn [error result-code]
-                                                                                                   (js/console.log "Failure installing Chrome extension: " result-code " - " error)))))}
-       [:img {:src "/images/chrome-logo.png"
-              :alt "Chrome"}]
-       [:p "Click here to add to Chrome"]]]]
-
-    [:div.col-xs-12.col-md-6
+      [:a#chrome.integration-button
+       {:href "#chrome"
+        :on-click #(do (event! "chrome-install")
+                       (when (and js/window.chrome.webstore (not js/window.chrome.app.isInstalled))
+                         (.install js/window.chrome.webstore js/undefined js/undefined (fn [error result-code]
+                                                                                         (js/console.log "Failure installing Chrome extension: " result-code " - " error)))))}
+       [:img {:src "/images/add-to-chrome.png"
+              :alt "Chrome"}]]]
      [:div.leader
-      [:a#firefox {:href "https://addons.mozilla.org/en-US/firefox/addon/slacky/"
-                   :target "_blank"
-                   :on-click #(event! "firefox-install")}
-       [:img {:src "/images/firefox-logo.png"
-              :alt "Firefox"}]
-       [:p "Click here to add to Firefox"]]]]]])
+      [:a#firefox.integration-button
+       {:href "https://addons.mozilla.org/en-US/firefox/addon/slacky/"
+        :target "_blank"
+        :on-click #(event! "firefox-install")}
+       [:img {:src "/images/add-to-firefox.png"
+              :alt "Firefox"}]]]]
+
+    [:div.col-xs-12.col-md-6 {:style {:border "none" :text-align "center"}}
+     [:iframe {:src "https://player.vimeo.com/video/147954001?title=0&byline=0&portrait=0"
+               :width "100%"
+               :height 250
+               :frameborder 0
+               :webkitallowfullscreen true
+               :mozallowfullscreen true
+               :allowfullscreen true}]]]])

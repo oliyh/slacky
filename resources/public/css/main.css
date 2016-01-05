@@ -113,20 +113,6 @@ button.close {
     }
 }
 
-#memes-in-slack span {
-    vertical-align: middle;
-}
-
-#memes-in-slack img {
-    height: 78px;
-}
-
-@media screen and (max-width: 768px) {
-    #memes-in-slack img {
-        height: 50px;
-    }
-}
-
 @media screen and (max-width: 620px) {
     #add-to-slack-success, #add-to-slack-failure, #add-to-slack-denied, #demo-meme-popup, #upgrade-slack-modal {
         min-width: auto;
@@ -202,4 +188,8 @@ button.close {
     -ms-transform: translate(-50%, -50%) scale(1);
     -o-transform: translate(-50%, -50%) scale(1);
     transform: translate(-50%, -50%) scale(1);
+}
+
+.integration-button {
+    line-height: 120px;
 }
