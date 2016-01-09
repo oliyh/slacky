@@ -56,9 +56,9 @@
               :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
 
       [:p
-       [:a {:href "/slack/upgrade"
-            :on-click (nav/nav! "/slack/upgrade")}
-        "Already installed Slacky the old way?"]]]]
+       [:small [:a {:href "/slack/upgrade"
+                    :on-click (nav/nav! "/slack/upgrade")}
+                "Already installed Slacky the old way?"]]]]]
 
     [:div.col-xs-12.col-md-6 {:style {:border "none" :text-align "center"}}
      [:iframe {:src "https://player.vimeo.com/video/138360289?title=0&byline=0&portrait=0"
