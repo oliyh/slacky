@@ -1,5 +1,5 @@
 (ns slacky.analytics)
 
 (defn event! [event-name]
-  (when js/ga
+  (when (exists? js/ga)
     (js/ga "send" "event" event-name)))
