@@ -12,8 +12,9 @@
 
 (defn- home-component [& [modal]]
   [:div
-   (when modal [:div.slacky-modal-cover])
-   (when modal modal)
+   [:div.slacky-modal-cover
+    (when-not modal {:style {:display "none"}})]
+   (if modal modal [:div {:style {:display "none"}}])
    [:div
     {:class (when modal "slacky-modal-blur")}
     [:div.header
