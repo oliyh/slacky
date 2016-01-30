@@ -21,7 +21,7 @@
                           ;; do not block thread that starts web server
                           ::bootstrap/join? false
                           ;; reload routes on every request
-                          ::bootstrap/routes (deref #'service/routes)
+                          ::bootstrap/routes #(deref #'service/routes)
                           ;; all origins are allowed in dev mode
                           ::bootstrap/allowed-origins (constantly true)})
                  angel/satisfy
