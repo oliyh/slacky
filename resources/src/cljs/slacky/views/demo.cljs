@@ -128,7 +128,7 @@
           {:on-click generate-meme}
           "Try!"]]]])))
 
-(defn component []
+(defn component [app-name]
   [:div.jumbotron
    [:a {:name "demo"}]
    [:div.leader
@@ -136,7 +136,9 @@
 
    [:div.row
     [example "/images/pai-mei-approves.png" "pai mei | pai mei | approves"]
-    [example "/images/slacky-wins.png" "https://goo.gl/h9eUDM | slacky | wins"]
+    (if (= "ZOMG" app-name)
+      [example "/images/zomg-win.png" "https://goo.gl/h9eUDM | zomg | win"]
+      [example "/images/slacky-wins.png" "https://goo.gl/h9eUDM | slacky | wins"])
     [example "/images/all-the-memes.png" "create all the memes!"]]
 
    [:div.row

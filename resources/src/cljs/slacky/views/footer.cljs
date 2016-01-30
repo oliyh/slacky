@@ -3,13 +3,13 @@
 
 (defn- privacy []
   [:div
-   [:p "Slacky stores a randomly generated token to identify your account, allowing
+   [:p "We store a randomly generated token to identify your account, allowing
 you to take advantage of various features."]
-   [:p "Slacky uses a third-party service, "
+   [:p "We use a third-party service, "
     [:a {:href "http://memecaptain.com"
          :target "_blank"}
      "memecaptain.com"]
-    ", to generate your memes, so anything you send to Slacky may end up there."]
+    ", to generate your memes, so anything you send to us may end up there."]
    [:p "Users of the Slack integration will have any interaction transmitted via Slack's servers."]])
 
 (defn component []
@@ -29,4 +29,4 @@ you to take advantage of various features."]
                  :on-click (nav! "/privacy")}
              "Privacy policy"]]]
 
-   [:p [:small "Slacky is not created by, affiliated with, or supported by either Slack Technologies, Inc., Google or Mozilla"]]])
+   [:p [:small "We are not created by, affiliated with, or supported by either Slack Technologies, Inc., Google or Mozilla"]]])

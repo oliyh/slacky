@@ -17,11 +17,11 @@
 
 (defn- slack-denied []
   [:div
-   [:p "You will have to authorise Slacky to be able to use it in Slack."]])
+   [:p "You will have to authorise this service to be able to use it in Slack."]])
 
 (defn slack-upgrade [slack-oauth-url]
   [:div
-   [:h3 "1. Use Slacky once more"]
+   [:h3 "1. Use once more"]
    [:p "Type "
     [:code "/meme :help"]
     " in any channel in Slack. This will prepare your account to be upgraded."]
@@ -58,7 +58,7 @@
       [:p
        [:small [:a {:href "/slack/upgrade"
                     :on-click (nav/nav! "/slack/upgrade")}
-                "Already installed Slacky the old way?"]]]]]
+                "Already installed on Slack the old way?"]]]]]
 
     [:div.col-xs-12.col-md-6 {:style {:border "none" :text-align "center"}}
      [:iframe {:src "https://player.vimeo.com/video/138360289?title=0&byline=0&portrait=0"

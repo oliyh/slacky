@@ -178,10 +178,13 @@
 
 (def home
   (handler ::home-handler
-           (fn [{:keys [google-analytics-key slack-client-id]}]
+           (fn [{:keys [google-analytics-key slack-client-id server-name]}]
              (-> (response (index/index {:google-analytics-key google-analytics-key
                                          :slack-oauth-url (format "https://slack.com/oauth/authorize?scope=incoming-webhook,commands&client_id=%s"
-                                                                  slack-client-id)}))
+                                                                  slack-client-id)
+                                         :app-name (if (= "zomg.oliy.co.uk" server-name)
+                                                     "ZOMG"
+                                                     "Slacky")}))
                  (content-type "text/html")))))
 
 ;; routes

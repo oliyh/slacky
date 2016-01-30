@@ -13,7 +13,7 @@
      "ga('create', '" google-analytics-key "', 'auto');"
      "ga('send', 'pageview');"]))
 
-(defn index [{:keys [google-analytics-key slack-oauth-url]}]
+(defn index [{:keys [google-analytics-key slack-oauth-url app-name]}]
   (html5 {:lang "en"}
          [:head
           [:meta {:charset "utf-8"}]
@@ -22,7 +22,7 @@
           [:meta {:name "viewport"
                   :content "width=device-width, initial-scale=1"}]
 
-          [:title "Slacky"]
+          [:title app-name]
           [:link {:id "favicon"
                   :rel "shortcut icon"
                   :href "/images/slacky-64.png"
@@ -44,13 +44,15 @@
                   :data-canonical-src "https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"}]]
 
           [:div#app.container
-           {:data-slack-oauth-url slack-oauth-url}
+           {:data-slack-oauth-url slack-oauth-url
+            :data-app-name app-name}
            [:div.header
-            [:h1 "Slacky"]
+            [:h1 app-name]
             [:h4 "Memes as a Service"]]
            [:div#loading-notice.jumbotron
-            [:h1 "Slacky is loading..."]
-            [:p [:small "Slacky is a modern website with modern requirements. If you cannot see anything, try upgrading your browser."]]
+            [:h1 (format "%s is loading..." app-name)]
+            [:p [:small (format "%s is a modern website with modern requirements. If you cannot see anything, try upgrading your browser."
+                                app-name)]]
             [:p [:small "Stuck? Contact "
                  [:a {:href "https://twitter.com/oliyh"
                       :target "_blank"} "@oliyh"]
