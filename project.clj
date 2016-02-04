@@ -4,7 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [frankiesardo/pedestal-swagger "0.4.3"]
+                 [pedestal-api "0.1.0-SNAPSHOT"]
                  [io.pedestal/pedestal.service "0.4.0"]
                  [io.pedestal/pedestal.jetty "0.4.0"]
                  [angel-interceptor "0.2.0"]
@@ -76,9 +76,4 @@
                                    :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
                    :plugins [[lein-cljsbuild "1.1.2"]
                              [lein-figwheel "0.5.0-2"]]}}
-  :figwheel {:server-port 8083
-             :nrepl-port 7888
-             :nrepl-middleware ["cider.nrepl/cider-middleware"
-                                "cemerick.piggieback/wrap-cljs-repl"]}
-  :uberjar-name "slacky-standalone.jar"
-)
+  :uberjar-name "slacky-standalone.jar")
