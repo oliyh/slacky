@@ -54,7 +54,10 @@
        "what if i told you [lower]\n"
        "[upper] how do they work?\n"
        "[upper] all the [lower]\n"
-       "[upper] [upper] everywhere\n\n"
+       "[upper] [upper] everywhere\n"
+       "good news everyone [lower]\n"
+       "the [upper] is too damn high\n"
+       "[upper] why not zoidberg?\n\n"
 
        "Create a template to use in memes:\n"
        "/meme :template [name of template] https://cats.com/cat.jpg"))
