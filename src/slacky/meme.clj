@@ -77,6 +77,18 @@
    {:pattern #"^(?i)(?<upper>.+),? (?:\1) everywhere"
     :template :yDcY5w
     :parser (fn [_ text-upper] [text-upper (str text-upper " everywhere")])}
+  
+   {:pattern #"^(?i)good news,? everyone[.:;,]? (?<lower>.+)"
+    :template :7SthVg
+    :parser (fn [_ text-lower] ["good news, everyone" text-lower])}
+  
+   {:pattern #"^(?i)the (?<upper>.+) is too damn high"
+    :template :RCkv6Q
+    :parser (fn [_ text-upper] ["the " text-upper "is too damn high"])}  
+
+   {:pattern #"^(?i)(?<upper>.+) why not zoidberg\??"
+    :template :kzsGfQ
+    :parser (fn [_ text-upper] [text-upper "why not zoidberg?"])}
    ])
 
 
