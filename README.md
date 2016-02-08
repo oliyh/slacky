@@ -30,9 +30,12 @@ Some pre-defined memes are also provided, documentation will follow shortly:
 
 `/meme create all the memes!`
 
-#Development
+## Build
+[![Circle CI](https://circleci.com/gh/oliyh/slacky.svg?style=svg)](https://circleci.com/gh/oliyh/slacky)
 
-## ClojureScript
+## Development
+
+### ClojureScript
 
 Sources files are in `resources/src/cljs`.
 
