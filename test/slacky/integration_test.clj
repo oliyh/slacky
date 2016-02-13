@@ -5,10 +5,11 @@
             [clojure.test :refer :all]
             [conjure.core :as cj]
             [slacky
+             [accounts :as accounts]
              [memecaptain :as memecaptain]
-             [fixture :refer [with-web-api with-database with-fake-internet]]
+             [fixture :refer [with-web-api with-database with-fake-internet *db*]]
              [service :as service]
-             [settings :refer [web-port]]
+             [settings :refer [web-port slack-client-id slack-client-secret]]
              [bing :as bing]
              [slack :as slack]])
   (:import [java.util UUID]))
@@ -59,6 +60,15 @@
        "Create a template to use in memes:\n"
        "/meme :template [name of template] https://cats.com/cat.jpg"))
 
+(deftest can-register-with-slack-oauth
+  (testing "can successfully register slack app"
+    (with-fake-internet {:slack-oauth-response {:team-id "slack-team-id"}}
+      (http/get (slacky-url "/api/oauth/slack") {:query-params {:code "slack-code"}})
+
+      (cj/verify-called-once-with-args slack/api-access (slack-client-id) (slack-client-secret) "slack-code")
+
+      (testing "account exists"
+        (is (:id (accounts/lookup-slack-account *db* "slack-team-id")))))))
 
 (deftest can-integrate-with-slack
   (let [token (clojure.string/replace (str (UUID/randomUUID)) "-" "")

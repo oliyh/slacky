@@ -29,20 +29,28 @@
 
 
 
-(defmacro with-fake-internet [{:keys [template-id meme-url search-result]
+(defmacro with-fake-internet [{:keys [template-id meme-url search-result slack-oauth-response]
                                :or {template-id "b7k3me"
                                     meme-url (str memecaptain/memecaptain-url "/gend_images/a1jB3q.jpg")
-                                    search-result "http://images.com/cat.jpg"}}
+                                    search-result "http://images.com/cat.jpg"
+                                    slack-oauth-response {:team-name "Team Name"
+                                                          :team-id "team id"
+                                                          :access-token "access-token"
+                                                          :webhook-url "webhook-url"
+                                                          :webhook-channel "webhook-channel"
+                                                          :webhook-config-url "webhook-config-url"}}}
                               & body]
   `(let [slack-channel# (a/chan)]
      (cj/stubbing [memecaptain/create-template ~template-id
                    memecaptain/create-instance ~meme-url
                    bing/image-search ~search-result
                    slack/send-message (fn [& args#]
-                                        (a/put! slack-channel# args#))]
+                                        (a/put! slack-channel# args#))
+                   slack/api-access ~slack-oauth-response]
 
                   (let [~'template-id ~template-id
                         ~'meme-url ~meme-url
                         ~'search-result ~search-result
-                        ~'slack-channel slack-channel#]
+                        ~'slack-channel slack-channel#
+                        ~'slack-oauth-response ~slack-oauth-response]
                     ~@body))))
