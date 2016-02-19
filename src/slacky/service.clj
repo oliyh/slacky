@@ -232,7 +232,9 @@
                            :url "https://github.com/oliyh/slacky"}
             :version "2.0"}
      :tags [{:name "meme"
-             :description "All the memes!"}]}
+             :description "All the memes!"}
+            {:name "image"
+             :description "Image search"}]}
     [[["/api" ^:interceptors [api/error-responses
                               (api/negotiate-response)
                               (api/body-params)
