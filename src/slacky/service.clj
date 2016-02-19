@@ -15,6 +15,7 @@
             [schema.core :as s]
             [slacky
              [accounts :as accounts]
+             [bing :as bing]
              [meme :as meme]
              [slack :as slack]
              [settings :as settings]]
@@ -65,6 +66,27 @@
 
                   :else
                   (response "Sorry, the command was not recognised, try '/meme :help' for help")))))))
+
+(def slack-image
+  (api/annotate
+   {:summary "Responds asynchonously to an image request from Slack"
+    :parameters {:form-params slack/SlackRequest}
+    :responses {:200 {:body s/Str}}}
+   (handler ::slack-image
+            (fn [{:keys [form-params]}]
+              (let [text (:text form-params)
+                    slack-responder (slack/build-responder (:response_url form-params) form-params)]
+
+                (cond
+                  (re-matches #"(?i):help$" text) (response "Type a search term e.g. \"pai mei\" or search for an animated image by typing \":anim pai mei\".")
+
+                  :else
+                  (do
+                    (divert-to-slack slack-responder (let [response-chan (a/chan)]
+                                                       (a/thread
+                                                         (a/>!! response-chan [:image (bing/image-search text)]))
+                                                       response-chan))
+                    (response "Your image is on its way"))))))))
 
 (def rest-meme
   (api/annotate
@@ -222,7 +244,9 @@
 
        ["/slack" ^:interceptors [(angel/provides authenticate-slack-request :account)]
         ["/meme" ^:interceptors [(api/doc {:tags ["meme"]})]
-         {:post slack-meme}]]
+         {:post slack-meme}]
+        ["/image" ^:interceptors [(api/doc {:tags ["image"]})]
+         {:post slack-image}]]
 
        ["/oauth/slack"
         {:get slack-oauth}]

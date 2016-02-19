@@ -42,6 +42,15 @@
      :title (format "%s added a meme template called '%s'" user-name name)
      :image_url image-url}]})
 
+(defmethod ->message :image [_ user-name search-term image-url]
+  {:attachments
+   [{:fallback (str user-name ": " search-term)
+     :pretext nil
+     :color "#D00000"
+     :title user-name
+     :text (str search-term "\n" image-url)
+     :image_url image-url}]})
+
 (defmethod ->message :default [_ _ _ string-message]
   string-message)
 
