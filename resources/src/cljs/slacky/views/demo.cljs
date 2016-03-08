@@ -15,7 +15,7 @@
 (defn- example [img-src command]
   [:div.col-xs-12.col-md-4
    [:div.example {:on-click #(reset! meme-input command)}
-    [:img.img-thumbnail {:src img-src}]
+    [:img.img-thumbnail.clickable {:src img-src}]
     [:code command]]])
 
 (defn create-meme []

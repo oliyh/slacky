@@ -27,10 +27,11 @@
     " in any channel in Slack. This will prepare your account to be upgraded."]
    [:h3 "2. Authenticate the app"]
    [:p "Press "
-    [:a {:href slack-oauth-url
-         :on-click #(do (event! "slack-upgrade")
-                        (event! "slack-install"))
-         :target "_blank"}
+    [:a.integration-button.clickable
+     {:href slack-oauth-url
+      :on-click #(do (event! "slack-upgrade")
+                     (event! "slack-install"))
+      :target "_blank"}
      [:img {:alt "Add to Slack"
             :height 40
             :width 139
@@ -45,7 +46,7 @@
       [:div
        [:span.h1 "Get it!"]]
 
-      [:a#slack.integration-button
+      [:a#slack.integration-button.clickable
        {:href slack-oauth-url
         :target "_blank"
         :on-click #(event! "slack-install")}
@@ -72,7 +73,7 @@
    [:div.row
     [:div.col-xs-12.col-md-6
      [:div.leader
-      [:a#chrome.integration-button
+      [:a#chrome.integration-button.clickable
        {:href "#chrome"
         :on-click #(do (event! "chrome-install")
                        (when (and js/window.chrome.webstore (not js/window.chrome.app.isInstalled))
@@ -81,7 +82,7 @@
        [:img {:src "/images/add-to-chrome.png"
               :alt "Chrome"}]]]
      [:div.leader
-      [:a#firefox.integration-button
+      [:a#firefox.integration-button.clickable
        {:href "https://addons.mozilla.org/en-US/firefox/addon/slacky/"
         :target "_blank"
         :on-click #(event! "firefox-install")}
