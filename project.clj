@@ -10,14 +10,14 @@
                  [io.pedestal/pedestal.jetty "0.4.1"]
                  [angel-interceptor "0.2.0"]
 
-                 [ch.qos.logback/logback-classic "1.1.2" :exclusions [org.slf4j/slf4j-api]]
-                 [org.slf4j/jul-to-slf4j "1.7.7"]
-                 [org.slf4j/jcl-over-slf4j "1.7.7"]
-                 [org.slf4j/log4j-over-slf4j "1.7.7"]
+                 [ch.qos.logback/logback-classic "1.1.6" :exclusions [org.slf4j/slf4j-api]]
+                 [org.slf4j/jul-to-slf4j "1.7.18"]
+                 [org.slf4j/jcl-over-slf4j "1.7.18"]
+                 [org.slf4j/log4j-over-slf4j "1.7.18"]
 
                  [org.clojure/tools.logging "0.3.1"]
-                 [clj-http "1.1.2"]
-                 [cheshire "5.4.0"]
+                 [clj-http "2.1.0"]
+                 [cheshire "5.5.0"]
                  [org.clojure/core.memoize "0.5.8"]
 
                  ;; web
@@ -25,13 +25,13 @@
                  [enlive "1.1.6"]
 
                  ;; persistence
-                 [org.clojure/java.jdbc "0.3.5"]
-                 [org.postgresql/postgresql "9.4-1201-jdbc41"]
-                 [com.h2database/h2 "1.4.189"]
-                 [com.mchange/c3p0 "0.9.5.1"]
-                 [joplin.core "0.2.12"]
-                 [joplin.jdbc "0.2.12"]
-                 [honeysql "0.6.1"]]
+                 [org.clojure/java.jdbc "0.4.2"]
+                 [org.postgresql/postgresql "9.4.1208"]
+                 [com.h2database/h2 "1.4.191"]
+                 [com.mchange/c3p0 "0.9.5.2"]
+                 [joplin.core "0.3.6"]
+                 [joplin.jdbc "0.3.6"]
+                 [honeysql "0.6.3"]]
   :main ^:skip-aot slacky.server
   :min-lein-version "2.0.0"
   :target-path "target/%s"
@@ -59,20 +59,20 @@
                        :prep-tasks ["javac" "compile" ["with-profile" "dev" "cljsbuild" "once" "prod"]]}
              :dev {:source-paths ["dev"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
-                                  [clj-http-fake "1.0.1"]
-                                  [org.clojars.runa/conjure "2.1.3"]
+                                  [clj-http-fake "1.0.2"]
+                                  [org.clojars.runa/conjure "2.2.0"]
 
                                   ;; cljs
-                                  [org.clojure/clojurescript "1.7.189"]
-                                  [figwheel-sidecar "0.5.0-1"]
+                                  [org.clojure/clojurescript "1.7.228"]
+                                  [figwheel-sidecar "0.5.0-6"]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/tools.nrepl "0.2.12"]
-                                  [org.clojure/tools.reader "0.10.0-alpha3"]
-                                  [org.clojure/tools.trace "0.7.6"]
+                                  [org.clojure/tools.reader "0.10.0"]
+                                  [org.clojure/tools.trace "0.7.9"]
 
                                   [secretary "1.2.3"]
                                   [reagent "0.6.0-alpha"]
-                                  [cljs-ajax "0.5.2"]]
+                                  [cljs-ajax "0.5.3"]]
                    :repl-options {:init-ns user
                                    :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
                    :plugins [[lein-cljsbuild "1.1.2"]
