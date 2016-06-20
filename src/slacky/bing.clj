@@ -28,6 +28,7 @@
                          (:body resp))]
       (->> (html/select (html/html-snippet body) [:div.item :a.thumb])
            not-empty
+           (take 5)
            rand-nth
            :attrs
            :href))))
