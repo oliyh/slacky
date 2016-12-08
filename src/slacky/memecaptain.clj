@@ -43,7 +43,8 @@
                               :headers {:Content-Type "application/json"
                                         :Accept "application/json"}
                               :follow-redirects false
-                              :body (json/encode {:url (.trim image-url)})})]
+                              :body (json/encode {:private true
+                                                  :url (.trim image-url)})})]
 
          (if-let [polling-url (and (= 202 (:status resp))
                                    (not-empty (get-in resp [:headers "location"])))]
@@ -62,7 +63,8 @@
                          :headers {:Content-Type "application/json"
                                    :Accept "application/json"}
                          :follow-redirects false
-                         :body (json/encode {:src_image_id template-id
+                         :body (json/encode {:private true
+                                             :src_image_id template-id
                                              :captions_attributes
                                              [{:text text-upper
                                                :top_left_x_pct 0.05
