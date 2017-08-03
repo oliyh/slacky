@@ -19,7 +19,8 @@
    (req :user_name)    s/Str
    (req :command)      s/Str
    (req :text)         s/Str
-   (req :response_url) s/Str})
+   (req :response_url) s/Str
+   s/Keyword           s/Str})
 
 (def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
 
