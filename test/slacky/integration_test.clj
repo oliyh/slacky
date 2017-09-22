@@ -61,7 +61,10 @@
        "[upper] why not zoidberg?\n\n"
 
        "Create a template to use in memes:\n"
-       "/meme :template [name of template] https://cats.com/cat.jpg"))
+       "/meme :template [name of template] https://cats.com/cat.jpg\n\n"
+
+       "Delete a template\n"
+       "/meme :delete-template [name of template]"))
 
 (deftest can-register-with-slack-oauth
   (testing "can successfully register slack app"

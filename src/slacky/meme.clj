@@ -203,6 +203,9 @@
                 [""
                  "Create a template to use in memes:"
                  "/meme :template [name of template] https://cats.com/cat.jpg"]
+                [""
+                 "Delete a template"
+                 "/meme :delete-template [name of template]"]
                 (when-let [templates (and account-id
                                           (not-empty (templates/list db account-id)))]
                   (cons "\nCustom templates:" (map :name templates))))))
