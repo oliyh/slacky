@@ -13,7 +13,7 @@
 (defn- poll-for-result [polling-url]
   (log/debug "Polling" polling-url)
   (loop [attempts 0]
-    (let [resp (http/get polling-url {:connection-manager connection-pool :follow-redirects false})
+    (let [resp (http/get polling-url {:connection-manager connection-pool :redirect-strategy :none})
           status (:status resp)]
 
       (cond
@@ -42,7 +42,7 @@
                              {:connection-manager connection-pool
                               :headers {:Content-Type "application/json"
                                         :Accept "application/json"}
-                              :follow-redirects false
+                              :redirect-strategy :none
                               :body (json/encode {:private true
                                                   :url (.trim image-url)})})]
 
@@ -62,7 +62,7 @@
                         {:connection-manager connection-pool
                          :headers {:Content-Type "application/json"
                                    :Accept "application/json"}
-                         :follow-redirects false
+                         :redirect-strategy :none
                          :body (json/encode {:private true
                                              :src_image_id template-id
                                              :captions_attributes
