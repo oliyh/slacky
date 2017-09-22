@@ -7,19 +7,19 @@
     (sql/with-db-transaction [db db]
       (sql/db-do-commands
        db
-       (sql/create-table-ddl :slack_app_authentication
-                             [:id "bigserial primary key"]
-                             [:account_id "integer not null references accounts(id)"]
-                             [:team_name "varchar(128)"]
-                             [:team_id "varchar(128)"]
-                             [:access_token "varchar(128)"]
-                             [:webhook_url "varchar(128)"]
-                             [:webhook_channel "varchar(128)"]
-                             [:webhook_config_url "varchar(128)"])
-       "CREATE UNIQUE INDEX slack_app_authentication_team_id_idx ON slack_app_authentication(team_id);"))))
+       [(sql/create-table-ddl :slack_app_authentication
+                              [[:id "bigserial primary key"]
+                               [:account_id "integer not null references accounts(id)"]
+                               [:team_name "varchar(128)"]
+                               [:team_id "varchar(128)"]
+                               [:access_token "varchar(128)"]
+                               [:webhook_url "varchar(128)"]
+                               [:webhook_channel "varchar(128)"]
+                               [:webhook_config_url "varchar(128)"]])
+        "CREATE UNIQUE INDEX slack_app_authentication_team_id_idx ON slack_app_authentication(team_id);"]))))
 
 (defn down [db]
   (sql/with-db-transaction [db db]
     (sql/db-do-commands
      db
-     "DROP TABLE IF EXISTS slack_app_authentication")))
+     ["DROP TABLE IF EXISTS slack_app_authentication"])))
