@@ -6,7 +6,7 @@
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.http.route :as route]
             [io.pedestal.http.route.definition :refer [defroutes]]
-            [io.pedestal.impl.interceptor :refer [terminate]]
+            [io.pedestal.interceptor.chain :refer [terminate]]
             [io.pedestal.interceptor.helpers :refer [before handler after]]
             [io.pedestal.interceptor :as interceptor]
             [pedestal-api.core :as api]
@@ -285,7 +285,9 @@
    ::bootstrap/router :linear-search
    ::bootstrap/resource-path "/public"
    ::bootstrap/type :jetty
-   ::bootstrap/port (settings/web-port)})
+   ::bootstrap/port (settings/web-port)
+   ::bootstrap/secure-headers {:content-security-policy-settings
+                               {:script-src "'self' 'unsafe-inline' 'unsafe-eval'"}}})
 
 (defn with-database [service db]
   (update-in service
