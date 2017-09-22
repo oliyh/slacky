@@ -64,6 +64,10 @@
                   (re-matches #"(?i):help$" text)
                   (response (meme/generate-help db account-id))
 
+                  (not (nil? (meme/resolve-template-deletion text)))
+                  (do (divert-to-slack slack-responder (meme/delete-template db account-id text))
+                      (response "Your template is being deleted"))
+
                   :else
                   (response "Sorry, the command was not recognised, try '/meme :help' for help")))))))
 

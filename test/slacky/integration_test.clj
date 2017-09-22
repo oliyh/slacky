@@ -132,16 +132,23 @@
                  (first (a/alts!! [slack-channel (a/timeout 500)]))))
 
           (cj/verify-call-times-for memecaptain/create-template 1)
-          (cj/verify-first-call-args-for memecaptain/create-instance template-id "omg" "so cute")))
+          (cj/verify-first-call-args-for memecaptain/create-instance template-id "omg" "so cute"))
 
-      (testing "templates show up in help message"
-        (with-fake-internet {}
+        (testing "which shows up in help message"
           (is (= (str basic-help-message
                       "\n\n"
                       (string/join "\n"
                                    ["Custom templates:"
                                     "cute cats"]))
-                 (slack-post! ":help"))))))))
+                 (slack-post! ":help"))))
+
+        (testing "and delete it"
+          (is (= "Your template is being deleted"
+                 (slack-post! ":delete-template cute cats")))
+
+          (is (= [response-url "in_channel"
+                  (slack/->message :delete-template user-name nil "cute cats")]
+                 (first (a/alts!! [slack-channel (a/timeout 500)])))))))))
 
 
 (deftest can-integrate-with-browser-plugins

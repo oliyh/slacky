@@ -17,12 +17,18 @@
    :template_id
    keyword))
 
-(defn persist! [db account-id name source-url template-id]
+(defn persist! [db account-id template-name source-url template-id]
   (jdbc/with-db-transaction [db db]
     (jdbc/insert! db :meme_templates {:account_id account-id
-                                      :name (-> name string/trim string/lower-case)
+                                      :name (-> template-name string/trim string/lower-case)
                                       :source_url source-url
                                       :template_id template-id})))
+
+(defn delete! [db account-id template-name]
+  (jdbc/with-db-transaction [db db]
+    (jdbc/delete! db :meme_templates ["account_id = ? AND name = ?"
+                                      account-id
+                                      (-> template-name string/trim string/lower-case)])))
 
 (defn list [db account-id]
   (->>

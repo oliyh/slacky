@@ -42,13 +42,23 @@
   (let [account-id (:id (register-basic-account! *db* "foo"))]
     (cj/stubbing [memecaptain/create-template "some-template-id"]
 
-                 (let [response (add-template *db*
-                                              account-id
-                                              ":template angry martin http://foo.bar/baz.jpg")]
 
-                   (is (= [:add-template "angry martin" "http://foo.bar/baz.jpg"]
-                          (safe-read response))))
-                 (cj/verify-called-once-with-args memecaptain/create-template "http://foo.bar/baz.jpg")
+                 (testing "can create a template"
+                   (let [response (add-template *db*
+                                                account-id
+                                                ":template angry martin http://foo.bar/baz.jpg")]
 
-                 (is (= [:some-template-id "" "bidi!!!111one"]
-                        (resolve-meme-pattern *db* account-id "angry martin | | bidi!!!111one"))))))
+                     (is (= [:add-template "angry martin" "http://foo.bar/baz.jpg"]
+                            (safe-read response))))
+                   (cj/verify-called-once-with-args memecaptain/create-template "http://foo.bar/baz.jpg")
+
+                   (testing "use it"
+                     (is (= [:some-template-id "" "bidi!!!111one"]
+                            (resolve-meme-pattern *db* account-id "angry martin | | bidi!!!111one"))))
+
+                   (testing "and delete it"
+                     (is (= [:delete-template "angry martin"]
+                            (safe-read (delete-template *db* account-id ":delete-template angry martin"))))
+
+                     (is (= ["angry martin" "" "bidi!!!111one"]
+                            (resolve-meme-pattern *db* account-id "angry martin | | bidi!!!111one"))))))))

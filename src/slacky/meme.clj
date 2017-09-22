@@ -134,13 +134,31 @@
 (defn add-template [db account-id text]
   (let [response-chan (a/chan)]
     (a/thread
-      (let [[_ name source-url] (resolve-template-addition text)]
+      (let [[_ template-name source-url] (resolve-template-addition text)]
         (try
           (let [template-id (memecaptain/create-template source-url)]
-            (templates/persist! db account-id name source-url template-id)
-            (a/>!! response-chan [:add-template name source-url]))
+            (templates/persist! db account-id template-name source-url template-id)
+            (a/>!! response-chan [:add-template template-name source-url]))
           (catch Exception e
             (a/>!! response-chan [:error (format "Could not create template from %s" source-url)]))))
+      (a/close! response-chan))
+    response-chan))
+
+(defn resolve-template-deletion [text]
+  (re-matches #"(?i):delete-template (.+)" text))
+
+(resolve-template-deletion ":delete-template foo bar")
+
+(defn delete-template [db account-id text]
+  (let [response-chan (a/chan)]
+    (a/thread
+      (let [[_ template-name] (resolve-template-deletion text)]
+        (try
+          (templates/delete! db account-id template-name)
+          (a/>!! response-chan [:delete-template template-name])
+          (catch Exception e
+            (println e)
+            (a/>!! response-chan [:error (format "Could not delete template \"%s\"" template-name)]))))
       (a/close! response-chan))
     response-chan))
 

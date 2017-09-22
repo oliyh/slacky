@@ -35,13 +35,20 @@
      :text (str meme-command "\n" meme-url)
      :image_url meme-url}]})
 
-(defmethod ->message :add-template [_ user-name _ name image-url]
+(defmethod ->message :add-template [_ user-name _ template-name image-url]
   {:attachments
-   [{:fallback (format "%s added a template called '%s' for %s" user-name name image-url)
+   [{:fallback (format "%s added a meme template called '%s' for %s" user-name template-name image-url)
      :pretext nil
      :color "#D00000"
-     :title (format "%s added a meme template called '%s'" user-name name)
+     :title (format "%s added a meme template called '%s'" user-name template-name)
      :image_url image-url}]})
+
+(defmethod ->message :delete-template [_ user-name _ template-name]
+  {:attachments
+   [{:fallback (format "%s deleted a meme template called '%s'" user-name template-name)
+     :pretext nil
+     :color "#D00000"
+     :title (format "%s deleted a meme template called '%s'" user-name template-name)}]})
 
 (defmethod ->message :image [_ user-name search-term image-url]
   {:attachments
@@ -74,6 +81,7 @@
     (try
       (send-message webhook-url
                     (get {:add-template "in_channel"
+                          :delete-template "in_channel"
                           :meme (if (= "directmessage" channel_name)
                                   "ephemeral"
                                   "in_channel")
