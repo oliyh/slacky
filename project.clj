@@ -56,7 +56,9 @@
                                    :asset-path "/cljs/prod"
                                    :optimizations :advanced}}}}
   :profiles {:uberjar {:aot :all
-                       :prep-tasks ["javac" "compile" ["with-profile" "dev" "cljsbuild" "once" "prod"]]}
+                       :prep-tasks ["javac" "compile"
+                                    ["shell" "./compile-memecaptain.sh"]
+                                    ["with-profile" "dev" "cljsbuild" "once" "prod"]]}
              :dev {:source-paths ["dev"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [clj-http-fake "1.0.3"]
@@ -76,5 +78,6 @@
                    :repl-options {:init-ns user
                                    :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
                    :plugins [[lein-cljsbuild "1.1.2"]
-                             [lein-figwheel "0.5.0-2"]]}}
+                             [lein-figwheel "0.5.0-2"]
+                             [lein-shell "0.5.0"]]}}
   :uberjar-name "slacky-standalone.jar")
