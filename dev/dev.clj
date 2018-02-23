@@ -36,6 +36,11 @@
   (when server/service-instance
     (bootstrap/stop server/service-instance)))
 
+(defn reset []
+  (stop)
+  (refresh)
+  (start))
+
 (defn run-all-tests []
   (stop)
   (refresh)

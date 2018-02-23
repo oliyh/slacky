@@ -14,8 +14,8 @@
 (deftest resolve-meme-pattern-test
   (are [text meme-pattern] (= meme-pattern (resolve-meme text))
 
-    "y u no foos?" [:NryNmg "y u no" "foos?"]
-    "one does not simply photograph the photographer" [:da2i4A "one does not simply" "photograph the photographer"]
+    "y u no foos?" ["https://imgflip.com/s/meme/Y-U-No.jpg" "y u no" "foos?"]
+    "one does not simply photograph the photographer" ["https://imgflip.com/s/meme/One-Does-Not-Simply.jpg" "one does not simply" "photograph the photographer"]
 
     "ceiling cat | ceiling cat | watching you" ["ceiling cat" "ceiling cat" "watching you"]
     "ceiling cat | | watching all the things" ["ceiling cat" "" "watching all the things"]
@@ -32,7 +32,7 @@
 (deftest describe-meme-patterns-test
   (let [descriptions (describe-meme-patterns)]
     (is (= {:pattern "y u no [lower]"
-            :template "http://i.memecaptain.com/src_images/NryNmg.jpg"}
+            :template "https://imgflip.com/s/meme/Y-U-No.jpg"}
            (second descriptions)))))
 
 (defn- safe-read [chan]

@@ -9,6 +9,7 @@
             [io.pedestal.interceptor.chain :refer [terminate]]
             [io.pedestal.interceptor.helpers :refer [before handler after]]
             [io.pedestal.interceptor :as interceptor]
+            [io.pedestal.http.ring-middlewares :as ring-middleware]
             [pedestal-api.core :as api]
             [ring.util.codec :as codec]
             [ring.util.response :refer [response not-found created resource-response content-type status redirect]]
@@ -215,6 +216,9 @@
 
 ;; app-routes
 
+(def meme-image
+  (ring-middleware/file "."))
+
 (def home
   (handler ::home-handler
            (fn [{:keys [google-analytics-key slack-client-id server-name]}]
@@ -270,7 +274,8 @@
        ["/*resource" {:get api/swagger-ui}]]]]))
 
 (defroutes app-routes
-  [[["/*route" {:get home}]]])
+  [[["/memes/:id" {:get meme-image}]
+    ["/*route" {:get home}]]])
 
 (def routes
   (concat api-routes app-routes))

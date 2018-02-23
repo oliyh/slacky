@@ -12,25 +12,23 @@
              [bing :as bing]
              [memecaptain :as memecaptain]
              [slack :as slack]
-             [templates :as templates]]))
+             [templates :as templates]]
+            [slacky.settings :as settings]))
 
 (defn- url? [term]
   (re-matches #"^https?://.*$" term))
 
-(defn- resolve-template-id [term]
+(defn- resolve-template-url [term]
   (log/debug "Resolving template for term" term)
   (cond
-    (keyword? term)
-    (name term)
-
     (string/blank? term)
     nil
 
     (url? term)
-    (memecaptain/create-template term)
+    term
 
     :else
-    (memecaptain/create-template (bing/image-search term))))
+    (bing/image-search term)))
 
 ;; from https://bitbucket.org/atlassianlabs/ac-koa-hipchat-sassy/src/1d0a72839002d9dc9f911825de73d819d7f94f5c/lib/commands/meme.js?at=master
 (def ^:private meme-patterns
@@ -39,55 +37,55 @@
               (mapv string/trim [template-search text-upper text-lower]))}
 
    {:pattern #"^(?i)y u no (?<lower>.+)"
-    :template :NryNmg
+    :template "https://imgflip.com/s/meme/Y-U-No.jpg"
     :parser (fn [_ text-lower] ["y u no" text-lower])}
 
    {:pattern #"^(?i)one does not simply (?<lower>.+)"
-    :template :da2i4A
+    :template "https://imgflip.com/s/meme/One-Does-Not-Simply.jpg"
     :parser (fn [_ text-lower] ["one does not simply" text-lower])}
 
    {:pattern #"^(?i)not sure if (?<upper>.+) or (?<lower>.+)"
-    :template :CsNF8w
+    :template "https://imgflip.com/s/meme/Futurama-Fry.jpg"
     :parser (fn [_ text-upper text-lower] [(str "not sure if " text-upper) (str "or " text-lower)])}
 
    {:pattern #"^(?i)brace yoursel(?:f|ves) (?<lower>.+)"
-    :template :_I74XA
+    :template "https://imgflip.com/s/meme/Brace-Yourselves-X-is-Coming.jpg"
     :parser (fn [_ text-lower] ["brace yourself" text-lower])}
 
    {:pattern #"^(?i)success when (?<upper>.+) then (?<lower>.*)"
-    :template :AbNPRQ
+    :template "https://imgflip.com/s/meme/Success-Kid.jpg"
     :parser (fn [_ text-upper text-lower] [text-upper text-lower])}
 
    {:pattern #"^(?i)cry when (?<upper>.+) then (?<lower>.+)"
-    :template :QZZvlg
+    :template "https://imgflip.com/s/meme/First-World-Problems.jpg"
     :parser (fn [_ text-upper text-lower] [text-upper text-lower])}
 
    {:pattern #"^(?i)what if i told you (?<lower>.+)"
-    :template :fWle1w
+    :template "https://imgflip.com/s/meme/Matrix-Morpheus.jpg"
     :parser (fn [_ text-lower] ["what if i told you" text-lower])}
 
    {:pattern #"^(?i)(?<upper>.+),? how do they work\??"
-    :template :3V6rYA
+    :template "https://i.imgflip.com/18jot2.jpg"
     :parser (fn [_ text-upper] [text-upper "how do they work?"])}
 
    {:pattern #"^(?i)(?<upper>.+) all the (?<lower>.+)"
-    :template :Dv99KQ
+    :template "https://imgflip.com/s/meme/X-All-The-Y.jpg"
     :parser (fn [_ text-upper text-lower] [text-upper (str "all the " text-lower)])}
 
    {:pattern #"^(?i)(?<upper>.+),? (?:\1) everywhere"
-    :template :yDcY5w
+    :template "https://imgflip.com/s/meme/X-Everywhere.jpg"
     :parser (fn [_ text-upper] [text-upper (str text-upper " everywhere")])}
 
    {:pattern #"^(?i)good news,? everyone[.:;,]? (?<lower>.+)"
-    :template :7SthVg
+    :template "https://i.imgflip.com/73sbv.jpg"
     :parser (fn [_ text-lower] ["good news, everyone" text-lower])}
 
    {:pattern #"^(?i)the (?<upper>.+) is too damn high!?"
-    :template :RCkv6Q
+    :template "https://imgflip.com/s/meme/Too-Damn-High.jpg"
     :parser (fn [_ text-upper] [(str "the " text-upper) "is too damn high"])}
 
    {:pattern #"^(?i)(?<upper>.+) why not zoidberg\??"
-    :template :kzsGfQ
+    :template "https://imgflip.com/s/meme/Futurama-Zoidberg.jpg"
     :parser (fn [_ text-upper] [text-upper "why not zoidberg?"])}])
 
 
@@ -113,8 +111,8 @@
   (let [response-chan (a/chan)]
     (a/thread
       (when-let [[template-search text-upper text-lower] (resolve-meme-pattern db account-id text)]
-        (if-let [template-id (resolve-template-id template-search)]
-          (try (let [meme-url (memecaptain/create-instance template-id text-upper text-lower)]
+        (if-let [template-url (resolve-template-url template-search)]
+          (try (let [meme-url (str (settings/server-dns) "/" (memecaptain/create-direct template-url text-upper text-lower))]
                  (log/info "Generated meme" meme-url "from command" text)
                  (a/>!! response-chan [:meme meme-url]))
                (catch Exception e
@@ -187,9 +185,6 @@
    #(cond-> %
       :always
       (update :pattern clean-pattern)
-
-      (:template %)
-      (update :template (fn [t] (str "http://i.memecaptain.com/src_images/" (name t) ".jpg")))
 
       :always
       (dissoc :parser))

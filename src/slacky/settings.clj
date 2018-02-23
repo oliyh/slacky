@@ -26,3 +26,7 @@
 
 (defn slack-client-secret []
   (System/getenv "SLACK_CLIENT_SECRET"))
+
+(defn server-dns []
+  (or (System/getenv "SERVER_DNS")
+      (format "http://localhost:%s" (web-port))))

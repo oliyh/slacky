@@ -6,7 +6,8 @@
              [slack :as slack]
              [bing :as bing]
              [server :as server]
-             [db :refer [create-fresh-db-connection]]]))
+             [db :refer [create-fresh-db-connection]]]
+            [slacky.settings :as settings]))
 
 (def test-database-url "jdbc:h2:./db/test")
 
@@ -29,9 +30,9 @@
 
 
 
-(defmacro with-fake-internet [{:keys [template-id meme-url search-result slack-oauth-response]
+(defmacro with-fake-internet [{:keys [template-id meme-file search-result slack-oauth-response]
                                :or {template-id "b7k3me"
-                                    meme-url (str memecaptain/memecaptain-url "/gend_images/a1jB3q.jpg")
+                                    meme-file "/memes/ab342.jpg"
                                     search-result "http://images.com/cat.jpg"
                                     slack-oauth-response {:team-name "Team Name"
                                                           :team-id "team id"
@@ -40,16 +41,19 @@
                                                           :webhook-channel "webhook-channel"
                                                           :webhook-config-url "webhook-config-url"}}}
                               & body]
-  `(let [slack-channel# (a/chan)]
+  `(let [slack-channel# (a/chan)
+         meme-url# (str (settings/server-dns) "/" ~meme-file)]
      (cj/stubbing [memecaptain/create-template ~template-id
-                   memecaptain/create-instance ~meme-url
+                   memecaptain/create-instance meme-url#
+                   memecaptain/create-direct ~meme-file
                    bing/image-search ~search-result
                    slack/send-message (fn [& args#]
                                         (a/put! slack-channel# args#))
                    slack/api-access ~slack-oauth-response]
 
                   (let [~'template-id ~template-id
-                        ~'meme-url ~meme-url
+                        ~'meme-file ~meme-file
+                        ~'meme-url meme-url#
                         ~'search-result ~search-result
                         ~'slack-channel slack-channel#
                         ~'slack-oauth-response ~slack-oauth-response]
