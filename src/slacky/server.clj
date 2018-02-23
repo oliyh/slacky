@@ -5,7 +5,8 @@
              [db :as db]
              [service :as service]
              [settings :as settings]]
-            [io.pedestal.http :as bootstrap]))
+            [io.pedestal.http :as bootstrap]
+            [slacky.memecaptain :as memecaptain]))
 
 (defonce service-instance nil)
 
@@ -25,6 +26,7 @@
                                       (settings/slack-client-secret))))))))
 
 (defn -main [& args]
+  (memecaptain/init)
   (create-server)
   (bootstrap/start service-instance))
 
