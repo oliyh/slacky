@@ -1,3 +1,5 @@
+mksquashfs -version
+
 curl -L http://enclose.io/rubyc/rubyc-linux-x64.gz | gunzip > rubyc
 chmod +x rubyc
 
