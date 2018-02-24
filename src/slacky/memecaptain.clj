@@ -103,8 +103,8 @@
 (defn create-direct [image-url text-upper text-lower]
   (let [extension (second (re-find #".*\.(\w{3,4})($|\?)" image-url))
         filename (str (UUID/randomUUID) (when extension (str "." extension)))
-        output-file (io/file "./memes/" filename)
-        input-file (io/file "./templates/" filename)]
+        output-file (io/file "memes/" filename)
+        input-file (io/file "templates/" filename)]
     (log/info "Downloading" image-url "to" (.getPath input-file))
     (try
       (let [response (http/get image-url {:as :byte-array})]
