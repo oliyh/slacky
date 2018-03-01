@@ -113,7 +113,7 @@
                 (slack/->message :meme user-name "cats | cute cats | FTW" meme-url)]
                (first (a/alts!! [slack-channel (a/timeout 500)]))))))
 
-    #_(testing "can register a template"
+    (testing "can register a template"
       (with-fake-internet {:template-id "cute-cat-template-id"}
         (is (= "Your template is being registered"
                (slack-post! ":template cute cats http://cats.com/cute.jpg")))
@@ -123,8 +123,6 @@
                                  "cute cats" "http://cats.com/cute.jpg")]
                (first (a/alts!! [slack-channel (a/timeout 500)]))))
 
-        (cj/verify-first-call-args-for memecaptain/create-template "http://cats.com/cute.jpg")
-
         (testing "and can use it in a meme"
           (is (= "Your meme is on its way"
                  (slack-post! "cute cats | omg | so cute")))
@@ -133,7 +131,6 @@
                   (slack/->message :meme user-name "cute cats | omg | so cute" meme-url)]
                  (first (a/alts!! [slack-channel (a/timeout 500)]))))
 
-          (cj/verify-call-times-for memecaptain/create-template 1)
           (cj/verify-first-call-args-for memecaptain/create-direct "http://cats.com/cute.jpg" "omg" "so cute"))
 
         (testing "which shows up in help message"

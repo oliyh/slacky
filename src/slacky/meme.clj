@@ -134,9 +134,8 @@
     (a/thread
       (let [[_ template-name source-url] (resolve-template-addition text)]
         (try
-          (let [template-id (memecaptain/create-template source-url)]
-            (templates/persist! db account-id template-name source-url template-id)
-            (a/>!! response-chan [:add-template template-name source-url]))
+          (templates/persist! db account-id template-name source-url)
+          (a/>!! response-chan [:add-template template-name source-url])
           (catch Exception e
             (a/>!! response-chan [:error (format "Could not create template from %s" source-url)]))))
       (a/close! response-chan))
