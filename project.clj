@@ -3,11 +3,11 @@
   :url "https://github.com/oliyh/slacky"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/core.async "0.3.443"]
-                 [pedestal-api "0.3.1"]
-                 [io.pedestal/pedestal.service "0.5.2"]
-                 [io.pedestal/pedestal.jetty "0.5.2"]
+                 [pedestal-api "0.3.4"]
+                 [io.pedestal/pedestal.service "0.5.7"]
+                 [io.pedestal/pedestal.jetty "0.5.7"]
                  [angel-interceptor "0.3.0"]
 
                  [ch.qos.logback/logback-classic "1.2.3" :exclusions [org.slf4j/slf4j-api]]
@@ -36,7 +36,7 @@
   :min-lein-version "2.0.0"
   :target-path "target/%s"
   :resource-paths ["config", "resources", "migrators"]
-  :cljsbuild {:builds {:dev
+  #_#_:cljsbuild {:builds {:dev
                        {:source-paths ["resources/src/cljs"]
                         :figwheel true
                         :compiler {:output-to "resources/public/cljs/main.js"
@@ -58,26 +58,27 @@
   :profiles {:uberjar {:aot :all
                        :prep-tasks ["javac" "compile"
                                     ["shell" "./compile-memecaptain.sh"]
-                                    ["with-profile" "dev" "cljsbuild" "once" "prod"]]}
+                                    ["with-profile" "dev" "fig:min"]]}
              :dev {:source-paths ["dev"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [clj-http-fake "1.0.3"]
                                   [org.clojars.runa/conjure "2.2.0"]
 
                                   ;; cljs
-                                  [org.clojure/clojurescript "1.9.908"]
-                                  [figwheel-sidecar "0.5.13"]
-                                  [com.cemerick/piggieback "0.2.2"]
+                                  [org.clojure/clojurescript "1.10.597"]
+                                  [binaryage/devtools "1.0.0"]
+                                  [com.bhauman/figwheel-main "0.2.1"]
+                                  [cider/piggieback "0.4.1"]
                                   [org.clojure/tools.nrepl "0.2.13"]
-                                  [org.clojure/tools.reader "1.1.0"]
-                                  [org.clojure/tools.trace "0.7.9"]
 
                                   [secretary "1.2.3"]
                                   [reagent "0.7.0"]
                                   [cljs-ajax "0.7.2"]]
                    :repl-options {:init-ns user
-                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+                                  :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}}
                    :plugins [[lein-cljsbuild "1.1.2"]
                              [lein-figwheel "0.5.0-2"]
                              [lein-shell "0.5.0"]]}}
-  :uberjar-name "slacky-standalone.jar")
+  :uberjar-name "slacky-standalone.jar"
+  :aliases {"fig" ["trampoline" "run" "-m" "figwheel.main"]
+            "fig:min" ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "dist"]})

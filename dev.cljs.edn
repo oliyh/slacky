@@ -1,0 +1,9 @@
+^{:watch-dirs ["resources/src/cljs"]
+  :open-url false
+  :auto-testing true}
+{:main "slacky.app"
+ :output-to "resources/public/cljs/main.js"
+ :preloads [devtools.preload]
+ :external-config {:devtools/config {:features-to-install    [:formatters :hints]
+                                     :fn-symbol              "F"
+                                     :print-config-overrides true}}}
