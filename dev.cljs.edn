@@ -1,8 +1,14 @@
 ^{:watch-dirs ["src/cljs"]
+  :css-dirs ["resources/public/css"]
   :open-url false
   :auto-testing true}
 {:main "slacky.app"
  :output-to "resources/public/cljs/main.js"
+ :output-dir "resources/public/cljs/dev"
+ :asset-path "cljs/dev"
+ :source-map true
+ :optimizations :none
+ :pretty-print true
  :preloads [devtools.preload]
  :external-config {:devtools/config {:features-to-install    [:formatters :hints]
                                      :fn-symbol              "F"

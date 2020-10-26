@@ -24,7 +24,13 @@
              (and (not= :error @meme-output)
                   @meme-output)]
     [:div#meme-output
-     [:img#demo-meme.center-block.img-thumbnail {:src url}]
+     [:img#demo-meme.center-block.img-thumbnail
+      {:src (let [browser-host (.. js/window -location -href)
+                  new-url (.toString (js/URL. (.-pathname (js/URL. url browser-host))
+                                              browser-host))]
+              (when (not= url new-url)
+                (js/console.log "Rewrote" url "to" new-url "..."))
+              new-url)}]
      [:br]
      [:code command]]))
 
