@@ -105,6 +105,8 @@
         filename (str (UUID/randomUUID) (when extension (str "." extension)))
         output-file (io/file "memes/" filename)
         input-file (io/file "templates/" filename)]
+    (io/make-parents input-file)
+    (io/make-parents output-file)
     (log/info "Downloading" image-url "to" (.getPath input-file))
     (try
       (let [response (http/get image-url {:as :byte-array})]

@@ -1,6 +1,5 @@
 (ns slacky.routes
-  (:require [goog.events :as events]
-            [reagent.dom :as r]
+  (:require [reagent.dom :as r]
             [secretary.core :as secretary :refer-macros [defroute]]
             [slacky.nav :as nav]
             [slacky.views.demo :as demo]
