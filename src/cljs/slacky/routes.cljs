@@ -49,12 +49,6 @@
 
 (def app-name (.getAttribute app "data-app-name"))
 
-(defroute "/slack/upgrade" {:as params}
-  (r/render [home-component app-name
-             [modal-component "Upgrade Slack"
-              [integrations/slack-upgrade
-               (.getAttribute app "data-slack-oauth-url")]]] app))
-
 (defroute "/slack/success" {:as params}
   (r/render [home-component app-name
              [modal-component "Success!"

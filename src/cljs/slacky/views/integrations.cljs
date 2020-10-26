@@ -19,25 +19,6 @@
   [:div
    [:p "You will have to authorise this service to be able to use it in Slack."]])
 
-(defn slack-upgrade [slack-oauth-url]
-  [:div
-   [:h3 "1. Use once more"]
-   [:p "Type "
-    [:code "/meme :help"]
-    " in any channel in Slack. This will prepare your account to be upgraded."]
-   [:h3 "2. Authenticate the app"]
-   [:p "Press "
-    [:a.integration-button.clickable
-     {:href slack-oauth-url
-      :on-click #(do (event! "slack-upgrade")
-                     (event! "slack-install"))
-      :target "_blank"}
-     [:img {:alt "Add to Slack"
-            :height 40
-            :width 139
-            :src "https://platform.slack-edge.com/img/add_to_slack.png"
-            :srcSet "https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"}]]]])
-
 (defn component [slack-oauth-url]
   [:div.jumbotron
    [:div.row
@@ -54,20 +35,13 @@
        [:img {:alt "Add to Slack"
               :height 80
               :width 278
-              :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
-
-      [:p
-       [:small [:a {:href "/slack/upgrade"
-                    :on-click (nav/nav! "/slack/upgrade")}
-                "Already installed on Slack the old way?"]]]]]
+              :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]]]
 
     [:div.col-xs-12.col-md-6 {:style {:border "none" :text-align "center"}}
      [:iframe {:src "https://player.vimeo.com/video/138360289?title=0&byline=0&portrait=0"
                :width "100%"
                :height 230
                :frameBorder 0
-               :webkitallowfullscreen true
-               :mozallowfullscreen true
                :allowFullScreen true}]]]
 
    [:div.row
@@ -94,6 +68,4 @@
                :width "100%"
                :height 250
                :frameBorder 0
-               :webkitallowfullscreen true
-               :mozallowfullscreen true
                :allowFullScreen true}]]]])
