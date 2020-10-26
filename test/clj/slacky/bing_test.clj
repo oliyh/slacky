@@ -12,7 +12,7 @@
         :query-params {:q "cats"}}
        {:get (fn [req] {:status 200
                         :headers {}
-                        :body (slurp "test/slacky/bing-image-response.html")})}}
+                        :body (slurp "test/clj/slacky/bing-image-response.html")})}}
 
       (is (= "http://cats.com/cat-image.jpg"
              (image-search "cats")))))
@@ -24,7 +24,7 @@
                        :qft "+filterui:photo-animatedgif"}}
        {:get (fn [req] {:status 200
                         :headers {}
-                        :body (slurp "test/slacky/bing-image-response.html")})}}
+                        :body (slurp "test/clj/slacky/bing-image-response.html")})}}
 
       (is (= "http://cats.com/cat-image.jpg"
              (image-search "cats :anim"))))))
