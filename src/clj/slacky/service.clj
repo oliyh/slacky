@@ -291,6 +291,7 @@
    ::bootstrap/resource-path "/public"
    ::bootstrap/type :jetty
    ::bootstrap/port (settings/web-port)
+   ::bootstrap/host "0.0.0.0" ;; bind to all interfaces
    ::bootstrap/secure-headers {:content-security-policy-settings
                                {:script-src "'self' 'unsafe-inline' 'unsafe-eval'"}}})
 
