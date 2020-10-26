@@ -10,3 +10,9 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
+/impact.ttf
+/memecaptain
+/memes
+/resources/public/cljs
+/resources/memecaptain/memecaptain
+/rubyc
