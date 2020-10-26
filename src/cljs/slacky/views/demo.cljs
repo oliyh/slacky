@@ -24,7 +24,7 @@
              (and (not= :error @meme-output)
                   @meme-output)]
     [:div#meme-output
-     [:img#demo-meme.center-block.img-thumbnail {:src url}]
+     [:img#demo-meme.center-block.img-thumbnail {:src (js/URL. url (.. js/window -location -href))}]
      [:br]
      [:code command]]))
 
