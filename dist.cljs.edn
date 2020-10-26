@@ -1,0 +1,2 @@
+{:main "slacky.app"
+ :output-to "resources/public/cljs/main.js"}

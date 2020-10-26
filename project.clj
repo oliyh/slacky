@@ -38,25 +38,6 @@
   :source-paths ["src/clj"]
   :test-paths ["test/clj"]
   :resource-paths ["config", "resources", "migrators"]
-  #_#_:cljsbuild {:builds {:dev
-                       {:source-paths ["resources/src/cljs"]
-                        :figwheel true
-                        :compiler {:output-to "resources/public/cljs/main.js"
-                                   :output-dir "resources/public/cljs/dev"
-                                   :source-map true
-                                   :main "slacky.app"
-                                   :asset-path "/cljs/dev"
-                                   :optimizations :none
-                                   :pretty-print true}}
-                       :prod
-                       {:source-paths ["resources/src/cljs"]
-                        :jar true
-                        :compiler {:parallel-build true
-                                   :output-to "resources/public/cljs/main.js"
-                                   :output-dir "resources/public/cljs/prod"
-                                   :main "slacky.app"
-                                   :asset-path "/cljs/prod"
-                                   :optimizations :advanced}}}}
   :profiles {:uberjar {:aot :all
                        :prep-tasks ["javac" "compile"
                                     ["shell" "./compile-memecaptain.sh"]
