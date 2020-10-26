@@ -1,7 +1,7 @@
 (ns slacky.views.footer
   (:require [slacky.nav :refer [nav!]]))
 
-(defn- privacy []
+(defn privacy []
   [:div
    [:p "We store a randomly generated token to identify your account, allowing
 you to take advantage of various features."]

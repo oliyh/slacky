@@ -4,6 +4,7 @@
             [clojure.tools.namespace.repl :as repl]
             [io.pedestal.http :as bootstrap]
             [slacky
+             [memecaptain :as memecaptain]
              [service :as service]
              [server :as server]
              [settings :as settings]]))
@@ -24,6 +25,7 @@
                  (bootstrap/dev-interceptors)))
 
 (defn start [& [opts]]
+  (memecaptain/init)
   (server/create-server {:pedestal-opts (merge service opts)})
   (bootstrap/start server/service-instance))
 

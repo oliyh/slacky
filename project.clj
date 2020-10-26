@@ -35,6 +35,8 @@
   :main ^:skip-aot slacky.server
   :min-lein-version "2.0.0"
   :target-path "target/%s"
+  :source-paths ["src/clj"]
+  :test-paths ["test/clj"]
   :resource-paths ["config", "resources", "migrators"]
   #_#_:cljsbuild {:builds {:dev
                        {:source-paths ["resources/src/cljs"]
@@ -59,7 +61,7 @@
                        :prep-tasks ["javac" "compile"
                                     ["shell" "./compile-memecaptain.sh"]
                                     ["with-profile" "dev" "fig:min"]]}
-             :dev {:source-paths ["dev"]
+             :dev {:source-paths ["dev" "src/cljs"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [clj-http-fake "1.0.3"]
                                   [org.clojars.runa/conjure "2.2.0"]
@@ -81,4 +83,5 @@
                              [lein-shell "0.5.0"]]}}
   :uberjar-name "slacky-standalone.jar"
   :aliases {"fig" ["trampoline" "run" "-m" "figwheel.main"]
+            "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
             "fig:min" ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "dist"]})

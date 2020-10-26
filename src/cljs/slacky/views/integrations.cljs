@@ -2,7 +2,7 @@
   (:require [slacky.nav :as nav]
             [slacky.analytics :refer [event!]]))
 
-(defn- slack-success []
+(defn slack-success []
   [:div
    [:p "Start using in Slack right away by typing "
     [:code "/meme"]
@@ -11,11 +11,11 @@
     [:code "/meme :help"]
     " or try the demos on this page"]])
 
-(defn- slack-failure []
+(defn slack-failure []
   [:div
    [:p "Something went wrong. Contact me at @oliyh on Twitter if you need help!"]])
 
-(defn- slack-denied []
+(defn slack-denied []
   [:div
    [:p "You will have to authorise this service to be able to use it in Slack."]])
 

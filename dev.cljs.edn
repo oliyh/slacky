@@ -1,4 +1,4 @@
-^{:watch-dirs ["resources/src/cljs"]
+^{:watch-dirs ["src/cljs"]
   :open-url false
   :auto-testing true}
 {:main "slacky.app"
