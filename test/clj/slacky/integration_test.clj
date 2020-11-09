@@ -2,7 +2,7 @@
   (:require [clj-http.client :as http]
             [clojure.core.async :as a]
             [clojure.string :as string]
-            [clojure.test :refer :all]
+            [clojure.test :refer [deftest testing is use-fixtures]]
             [conjure.core :as cj]
             [slacky
              [accounts :as accounts]
@@ -38,8 +38,7 @@
                (:body response))))
 
       (cj/verify-call-times-for bing/image-search 0)
-      (cj/verify-call-times-for memecaptain/create-template 0)
-      (cj/verify-call-times-for memecaptain/create-instance 0))))
+      (cj/verify-call-times-for memecaptain/create-direct 0))))
 
 
 (def basic-help-message
@@ -158,7 +157,6 @@
                               :form-params {:token (str (UUID/randomUUID))
                                             :text "cats | cute cats | FTW"}}))))
 
-    ;;(cj/verify-called-once-with-args memecaptain/create-template "http://images.com/cat.jpg")
     (cj/verify-called-once-with-args memecaptain/create-direct "http://images.com/cat.jpg" "cute cats" "FTW"))
 
   (testing "400 when bad meme syntax"
@@ -172,5 +170,4 @@
                (:body response))))
 
       (cj/verify-call-times-for bing/image-search 0)
-      (cj/verify-call-times-for memecaptain/create-template 0)
-      (cj/verify-call-times-for memecaptain/create-instance 0))))
+      (cj/verify-call-times-for memecaptain/create-direct 0))))

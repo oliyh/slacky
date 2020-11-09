@@ -43,9 +43,7 @@
                               & body]
   `(let [slack-channel# (a/chan)
          meme-url# (str (settings/server-dns) "/" ~meme-file)]
-     (cj/stubbing [memecaptain/create-template ~template-id
-                   memecaptain/create-instance meme-url#
-                   memecaptain/create-direct ~meme-file
+     (cj/stubbing [memecaptain/create-direct ~meme-file
                    bing/image-search ~search-result
                    slack/send-message (fn [& args#]
                                         (a/put! slack-channel# args#))

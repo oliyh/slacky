@@ -1,13 +1,7 @@
 (ns slacky.meme
-  (:require [cheshire.core :as json]
-            [clj-http
-             [client :as http]
-             [conn-mgr :refer [make-reusable-conn-manager]]]
-            [clojure.core.async :as a]
-            [clojure.java.jdbc :as jdbc]
+  (:require [clojure.core.async :as a]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
-            [honeysql.core :as sql]
             [slacky
              [bing :as bing]
              [memecaptain :as memecaptain]
@@ -143,8 +137,6 @@
 
 (defn resolve-template-deletion [text]
   (re-matches #"(?i):delete-template (.+)" text))
-
-(resolve-template-deletion ":delete-template foo bar")
 
 (defn delete-template [db account-id text]
   (let [response-chan (a/chan)]

@@ -1,36 +1,29 @@
 (ns slacky.memecaptain-test
-  (:require [clj-http.fake :refer :all]
-            [clojure.test :refer :all]
-            [cheshire.core :as json]
-            [slacky
-             [memecaptain :refer :all]]))
+  (:require [slacky.memecaptain :refer [create-direct]]
+            [clojure.java.io :as io]
+            [clj-http.fake :as http-fake]
+            [clojure.java.shell :as sh]
+            [clojure.test :refer [deftest is]])
+  (:import (java.nio.file Files)))
 
-(def memecaptain-template-polling-url (str memecaptain-url "/template-polling"))
-(def memecaptain-meme-polling-url (str memecaptain-url "/meme-polling"))
-(def meme-url (str memecaptain-url "/gend_images/a1jB3q.jpg"))
-(def template-id "b7k3me")
+(deftest can-generate-meme
+  (let [image-url "http://foo.com/meme-image.jpg"
+        image-file (io/file (io/resource "public/images/businesscat.png"))
+        image-contents (Files/readAllBytes (.toPath image-file))
+        meme-file (atom nil)]
+    (http-fake/with-global-fake-routes
+      {image-url
+       {:get (constantly {:status 200 :body image-contents})}}
+      (with-redefs [sh/sh (fn [exe image-file _o output-file _ _font-file _t text-upper _b text-lower]
+                            (is (= "./memecaptain" exe))
+                            (is image-file)
+                            (is (= "slacky" text-upper))
+                            (is (= "test" text-lower))
+                            (reset! meme-file output-file)
+                            (io/copy (io/file image-file) (io/file output-file))
+                            {:exit 0})]
 
-(deftest can-generate-memes
-  (with-global-fake-routes
-    {memecaptain-meme-polling-url
-     {:get (fn [req] {:status 303 :headers {"location" meme-url} :body ""})}
-
-     (str memecaptain-url "/gend_images")
-     {:post (fn [req]
-              (if (= template-id (-> req :body slurp (json/decode keyword) :src_image_id))
-                {:status 202 :headers {"location" memecaptain-meme-polling-url} :body "Follow the header"}
-                {:status 500 :body "Template id is wrong!"}))}}
-
-    (is (= meme-url
-           (create-instance template-id "cute cats" "FTW")))))
-
-(deftest can-generate-templates
-  (with-global-fake-routes
-    {memecaptain-template-polling-url
-     {:get (fn [req] {:status 303 :headers {"location" "operation-complete"} :body ""})}
-
-     (str memecaptain-url "/src_images")
-     {:post (fn [req] {:status 202 :headers {"location" memecaptain-template-polling-url} :body (json/encode {:id template-id})})}}
-
-    (is (= template-id
-           (create-template "cats")))))
+        (let [meme-path (create-direct image-url "slacky" "test")]
+          (is meme-path)
+          (is (= (slurp image-file)
+                 (slurp @meme-file))))))))
