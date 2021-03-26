@@ -7,11 +7,8 @@
            [java.io File]))
 
 (defn init
-  "Copies the memecaptain binary to disk so it can be called"
+  "Copies the font to disk so it can be used and creates the meme directories"
   []
-  (io/copy (io/input-stream (io/resource "memecaptain/memecaptain"))
-           (io/file "memecaptain"))
-  (sh/sh "chmod" "+x" "memecaptain")
   (io/copy (io/input-stream (io/resource "memecaptain/impact.ttf"))
            (io/file "impact.ttf"))
   (.mkdir (io/file "./memes"))
@@ -33,7 +30,7 @@
           (do (io/copy (io/input-stream (:body response)) input-file)
               (log/info "Generating meme" (.getPath output-file))
               (sh/with-sh-dir (io/file ".")
-                (let [result (sh/sh "./memecaptain" (.getAbsolutePath input-file) "-o" (.getAbsolutePath output-file) "-f" "impact.ttf" "-t" text-upper "-b" text-lower)]
+                (let [result (sh/sh "./bin/memecaptain" (.getAbsolutePath input-file) "-o" (.getAbsolutePath output-file) "-f" "impact.ttf" "-t" text-upper "-b" text-lower)]
                   (if (zero? (:exit result))
                     (.getPath output-file)
                     (throw (ex-info "Failed to generate meme"

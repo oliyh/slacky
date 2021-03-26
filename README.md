@@ -10,7 +10,10 @@ Memes-as-a-Service for Slack. Live instance and registration at https://slacky-s
 
 ## Installation
 
-All ready for Heroku deployment.
+All ready for Heroku deployment. Requires the following buildpacks:
+- https://github.com/heroku/heroku-buildpack-apt.git
+- heroku/ruby
+- heroku/clojure
 
 ## Examples
 
@@ -34,6 +37,15 @@ Some pre-defined memes are also provided, documentation will follow shortly:
 [![Circle CI](https://circleci.com/gh/oliyh/slacky.svg?style=svg)](https://circleci.com/gh/oliyh/slacky)
 
 ## Development
+
+### memecaptain gem
+
+You will need:
+- imagemagick
+- [ruby](https://github.com/rbenv/rbenv)
+- [bundler](https://bundler.io/)
+
+Run `./install-memecaptain` to install the memecaptain binstub under `bin/memecaptain`.
 
 ### ClojureScript
 

@@ -15,7 +15,7 @@
       {image-url
        {:get (constantly {:status 200 :body image-contents})}}
       (with-redefs [sh/sh (fn [exe image-file _o output-file _ _font-file _t text-upper _b text-lower]
-                            (is (= "./memecaptain" exe))
+                            (is (= "./bin/memecaptain" exe))
                             (is image-file)
                             (is (= "slacky" text-upper))
                             (is (= "test" text-lower))

@@ -14,5 +14,5 @@ pom.xml.asc
 /memecaptain
 /memes
 /resources/public/cljs
-/resources/memecaptain/memecaptain
-/rubyc
+/.bundle
+/bin

@@ -1,0 +1,23 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    meme_captain (0.3.2)
+      mime-types (~> 3.3.1)
+      rmagick (~> 4.1.2)
+    mime-types (3.3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2021.0225)
+    rmagick (4.1.2)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  meme_captain (= 0.3.2)
+
+RUBY VERSION
+   ruby 2.7.2p137
+
+BUNDLED WITH
+   2.2.15

@@ -40,7 +40,7 @@
   :resource-paths ["config", "resources", "migrators"]
   :profiles {:uberjar {:aot :all
                        :prep-tasks ["javac" "compile"
-                                    ["shell" "./compile-memecaptain.sh"]
+                                    ["shell" "./install-memecaptain.sh"]
                                     ["with-profile" "dev" "fig:min"]]}
              :dev {:source-paths ["dev" "src/cljs"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
