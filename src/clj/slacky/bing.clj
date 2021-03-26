@@ -4,7 +4,8 @@
              [conn-mgr :refer [make-reusable-conn-manager]]]
             [clojure.tools.logging :as log]
             [clojure.string :as string]
-            [net.cgrand.enlive-html :as html]))
+            [net.cgrand.enlive-html :as html]
+            [cheshire.core :as json]))
 
 (def image-search-url "https://www.bing.com/images/search")
 (def connection-pool (make-reusable-conn-manager {:timeout 10 :threads 4 :default-per-route 4}))
@@ -26,9 +27,11 @@
 
     (when-let [body (and (= 200 (:status resp))
                          (:body resp))]
-      (->> (html/select (html/html-snippet body) [:div.item :a.thumb])
-           not-empty
-           (take 5)
-           rand-nth
-           :attrs
-           :href))))
+      (some->> (html/select (html/html-snippet body) [:div.imgpt :a.iusc])
+               not-empty
+               (take 5)
+               rand-nth
+               :attrs
+               :m
+               (#(json/decode % keyword))
+               :murl))))
