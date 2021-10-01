@@ -1,17 +1,17 @@
 (ns slacky.views.index
-  (:require [hiccup.page :refer [html5 include-css include-js]]
-            [cheshire.core :as json]))
+  (:require [hiccup.page :refer [html5 include-css include-js]]))
 
 (defn- google-analytics [google-analytics-key]
   (when google-analytics-key
-    [:script
-     "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){"
-     "(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),"
-     "m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)"
-     "})(window,document,'script','//www.google-analytics.com/analytics.js','ga');"
-
-     "ga('create', '" google-analytics-key "', 'auto');"
-     "ga('send', 'pageview');"]))
+    [:div
+     [:script {:async true
+               :src (format "https://www.googletagmanager.com/gtag/js?id=%s" google-analytics-key)}]
+     [:script
+      (format "window.dataLayer = window.dataLayer || [];
+                     function gtag(){dataLayer.push(arguments);}
+                     gtag('js', new Date());
+                     gtag('config', '%s');"
+              google-analytics-key)]]))
 
 (defn index [{:keys [google-analytics-key slack-oauth-url app-name]}]
   (html5 {:lang "en"}
