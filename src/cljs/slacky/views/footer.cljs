@@ -5,11 +5,6 @@
   [:div
    [:p "We store a randomly generated token to identify your account, allowing
 you to take advantage of various features."]
-   [:p "We use a third-party service, "
-    [:a {:href "http://memecaptain.com"
-         :target "_blank"}
-     "memecaptain.com"]
-    ", to generate your memes, so anything you send to us may end up there."]
    [:p "Users of the Slack integration will have any interaction transmitted via Slack's servers."]])
 
 (defn component []
