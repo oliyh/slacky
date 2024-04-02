@@ -2,7 +2,7 @@
 
 ![](resources/public/images/slacky-logo.png?raw=true)
 
-Memes-as-a-Service for Slack. Live instance and registration at https://slacky-server.herokuapp.com.
+Memes-as-a-Service for Slack. Live instance and registration at https://zomg.oliy.co.uk.
 
 ## Demo
 
@@ -10,10 +10,7 @@ Memes-as-a-Service for Slack. Live instance and registration at https://slacky-s
 
 ## Installation
 
-All ready for Heroku deployment. Requires the following buildpacks:
-- https://github.com/heroku/heroku-buildpack-apt.git
-- heroku/ruby
-- heroku/clojure
+Build using nixpacks
 
 ## Examples
 
