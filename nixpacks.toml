@@ -1,0 +1,4 @@
+providers = ["...", "ruby", "clojure"]
+
+[phases.setup]
+nixPkgs = ["...", "imagemagick"]
