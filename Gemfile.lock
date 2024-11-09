@@ -6,7 +6,7 @@ GEM
       rmagick (~> 4.1.2)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0225)
+    mime-types-data (3.2024.1105)
     rmagick (4.1.2)
 
 PLATFORMS
@@ -17,7 +17,7 @@ DEPENDENCIES
   meme_captain (= 0.3.2)
 
 RUBY VERSION
-   ruby 2.7.2p137
+   ruby 3.3.6p108
 
 BUNDLED WITH
-   2.2.15
+   2.5.22
