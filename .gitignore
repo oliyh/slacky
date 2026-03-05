@@ -11,8 +11,6 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /impact.ttf
-/memecaptain
 /memes
+/templates
 /resources/public/cljs
-/.bundle
-/bin

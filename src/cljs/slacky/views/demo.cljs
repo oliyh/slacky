@@ -144,7 +144,7 @@
     [example "/images/pai-mei-approves.png" "pai mei | pai mei | approves"]
     (if (= "ZOMG" app-name)
       [example "/images/zomg-win.png" "https://goo.gl/h9eUDM | zomg | win"]
-      [example "/images/slacky-wins.png" "https://goo.gl/h9eUDM | slacky | wins"])
+      [example "/images/slacky-wins.png" "https://zomg.oliy.co.uk/images/businesscat.png | slacky | wins"])
     [example "/images/all-the-memes.png" "create all the memes!"]]
 
    [:div.row
