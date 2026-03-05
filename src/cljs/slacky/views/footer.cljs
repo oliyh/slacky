@@ -10,9 +10,6 @@ you to take advantage of various features."]
 (defn component []
   [:div#footer
    [:p [:small "Contact "
-        [:a {:href "https://twitter.com/oliyh"
-             :target "_blank"} "@oliyh"]
-        " or "
         [:a {:href "mailto://slackydev@gmail.com"}
          "slackydev@gmail.com"]]
     " / "

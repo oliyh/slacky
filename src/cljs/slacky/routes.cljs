@@ -9,7 +9,7 @@
 
 (def app (js/document.getElementById "app"))
 
-(defn- home-component [app-name & [modal]]
+(defn- home-component [& [modal]]
   [:div
    [:div.slacky-modal-cover
     (when-not modal {:style {:display "none"}})]
@@ -17,12 +17,12 @@
    [:div
     {:class (when modal "slacky-modal-blur")}
     [:div.header
-     [:h1 app-name]
+     [:h1 "ZOMG"]
      [:h4 "Memes as a Service"]]
 
     [:div.row
      [:div.col-xs-10.col-xs-offset-1
-      [demo/component app-name]]]
+      [demo/component]]]
 
     [:div.row
      [:div.col-xs-10.col-xs-offset-1
@@ -47,36 +47,34 @@
         :on-click hide-modal}
        "Close"]]]))
 
-(def app-name (.getAttribute app "data-app-name"))
-
 (defroute "/slack/success" {:as params}
-  (r/render [home-component app-name
+  (r/render [home-component
              [modal-component "Success!"
               [integrations/slack-success]]] app))
 
 (defroute "/slack/failure" {:as params}
-  (r/render [home-component app-name
+  (r/render [home-component
              [modal-component "Failure!"
               [integrations/slack-failure]]] app))
 
 (defroute "/slack/denied" {:as params}
-  (r/render [home-component app-name
+  (r/render [home-component
              [modal-component "Denied"
               [integrations/slack-denied]]] app))
 
 (defroute "/demo" {:as params}
   ;; todo use params to generate the meme
-  (r/render [home-component app-name
+  (r/render [home-component
              [modal-component "Brace yourselves..."
               [demo/create-meme]]] app))
 
 (defroute "/privacy" {:as params}
-  (r/render [home-component app-name
+  (r/render [home-component
              [modal-component "Privacy"
               [footer/privacy]]] app))
 
 (defroute "/" {:as params}
-  (r/render [home-component app-name] app))
+  (r/render [home-component] app))
 
 (defroute "/*" {:as params}
-  (r/render [home-component app-name] app))
+  (r/render [home-component] app))
